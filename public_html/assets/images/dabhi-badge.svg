@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none">
+  <!-- Circular Badge in the style of Probable Refrence LOGO.jpeg -->
+  <defs>
+    <!-- Outer shadow -->
+    <filter id="badgeShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+    <!-- 3D text extrusion shadow -->
+    <filter id="textShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="4" dy="5" stdDeviation="0" flood-color="#1a110f" flood-opacity="1"/>
+    </filter>
+  </defs>
+
+  <!-- Main Circle Background -->
+  <circle cx="150" cy="150" r="140" fill="#df3e38" filter="url(#badgeShadow)" stroke="#b52621" stroke-width="4"/>
+
+  <!-- Concentric Inner Rings -->
+  <circle cx="150" cy="150" r="122" fill="none" stroke="#e85d58" stroke-width="8" opacity="0.8"/>
+  <circle cx="150" cy="150" r="102" fill="none" stroke="#d6312b" stroke-width="12" opacity="0.6"/>
+  <circle cx="150" cy="150" r="80" fill="none" stroke="#ba2620" stroke-width="10" opacity="0.5"/>
+
+  <!-- DABHI CHIKKI Text (Yellow with black stroke and 3D shadow) -->
+  <g filter="url(#textShadow)">
+    <text x="150" y="128" 
+          text-anchor="middle" 
+          font-family="'Arial Black', 'Impact', 'Montserrat', sans-serif" 
+          font-weight="900" 
+          font-size="44" 
+          letter-spacing="0.02em" 
+          fill="#ffdf40" 
+          stroke="#1a110f" 
+          stroke-width="5" 
+          paint-order="stroke fill">DABHI</text>
+    <text x="150" y="174" 
+          text-anchor="middle" 
+          font-family="'Arial Black', 'Impact', 'Montserrat', sans-serif" 
+          font-weight="900" 
+          font-size="44" 
+          letter-spacing="0.02em" 
+          fill="#ffdf40" 
+          stroke="#1a110f" 
+          stroke-width="5" 
+          paint-order="stroke fill">CHIKKI</text>
+  </g>
+
+  <!-- Subtitle: SINCE 2009 -->
+  <g transform="translate(150, 212)">
+    <rect x="-85" y="-12" width="170" height="24" rx="12" fill="#1a110f" opacity="0.15"/>
+    <text x="0" y="5" 
+          text-anchor="middle" 
+          font-family="'Poppins', 'Inter', sans-serif" 
+          font-weight="800" 
+          font-size="13" 
+          letter-spacing="0.22em" 
+          fill="#ffffff">SINCE 2009</text>
+  </g>
+</svg>

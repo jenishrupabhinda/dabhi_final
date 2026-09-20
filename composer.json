@@ -1,0 +1,14 @@
+{
+    "name": "dabhichikki/ecommerce",
+    "description": "Dabhi Chikki e-commerce platform (plain PHP, MySQL)",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "phpmailer/phpmailer": "^6.9",
+        "mpdf/mpdf": "^8.2",
+        "picqer/php-barcode-generator": "^3.1"
+    },
+    "autoload": {
+        "classmap": ["vendor-extra/"]
+    }
+}

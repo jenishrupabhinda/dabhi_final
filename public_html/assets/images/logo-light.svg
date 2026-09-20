@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 80" fill="none">
+  <!-- Dabhi Chikki Horizontal Wordmark (Light variant for dark backgrounds) -->
+  <defs>
+    <filter id="shadowLight" x="-5%" y="-5%" width="115%" height="120%">
+      <feDropShadow dx="3" dy="4" stdDeviation="0" flood-color="#1e0a0a" flood-opacity="1"/>
+    </filter>
+  </defs>
+
+  <!-- Group with 3D drop shadow -->
+  <g filter="url(#shadowLight)">
+    <!-- Main "DABHI CHIKKI" retro lettering -->
+    <text x="10" y="44" 
+          font-family="'Recoleta Alt', 'Recoleta', 'Poppins', Georgia, serif" 
+          font-weight="900" 
+          font-size="44" 
+          letter-spacing="-0.03em" 
+          fill="#f6dc94" 
+          stroke="#1e0a0a" 
+          stroke-width="3.5" 
+          paint-order="stroke fill">Dabhi Chikki</text>
+  </g>
+
+  <!-- Subtitle: SINCE 2009 -->
+  <g transform="translate(14, 68)">
+    <text x="0" y="0" 
+          font-family="'Cascadia Code', ui-monospace, monospace" 
+          font-weight="700" 
+          font-size="11.5" 
+          letter-spacing="0.26em" 
+          fill="#f6e9de" 
+          opacity="0.9">HANDCRAFTED · SINCE 2009</text>
+  </g>
+</svg>

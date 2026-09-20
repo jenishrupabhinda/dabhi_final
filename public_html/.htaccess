@@ -1,0 +1,30 @@
+# Dabhi Chikki — public_html security & housekeeping
+# (Apache/LiteSpeed — standard on cPanel shared hosting)
+
+# Never show directory listings
+Options -Indexes
+
+# Hide dotfiles (.env, .git, etc.) if any ever end up here by mistake
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Basic security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Force HTTPS (uncomment once SSL is installed on the domain)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Pretty URLs, e.g. /shop/gud-chikki instead of /shop.php?category=gud-chikki
+# (left off by default for phase 1 — enable once shop.php reads the segments)
+# RewriteEngine On
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^shop/([a-z0-9-]+)/?$ shop.php?category=$1 [L,QSA]
+# RewriteRule ^product/([a-z0-9-]+)/?$ product.php?slug=$1 [L,QSA]

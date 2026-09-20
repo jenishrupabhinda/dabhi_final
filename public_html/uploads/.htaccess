@@ -1,0 +1,6 @@
+# Uploaded files are data, never code. Belt-and-braces against a
+# malicious upload ever being executed by the server.
+<FilesMatch "\.(php|php\d|phtml|pl|py|cgi|asp|aspx|sh|exe)$">
+    Require all denied
+</FilesMatch>
+Options -Indexes -ExecCGI

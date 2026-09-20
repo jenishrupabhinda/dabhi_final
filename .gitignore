@@ -1,0 +1,8 @@
+# Environment / temporary
+*.log
+storage/logs/*
+storage/php-error.log
+.DS_Store
+Thumbs.db
+node_modules/
+vendor/
