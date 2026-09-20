@@ -187,12 +187,19 @@ CREATE TABLE `menu_items` (
 - Loads active items via `Menu::getTree('primary', true)`.
 - **Desktop Navigation**:
   - Items with `children` render the rich `.nav-dropdown-card` on hover.
-  - The dropdown card has a **solid `#2b0e0d` background** with high-contrast text, icons, and badges.
+  - The dropdown card has a **solid 100% opaque `#2b0e0d` background** with high-contrast text, icons, and badges to prevent page content bleed-through.
   - Items without children render direct `.header-nav-link` anchors.
-- **Mobile Drawer**:
-  - Renders all active top-level menu items.
-  - Automatically renders active submenus in their own section with subtitles, icons, and badges.
-  - When an admin hides/toggles a menu item or submenu in `admin/menus.php`, it is immediately hidden on both desktop and mobile.
+- **Mobile Navigation Drawer (GimiGimi Style)**:
+  - **Custom Wavy Noodle Hamburger Icon**: Extracted SVG path featuring 3 rhythmic wavy strokes representing noodles/chikki strips.
+  - **Identical 1-to-1 Sync with Desktop**: Driven by the exact same `$navTree` structure from `Menu::getTree('primary', true)`. Any menu or submenu added, edited, deleted, or hidden in admin immediately updates both desktop and mobile in lockstep.
+  - **Horizontal Multi-Level Sliding Panels**:
+    - `#mobile-panel-main`: Root level view showing all primary items with emoji icons and bold uppercase titles (`HOME`, `OUR CHIKKI`, `OUR CRAFT`, `REELS`, `REVIEWS`, `TRACK ORDER`). Items with submenus have a rust-red chevron `>`.
+    - `#submenu-panel-{id}`: Level 1 sliding panel with `< {PARENT_TITLE}` back button and `View All →` link.
+    - Card items inside submenus display icon badge, bold title, subtitle description, badge pill (`BESTSELLER`, `SIGNATURE`, etc.), and circular arrow button `→`.
+    - Smooth horizontal cubic-bezier slide transitions (`transform: translateX(0)` vs `translateX(-35%)` / `translateX(100%)`).
+  - **Drawer Header & Footer**:
+    - Header: Deep roasted jaggery burgundy `#541f21` with brand logo and white `✕` close button.
+    - Footer: Warm card background `#f7f1e6` featuring `LOGIN / SIGN UP` (or `MY ACCOUNT`) button, WhatsApp chat button (`#25D366`), and 5-star trust badge (`100% Pure Jaggery • Handcrafted Since 2009`).
 
 ---
 
