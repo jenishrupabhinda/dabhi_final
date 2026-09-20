@@ -528,4 +528,47 @@ CREATE TABLE gst_settings (
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- =====================================================================
+-- SECTION 8: NAVIGATION MENUS & STOREFRONT SUBMENUS
+-- =====================================================================
+
+CREATE TABLE IF NOT EXISTS `menu_items` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `parent_id` INT UNSIGNED NULL DEFAULT NULL,
+    `title` VARCHAR(100) NOT NULL,
+    `url` VARCHAR(255) NOT NULL,
+    `icon` VARCHAR(50) NULL DEFAULT NULL,
+    `badge` VARCHAR(50) NULL DEFAULT NULL,
+    `badge_color` VARCHAR(50) NULL DEFAULT NULL,
+    `subtitle` VARCHAR(150) NULL DEFAULT NULL,
+    `target` VARCHAR(20) NOT NULL DEFAULT '_self',
+    `sort_order` INT NOT NULL DEFAULT 0,
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `location` VARCHAR(50) NOT NULL DEFAULT 'primary',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY `idx_parent_sort` (`parent_id`, `sort_order`),
+    KEY `idx_location_active` (`location`, `is_active`),
+    CONSTRAINT `fk_menu_parent` FOREIGN KEY (`parent_id`) REFERENCES `menu_items` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Seed default permission
+INSERT IGNORE INTO permissions (permission_key, label, category, applies_to_role, description)
+VALUES ('manage_menus', 'Manage navigation menus & submenus', 'storefront', 'both', 'Create, edit, toggle visibility, and delete storefront menu items and dropdown submenus');
+
+-- Seed default storefront navigation items
+INSERT INTO `menu_items` (`id`, `parent_id`, `title`, `url`, `icon`, `badge`, `badge_color`, `subtitle`, `sort_order`, `is_active`, `location`) VALUES
+(1, NULL, 'Home', 'index.php', NULL, NULL, NULL, NULL, 1, 1, 'primary'),
+(2, NULL, 'Our Chikki', 'index.php#products', NULL, NULL, NULL, NULL, 2, 1, 'primary'),
+(3, 2, 'Mandvi Peanut Chikki', 'product.php?slug=mandvi-chikki', '🥜', 'Bestseller', '#c7613d', 'Classic Saurashtra crunch', 1, 1, 'primary'),
+(4, 2, 'TIL Sesame Chikki', 'product.php?slug=til-chikki', '⚪', 'Calcium', 'rgba(255,255,255,0.15)', 'Rich in natural calcium', 2, 1, 'primary'),
+(5, 2, 'Daliya Gram Chikki', 'product.php?slug=daliya-chikki', '🌾', 'Crispy', 'rgba(255,255,255,0.15)', 'Crispy roasted chickpea', 3, 1, 'primary'),
+(6, 2, '3 Mix Signature Box', 'product.php?slug=3-mix-chikki', '✨', 'Signature', '#f6dc94', 'Peanut, Til & Coconut', 4, 1, 'primary'),
+(7, 2, 'Explore All 4 Flavors', 'index.php#products', '→', '', '', 'View full chikki collection', 5, 1, 'primary'),
+(8, NULL, 'Our Craft', 'index.php#our-story', NULL, NULL, NULL, NULL, 3, 1, 'primary'),
+(9, NULL, 'Reels', 'index.php#reels-section', '🔴', NULL, NULL, NULL, 4, 1, 'primary'),
+(10, NULL, 'Reviews', 'index.php#reviews', NULL, NULL, NULL, NULL, 5, 1, 'primary'),
+(11, NULL, 'Track Order', 'track.php', '📦', NULL, NULL, NULL, 6, 1, 'primary');
+
 SET FOREIGN_KEY_CHECKS = 1;
+

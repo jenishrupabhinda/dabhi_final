@@ -4,19 +4,87 @@
  */
 class Menu
 {
+    private static bool $tableChecked = false;
+
+    /**
+     * Automatically ensure menu_items table and manage_menus permission exist.
+     * Prevents 1146 "Table doesn't exist" exceptions across any environment.
+     */
+    public static function ensureTable(): void
+    {
+        if (self::$tableChecked) {
+            return;
+        }
+        self::$tableChecked = true;
+
+        try {
+            Database::query('SELECT 1 FROM menu_items LIMIT 1');
+        } catch (\Throwable $e) {
+            try {
+                Database::query("
+                    CREATE TABLE IF NOT EXISTS `menu_items` (
+                        `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                        `parent_id` INT UNSIGNED NULL DEFAULT NULL,
+                        `title` VARCHAR(100) NOT NULL,
+                        `url` VARCHAR(255) NOT NULL,
+                        `icon` VARCHAR(50) NULL DEFAULT NULL,
+                        `badge` VARCHAR(50) NULL DEFAULT NULL,
+                        `badge_color` VARCHAR(50) NULL DEFAULT NULL,
+                        `subtitle` VARCHAR(150) NULL DEFAULT NULL,
+                        `target` VARCHAR(20) NOT NULL DEFAULT '_self',
+                        `sort_order` INT NOT NULL DEFAULT 0,
+                        `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+                        `location` VARCHAR(50) NOT NULL DEFAULT 'primary',
+                        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        KEY `idx_parent_sort` (`parent_id`, `sort_order`),
+                        KEY `idx_location_active` (`location`, `is_active`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                ");
+
+                // Seed defaults if empty
+                try {
+                    $countRow = Database::fetchOne('SELECT COUNT(*) AS c FROM menu_items');
+                    if (!$countRow || (int)$countRow['c'] === 0) {
+                        self::seedDefaults();
+                    }
+                } catch (\Throwable $ignore) {}
+
+                // Ensure permission exists in permissions table
+                try {
+                    $perm = Database::fetchOne("SELECT id FROM permissions WHERE permission_key = 'manage_menus'");
+                    if (!$perm) {
+                        Database::query("
+                            INSERT INTO permissions (permission_key, label, category, applies_to_role, description)
+                            VALUES ('manage_menus', 'Manage navigation menus & submenus', 'storefront', 'both', 'Create, edit, toggle visibility, and delete storefront menu items and dropdown submenus')
+                        ");
+                    }
+                } catch (\Throwable $ignore) {}
+            } catch (\Throwable $createEx) {
+                error_log('Menu::ensureTable creation failed: ' . $createEx->getMessage());
+            }
+        }
+    }
+
     /**
      * All menu items as a flat list with parent title joined.
      */
     public static function getAll(string $location = 'primary'): array
     {
-        return Database::fetchAll(
-            'SELECT m.*, p.title AS parent_title
-             FROM menu_items m
-             LEFT JOIN menu_items p ON p.id = m.parent_id
-             WHERE m.location = ?
-             ORDER BY COALESCE(m.parent_id, m.id), m.parent_id IS NOT NULL, m.sort_order ASC, m.id ASC',
-            [$location]
-        );
+        self::ensureTable();
+        try {
+            return Database::fetchAll(
+                'SELECT m.*, p.title AS parent_title
+                 FROM menu_items m
+                 LEFT JOIN menu_items p ON p.id = m.parent_id
+                 WHERE m.location = ?
+                 ORDER BY COALESCE(m.parent_id, m.id), m.parent_id IS NOT NULL, m.sort_order ASC, m.id ASC',
+                [$location]
+            );
+        } catch (\Throwable $e) {
+            error_log('Menu::getAll failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /**
@@ -26,29 +94,35 @@ class Menu
      */
     public static function getTree(string $location = 'primary', bool $onlyActive = true): array
     {
-        $sql = 'SELECT * FROM menu_items WHERE location = ?';
-        $params = [$location];
-        if ($onlyActive) {
-            $sql .= ' AND is_active = 1';
-        }
-        $sql .= ' ORDER BY sort_order ASC, id ASC';
-
-        $rows = Database::fetchAll($sql, $params);
-        $indexed = [];
-        foreach ($rows as $r) {
-            $r['children'] = [];
-            $indexed[$r['id']] = $r;
-        }
-
-        $tree = [];
-        foreach ($indexed as &$item) {
-            if ($item['parent_id'] && isset($indexed[$item['parent_id']])) {
-                $indexed[$item['parent_id']]['children'][] = &$item;
-            } elseif (!$item['parent_id']) {
-                $tree[] = &$item;
+        self::ensureTable();
+        try {
+            $sql = 'SELECT * FROM menu_items WHERE location = ?';
+            $params = [$location];
+            if ($onlyActive) {
+                $sql .= ' AND is_active = 1';
             }
+            $sql .= ' ORDER BY sort_order ASC, id ASC';
+
+            $rows = Database::fetchAll($sql, $params);
+            $indexed = [];
+            foreach ($rows as $r) {
+                $r['children'] = [];
+                $indexed[$r['id']] = $r;
+            }
+
+            $tree = [];
+            foreach ($indexed as &$item) {
+                if ($item['parent_id'] && isset($indexed[$item['parent_id']])) {
+                    $indexed[$item['parent_id']]['children'][] = &$item;
+                } elseif (!$item['parent_id']) {
+                    $tree[] = &$item;
+                }
+            }
+            return $tree;
+        } catch (\Throwable $e) {
+            error_log('Menu::getTree failed: ' . $e->getMessage());
+            return [];
         }
-        return $tree;
     }
 
     /**
@@ -56,19 +130,31 @@ class Menu
      */
     public static function getParents(string $location = 'primary', ?int $excludeId = null): array
     {
-        $sql = 'SELECT id, title FROM menu_items WHERE parent_id IS NULL AND location = ?';
-        $params = [$location];
-        if ($excludeId !== null) {
-            $sql .= ' AND id != ?';
-            $params[] = $excludeId;
+        self::ensureTable();
+        try {
+            $sql = 'SELECT id, title FROM menu_items WHERE parent_id IS NULL AND location = ?';
+            $params = [$location];
+            if ($excludeId !== null) {
+                $sql .= ' AND id != ?';
+                $params[] = $excludeId;
+            }
+            $sql .= ' ORDER BY sort_order ASC, title ASC';
+            return Database::fetchAll($sql, $params);
+        } catch (\Throwable $e) {
+            error_log('Menu::getParents failed: ' . $e->getMessage());
+            return [];
         }
-        $sql .= ' ORDER BY sort_order ASC, title ASC';
-        return Database::fetchAll($sql, $params);
     }
 
     public static function getById(int $id): ?array
     {
-        return Database::fetchOne('SELECT * FROM menu_items WHERE id = ?', [$id]);
+        self::ensureTable();
+        try {
+            return Database::fetchOne('SELECT * FROM menu_items WHERE id = ?', [$id]);
+        } catch (\Throwable $e) {
+            error_log('Menu::getById failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**
@@ -76,6 +162,7 @@ class Menu
      */
     public static function save(array $data, ?int $id = null): array
     {
+        self::ensureTable();
         $title      = trim((string)($data['title'] ?? ''));
         $url        = trim((string)($data['url'] ?? ''));
         $parentId   = !empty($data['parent_id']) ? (int)$data['parent_id'] : null;
