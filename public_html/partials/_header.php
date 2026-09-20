@@ -148,13 +148,36 @@ $isLoggedIn = Auth::check();
 <div class="min-h-dvh bg-background">
   <div class="pb-24 md:pb-0">
 
+    <!-- ══ ANNOUNCEMENT BAR (Module Controlled) ══ -->
+    <?php if (function_exists('settingEnabled') && settingEnabled('module_announcement', '1')): 
+      $announcementText  = getSetting('announcement_text', '🎉 FREE shipping on orders above ₹499 | Authentic Rajkot Jaggery Chikki');
+      $announcementBadge = getSetting('announcement_badge', 'Special Offer');
+      $announcementLink  = getSetting('announcement_link', '#products');
+    ?>
+      <div id="site-announcement-bar" class="w-full text-center py-2 px-4 text-xs sm:text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2" style="background: linear-gradient(90deg, #3d1412 0%, #c7613d 50%, #3d1412 100%); color: #ffffff; z-index: 45;">
+        <?php if (!empty($announcementBadge)): ?>
+          <span class="rounded-full bg-white/20 px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#f6dc94]">
+            <?= htmlspecialchars($announcementBadge) ?>
+          </span>
+        <?php endif; ?>
+        <?php if (!empty($announcementLink)): ?>
+          <a href="<?= htmlspecialchars($announcementLink) ?>" class="hover:underline hover:text-[#f6dc94] flex items-center gap-1">
+            <span><?= htmlspecialchars($announcementText) ?></span>
+            <span class="text-[#f6dc94] text-xs">→</span>
+          </a>
+        <?php else: ?>
+          <span><?= htmlspecialchars($announcementText) ?></span>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
+
     <!-- ══ STICKY HEADER (Brown Header matching Brand Theme) ══ -->
     <header id="site-header" class="site-sticky-header header-unscrolled sticky top-0 z-40 transition-all duration-300">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
         
-        <!-- Brand Logo -->
-        <a href="index.php" class="flex items-center shrink-0" aria-label="Dabhi Chikki home">
-          <img src="assets/images/logo-light.svg" alt="Dabhi Chikki" class="site-logo-img h-10 w-auto md:h-12 object-contain shrink-0" draggable="false"/>
+        <!-- Brand Logo (Official Admin Emblem) -->
+        <a href="index.php" class="flex items-center gap-2.5 shrink-0" aria-label="Dabhi Chikki home">
+          <img src="assets/images/logo.png" alt="Dabhi Chikki" class="site-logo-img h-10 w-auto md:h-12 object-contain shrink-0" draggable="false"/>
         </a>
 
         <!-- Center Nav: Products & Track Order -->

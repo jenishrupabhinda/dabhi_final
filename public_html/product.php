@@ -42,9 +42,16 @@ try {
     }
     $variants    = $prod['variants'] ?? Product::getVariants((int)$prod['id']);
     $images      = $prod['images']   ?? Product::getImages((int)$prod['id']);
-    $reviews     = $prod['reviews']  ?? [];
-    $avgRating   = (float)($prod['avg_rating'] ?? 5.0);
-    $reviewCount = (int)($prod['review_count'] ?? count($reviews));
+    $reviews = Database::fetchAll(
+        "SELECT r.*, u.full_name 
+         FROM reviews r 
+         JOIN users u ON u.id = r.user_id 
+         WHERE r.product_id = ? AND r.is_approved = 1 
+         ORDER BY r.created_at DESC",
+        [(int)$prod['id']]
+    );
+    $reviewCount = count($reviews);
+    $avgRating   = $reviewCount > 0 ? round(array_sum(array_column($reviews, 'rating')) / $reviewCount, 1) : 5.0;
 } catch (\Throwable $e) {
     // Static fallback for when DB isn't connected
     $staticProds = [
@@ -343,7 +350,10 @@ require_once __DIR__ . '/partials/_header.php';
         </button>
       </div>
 
-      <!-- Pincode Delivery Check Widget -->
+      <!-- Pincode Delivery Check Widget (Module Controlled) -->
+      <?php if (function_exists('settingEnabled') ? settingEnabled('module_pincode_checker', '1') : true): 
+        $pinHelper = function_exists('getSetting') ? getSetting('pincode_helper_text', 'Enter your 6-digit PIN code to check shipping rates and COD availability.') : 'Enter your 6-digit PIN code to check shipping rates and COD availability.';
+      ?>
       <div class="mt-6 rounded-2xl border border-border/70 bg-card p-4 shadow-soft">
         <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground">
           <svg class="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -351,7 +361,7 @@ require_once __DIR__ . '/partials/_header.php';
           </svg>
           <span>Check Delivery Serviceability</span>
         </div>
-        <p class="mt-1 text-[11px] text-muted-foreground">Enter your 6-digit PIN code to check shipping rates and COD availability.</p>
+        <p class="mt-1 text-[11px] text-muted-foreground"><?= htmlspecialchars($pinHelper) ?></p>
         <div class="mt-2.5 flex items-center gap-2">
           <input
             type="text"
@@ -372,12 +382,16 @@ require_once __DIR__ . '/partials/_header.php';
         </div>
         <div id="detail-pincode-result" class="mt-2 text-xs hidden"></div>
       </div>
+      <?php endif; ?>
 
     </div>
 
   </div>
 
   <!-- ══ CUSTOMER REVIEWS SECTION ══ -->
+  <?php if (function_exists('settingEnabled') ? settingEnabled('module_reviews', '1') : true): 
+    $canSubmitReviews = function_exists('settingEnabled') ? settingEnabled('reviews_allow_submission', '1') : true;
+  ?>
   <section class="mt-16 border-t border-border/60 pt-12" id="reviews">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
@@ -398,6 +412,7 @@ require_once __DIR__ . '/partials/_header.php';
           </div>
         </div>
 
+        <?php if ($canSubmitReviews): ?>
         <button
           type="button"
           onclick="toggleReviewForm()"
@@ -409,6 +424,7 @@ require_once __DIR__ . '/partials/_header.php';
           </svg>
           <span>Write a Review</span>
         </button>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -537,6 +553,7 @@ require_once __DIR__ . '/partials/_header.php';
       <?php endif; ?>
     </div>
   </section>
+  <?php endif; ?>
 </main>
 
 <!-- ══ MOBILE STICKY BOTTOM ACTION BAR (Exact Yogurt Alley Architecture) ══ -->

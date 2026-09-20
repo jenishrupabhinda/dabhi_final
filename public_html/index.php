@@ -175,11 +175,14 @@ function discountPct($mrp, $sell): int {
 </section>
 
 <!-- ══ SECTION 5: FEATURED THIS SEASON (Horizontal Snap Carousel) ═ -->
+<?php if (function_exists('settingEnabled') ? settingEnabled('module_featured', '1') : true): 
+  $featHeading = function_exists('getSetting') ? getSetting('featured_heading', 'Featured This Season') : 'Featured This Season';
+?>
 <section class="mx-auto max-w-6xl px-4 pb-12 pt-8 md:px-6">
   <div class="mb-5 flex items-end justify-between">
     <div>
       <p class="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Highlighted</p>
-      <h2 class="mt-1 font-display text-3xl md:text-4xl text-foreground">Featured This Season</h2>
+      <h2 class="mt-1 font-display text-3xl md:text-4xl text-foreground"><?= htmlspecialchars($featHeading) ?></h2>
     </div>
     <div class="hidden sm:flex items-center gap-2">
       <button type="button" onclick="scrollFeatured(-1)" class="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-secondary shadow-soft transition hover:scale-105" aria-label="Previous">
@@ -299,39 +302,71 @@ function discountPct($mrp, $sell): int {
 
   </div>
 </section>
+<?php endif; ?>
 
 <!-- ══ SECTION 6: SOCIAL REELS SHOWCASE (@dabhichikki) ════════════ -->
-<section class="mx-auto max-w-6xl px-4 py-8 md:px-6">
+<?php if (function_exists('settingEnabled') ? settingEnabled('module_instagram', '1') : true): 
+  $igHandle    = function_exists('getSetting') ? getSetting('instagram_handle', '@dabhichikki') : '@dabhichikki';
+  $igTagline   = function_exists('getSetting') ? getSetting('instagram_tagline', 'Follow') : 'Follow';
+  $igProfile   = function_exists('getSetting') ? getSetting('instagram_profile_url', 'https://instagram.com') : 'https://instagram.com';
+  $igButtonText = function_exists('getSetting') ? getSetting('instagram_button_text', 'Follow') : 'Follow';
+
+  $dynamicReels = [];
+  try {
+    $dynamicReels = Database::fetchAll("SELECT * FROM `instagram_reels` WHERE is_active = 1 ORDER BY sort_order ASC, id ASC");
+  } catch (\Throwable $e) {
+    $dynamicReels = [];
+  }
+  if (empty($dynamicReels)) {
+    $dynamicReels = [
+      ['image_url'=>'assets/images/reels/reel-1.jpg', 'video_url'=>'assets/videos/reel-1.mp4', 'tag_label'=>'Pure Jaggery', 'title'=>'Bubbling Liquid Gold', 'instagram_url'=>'https://instagram.com'],
+      ['image_url'=>'assets/images/reels/reel-2.jpg', 'video_url'=>'assets/videos/reel-2.mp4', 'tag_label'=>'The Snap', 'title'=>'Crunch You Can Hear', 'instagram_url'=>'https://instagram.com'],
+      ['image_url'=>'assets/images/reels/reel-3.jpg', 'video_url'=>'assets/videos/reel-3.mp4', 'tag_label'=>'Handcrafted', 'title'=>'Rolling Fresh Til Slabs', 'instagram_url'=>'https://instagram.com'],
+      ['image_url'=>'assets/images/reels/reel-4.jpg', 'video_url'=>'assets/videos/reel-4.mp4', 'tag_label'=>'Festive Packs', 'title'=>'Hand-Tied Gift Boxes', 'instagram_url'=>'https://instagram.com'],
+      ['image_url'=>'assets/images/reels/reel-5.jpg', 'video_url'=>'assets/videos/reel-5.mp4', 'tag_label'=>'Sweet Joy', 'title'=>'Clean Craving Satisfied', 'instagram_url'=>'https://instagram.com'],
+      ['image_url'=>'assets/images/reels/reel-6.jpg', 'video_url'=>'assets/videos/reel-6.mp4', 'tag_label'=>'Signature 3 Mix', 'title'=>'Layered Coconut & Nuts', 'instagram_url'=>'https://instagram.com'],
+    ];
+  }
+?>
+<section id="reels-section" class="mx-auto max-w-6xl px-4 py-8 md:px-6">
   <div class="mb-5 flex items-end justify-between">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-wider text-primary font-mono">Follow</p>
-      <h2 class="font-display text-3xl md:text-4xl text-foreground">@dabhichikki</h2>
+      <p class="text-xs font-semibold uppercase tracking-wider text-primary font-mono"><?= htmlspecialchars($igTagline) ?></p>
+      <h2 class="font-display text-3xl md:text-4xl text-foreground"><?= htmlspecialchars($igHandle) ?></h2>
     </div>
-    <a href="https://instagram.com" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-semibold shadow-soft transition hover:scale-105 border border-border/60 text-foreground">
+    <a href="<?= htmlspecialchars($igProfile) ?>" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-semibold shadow-soft transition hover:scale-105 border border-border/60 text-foreground">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram h-4 w-4"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-      Follow
+      <?= htmlspecialchars($igButtonText) ?>
     </a>
   </div>
 
-  <!-- Interactive Snap-Scroll Reels Track (Exact Yogurt Alley Architecture) -->
+  <!-- Interactive Snap-Scroll Reels Track -->
   <div class="reels-scroll flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 md:gap-4" style="scrollbar-width:none;-webkit-overflow-scrolling:touch">
-    <?php
-    $reels = [
-      ['img'=>'assets/images/reels/reel-1.jpg', 'tag'=>'Pure Jaggery', 'title'=>'Bubbling Liquid Gold'],
-      ['img'=>'assets/images/reels/reel-2.jpg', 'tag'=>'The Snap', 'title'=>'Crunch You Can Hear'],
-      ['img'=>'assets/images/reels/reel-3.jpg', 'tag'=>'Handcrafted', 'title'=>'Rolling Fresh Til Slabs'],
-      ['img'=>'assets/images/reels/reel-4.jpg', 'tag'=>'Festive Packs', 'title'=>'Hand-Tied Gift Boxes'],
-      ['img'=>'assets/images/reels/reel-5.jpg', 'tag'=>'Sweet Joy', 'title'=>'Clean Craving Satisfied'],
-      ['img'=>'assets/images/reels/reel-6.jpg', 'tag'=>'Signature 3 Mix', 'title'=>'Layered Coconut & Nuts'],
-    ];
-    foreach ($reels as $idx => $r): ?>
-      <a href="https://instagram.com" target="_blank" rel="noreferrer" class="reel-card group relative aspect-[9/16] w-[calc((100%-0.75rem)/2)] flex-none cursor-pointer snap-start overflow-hidden rounded-2xl bg-secondary shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop sm:w-[calc((100%-2.25rem)/4)] md:w-[calc((100%-3rem)/5)] lg:w-[calc((100%-4rem)/6)] block">
-        <img src="<?= htmlspecialchars($r['img']) ?>" alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy" class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+    <?php foreach ($dynamicReels as $idx => $r): ?>
+      <a href="<?= htmlspecialchars($r['instagram_url'] ?? 'https://instagram.com') ?>" target="_blank" rel="noreferrer" class="reel-card group relative aspect-[9/16] w-[calc((100%-0.75rem)/2)] flex-none cursor-pointer snap-start overflow-hidden rounded-2xl bg-secondary shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop sm:w-[calc((100%-2.25rem)/4)] md:w-[calc((100%-3rem)/5)] lg:w-[calc((100%-4rem)/6)] block">
+        
+        <?php if (!empty($r['video_url'])): ?>
+          <video
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster="<?= htmlspecialchars($r['image_url'] ?? '') ?>"
+            class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            onmouseover="this.play().catch(function(){})"
+            onmouseout="this.pause();this.currentTime=0;"
+          >
+            <source src="<?= htmlspecialchars($r['video_url']) ?>" type="video/mp4">
+          </video>
+        <?php endif; ?>
+
+        <img src="<?= htmlspecialchars($r['image_url'] ?? '') ?>" alt="<?= htmlspecialchars($r['title']) ?>" loading="lazy" class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 <?= !empty($r['video_url']) ? 'hidden group-hover:block' : '' ?>" />
+        
         <div class="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/80 via-black/35 to-transparent"></div>
         
         <!-- Bottom caption -->
         <div class="absolute bottom-3 left-3 right-3 z-10 text-white">
-          <span class="inline-block rounded-full bg-white/20 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] backdrop-blur-sm"><?= htmlspecialchars($r['tag']) ?></span>
+          <span class="inline-block rounded-full bg-white/20 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] backdrop-blur-sm"><?= htmlspecialchars($r['tag_label'] ?? $r['tag'] ?? 'Pure Jaggery') ?></span>
           <p class="mt-1 line-clamp-2 font-display text-sm font-medium leading-tight text-white/95"><?= htmlspecialchars($r['title']) ?></p>
         </div>
 
@@ -343,7 +378,7 @@ function discountPct($mrp, $sell): int {
     <?php endforeach; ?>
   </div>
 
-  <!-- Carousel Navigation Control (Exact as shown in photo) -->
+  <!-- Carousel Navigation Control -->
   <div class="mt-6 flex items-center justify-center">
     <div class="inline-flex items-center gap-2 rounded-full border border-border/80 bg-white/95 p-1.5 shadow-soft">
       <!-- Left Arrow Button -->
@@ -378,8 +413,13 @@ function discountPct($mrp, $sell): int {
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- ══ SECTION 7: OUR STORY (Dessert, Reimagined With Real Ingredients) ═ -->
+<?php if (function_exists('settingEnabled') ? settingEnabled('module_story', '1') : true): 
+  $storyHeading = function_exists('getSetting') ? getSetting('story_heading', 'Dessert, reimagined with real ingredients.') : 'Dessert, reimagined with real ingredients.';
+  $storySubhead = function_exists('getSetting') ? getSetting('story_subheading', 'A modern chikki brand built around wholesome indulgence without compromise.') : 'A modern chikki brand built around wholesome indulgence without compromise.';
+?>
 <section class="px-4 py-16 md:px-6 md:py-24">
   <div class="mx-auto max-w-6xl rounded-[28px] border border-[#6e1f1f]/10 bg-[#f6dc94] px-5 py-14 shadow-[0_20px_60px_-30px_rgba(110,31,31,0.25)] md:px-14 md:py-20">
     
@@ -388,10 +428,10 @@ function discountPct($mrp, $sell): int {
       <span class="font-mono text-[11px] uppercase tracking-[0.28em] text-[#c05d37] font-semibold">Our Story</span>
       <div class="mx-auto mt-4 h-px w-12 bg-[#6e1f1f]/30"></div>
       <h2 class="font-display mt-6 text-3xl leading-[1.1] tracking-tight text-[#6e1f1f] sm:text-4xl md:text-5xl">
-        Dessert, reimagined with real ingredients.
+        <?= htmlspecialchars($storyHeading) ?>
       </h2>
       <p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#6e1f1f]/70 md:text-lg">
-        A modern chikki brand built around wholesome indulgence without compromise.
+        <?= htmlspecialchars($storySubhead) ?>
       </p>
     </div>
 
@@ -472,139 +512,149 @@ function discountPct($mrp, $sell): int {
 
   </div>
 </section>
+<?php endif; ?>
 
 <!-- ══ SECTION 8: CUSTOMER REVIEWS (Loved Across India) ════════════ -->
+<?php if (function_exists('settingEnabled') ? settingEnabled('module_reviews', '1') : true): 
+  $revHeading = function_exists('getSetting') ? getSetting('reviews_heading', 'Loved by Sweet Lovers Across India') : 'Loved by Sweet Lovers Across India';
+  $revSubhead = function_exists('getSetting') ? getSetting('reviews_subheading', 'Real testimonials from customers who made the switch to authentic 100% pure jaggery chikki.') : 'Real testimonials from customers who made the switch to authentic 100% pure jaggery chikki.';
+  $revBadge   = function_exists('getSetting') ? getSetting('reviews_badge_text', '4.9 / 5.0 Rated by 12,000+ Customers') : '4.9 / 5.0 Rated by 12,000+ Customers';
+
+  $approvedReviews = [];
+  try {
+    $approvedReviews = Database::fetchAll(
+      "SELECT r.*, u.full_name, p.name AS product_name 
+       FROM reviews r 
+       JOIN users u ON u.id = r.user_id 
+       JOIN products p ON p.id = r.product_id 
+       WHERE r.is_approved = 1 
+       ORDER BY r.created_at DESC LIMIT 4"
+    );
+  } catch (\Throwable $e) {
+    $approvedReviews = [];
+  }
+?>
 <section class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
   <!-- Section Header -->
   <div class="mb-8 text-center md:mb-12">
-    <div class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary font-mono uppercase tracking-[0.18em]">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#c7613d" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      4.9 / 5.0 Rated by 12,000+ Customers
-    </div>
+    <?php if (!empty($revBadge)): ?>
+      <div class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary font-mono uppercase tracking-[0.18em]">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#c7613d" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <?= htmlspecialchars($revBadge) ?>
+      </div>
+    <?php endif; ?>
     <h2 class="font-display mt-3 text-3xl md:text-5xl text-foreground">
-      Loved by Sweet Lovers Across India
+      <?= htmlspecialchars($revHeading) ?>
     </h2>
     <p class="mx-auto mt-3 max-w-xl text-sm md:text-base text-muted-foreground">
-      Real testimonials from customers who made the switch to authentic 100% pure jaggery chikki.
+      <?= htmlspecialchars($revSubhead) ?>
     </p>
   </div>
 
   <!-- Reviews Grid -->
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-5">
-    
-    <!-- Review Card 1 -->
-    <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
-      <div>
-        <!-- Star Rating -->
-        <div class="flex items-center gap-1 text-amber-500">
-          <?php for($s=0;$s<5;$s++): ?>
-            <svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <?php endfor; ?>
+    <?php if (!empty($approvedReviews)): ?>
+      <?php foreach ($approvedReviews as $rv): ?>
+        <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
+          <div>
+            <!-- Star Rating -->
+            <div class="flex items-center gap-1 text-amber-500">
+              <?php for($s=0; $s < (int)$rv['rating']; $s++): ?>
+                <svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <?php endfor; ?>
+            </div>
+            <h3 class="font-display mt-3 text-lg font-bold text-foreground">
+              <?= htmlspecialchars($rv['product_name'] ?? 'Authentic Chikki') ?>
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+              "<?= htmlspecialchars($rv['comment']) ?>"
+            </p>
+          </div>
+          <div class="mt-5 border-t border-border/50 pt-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-foreground"><?= htmlspecialchars($rv['full_name']) ?></span>
+              <span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                Verified
+              </span>
+            </div>
+            <div class="mt-1 font-mono text-[10px] text-muted-foreground"><?= date('d M Y', strtotime($rv['created_at'])) ?></div>
+          </div>
         </div>
-        <h3 class="font-display mt-3 text-lg font-bold text-foreground">
-          "Unmatched Saurashtra snap!"
-        </h3>
-        <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Growing up in Gujarat, chikki was a winter essential. After moving to Mumbai, I couldn't find authentic chikki without liquid glucose until Dabhi Chikki. The Mandvi peanut chikki has that authentic crisp snap!
-        </p>
-      </div>
-      <div class="mt-5 border-t border-border/50 pt-3">
-        <div class="flex items-center justify-between text-xs">
-          <span class="font-semibold text-foreground">Rajesh V., Mumbai</span>
-          <span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
-            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Verified
-          </span>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <!-- Static Testimonials Fallback -->
+      <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
+        <div>
+          <div class="flex items-center gap-1 text-amber-500">
+            <?php for($s=0;$s<5;$s++): ?><svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
+          </div>
+          <h3 class="font-display mt-3 text-lg font-bold text-foreground">"Unmatched Saurashtra snap!"</h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted-foreground">Growing up in Gujarat, chikki was a winter essential. After moving to Mumbai, I couldn't find authentic chikki without liquid glucose until Dabhi Chikki. The Mandvi peanut chikki has that authentic crisp snap!</p>
         </div>
-        <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: Mandvi Chikki 500g</div>
+        <div class="mt-5 border-t border-border/50 pt-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-foreground">Rajesh V., Mumbai</span>
+            <span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
+          </div>
+          <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: Mandvi Chikki 500g</div>
+        </div>
       </div>
-    </div>
 
-    <!-- Review Card 2 -->
-    <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
-      <div>
-        <div class="flex items-center gap-1 text-amber-500">
-          <?php for($s=0;$s<5;$s++): ?>
-            <svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <?php endfor; ?>
+      <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
+        <div>
+          <div class="flex items-center gap-1 text-amber-500">
+            <?php for($s=0;$s<5;$s++): ?><svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
+          </div>
+          <h3 class="font-display mt-3 text-lg font-bold text-foreground">"3 Mix is an absolute winner"</h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted-foreground">The blend of roasted peanuts, sesame seeds, and toasted coconut crush is pure perfection. Not overly sticky, perfect sweetness from pure sugarcane jaggery. My kids love it in their lunchbox!</p>
         </div>
-        <h3 class="font-display mt-3 text-lg font-bold text-foreground">
-          "3 Mix is an absolute winner"
-        </h3>
-        <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
-          The blend of roasted peanuts, sesame seeds, and toasted coconut crush is pure perfection. Not overly sticky, perfect sweetness from pure sugarcane jaggery. My kids love it in their lunchbox!
-        </p>
-      </div>
-      <div class="mt-5 border-t border-border/50 pt-3">
-        <div class="flex items-center justify-between text-xs">
-          <span class="font-semibold text-foreground">Pooja K., Ahmedabad</span>
-          <span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
-            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Verified
-          </span>
+        <div class="mt-5 border-t border-border/50 pt-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-foreground">Pooja K., Ahmedabad</span>
+            <span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
+          </div>
+          <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: 3 Mix Chikki 1kg</div>
         </div>
-        <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: 3 Mix Chikki 1kg</div>
       </div>
-    </div>
 
-    <!-- Review Card 3 -->
-    <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
-      <div>
-        <div class="flex items-center gap-1 text-amber-500">
-          <?php for($s=0;$s<5;$s++): ?>
-            <svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <?php endfor; ?>
+      <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
+        <div>
+          <div class="flex items-center gap-1 text-amber-500">
+            <?php for($s=0;$s<5;$s++): ?><svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
+          </div>
+          <h3 class="font-display mt-3 text-lg font-bold text-foreground">"Best clean energy snack"</h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted-foreground">As someone into fitness, I wanted clean plant protein without artificial sweeteners or sugar crashes. Daliya and Til chikki provide steady energy for my workouts. Delivered in 2 days to Bangalore!</p>
         </div>
-        <h3 class="font-display mt-3 text-lg font-bold text-foreground">
-          "Best clean energy snack"
-        </h3>
-        <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
-          As someone into fitness, I wanted clean plant protein without artificial sweeteners or sugar crashes. Daliya and Til chikki provide steady energy for my workouts. Delivered in 2 days to Bangalore!
-        </p>
-      </div>
-      <div class="mt-5 border-t border-border/50 pt-3">
-        <div class="flex items-center justify-between text-xs">
-          <span class="font-semibold text-foreground">Aditya M., Bengaluru</span>
-          <span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
-            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Verified
-          </span>
+        <div class="mt-5 border-t border-border/50 pt-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-foreground">Aditya M., Bengaluru</span>
+            <span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
+          </div>
+          <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: Daliya Chikki 500g</div>
         </div>
-        <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: Daliya Chikki 500g</div>
       </div>
-    </div>
 
-    <!-- Review Card 4 -->
-    <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
-      <div>
-        <div class="flex items-center gap-1 text-amber-500">
-          <?php for($s=0;$s<5;$s++): ?>
-            <svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <?php endfor; ?>
+      <div class="flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-pop">
+        <div>
+          <div class="flex items-center gap-1 text-amber-500">
+            <?php for($s=0;$s<5;$s++): ?><svg class="h-4 w-4 fill-amber-400 stroke-amber-400" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><?php endfor; ?>
+          </div>
+          <h3 class="font-display mt-3 text-lg font-bold text-foreground">"Crisp even after 3 weeks!"</h3>
+          <p class="mt-2 text-sm leading-relaxed text-muted-foreground">The packaging is top notch. The slabs stay completely crunchy even weeks after opening. You can genuinely taste the premium quality nuts and organic jaggery. Will definitely be reordering.</p>
         </div>
-        <h3 class="font-display mt-3 text-lg font-bold text-foreground">
-          "Crisp even after 3 weeks!"
-        </h3>
-        <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
-          The packaging is top notch. The slabs stay completely crunchy even weeks after opening. You can genuinely taste the premium quality nuts and organic jaggery. Will definitely be reordering.
-        </p>
-      </div>
-      <div class="mt-5 border-t border-border/50 pt-3">
-        <div class="flex items-center justify-between text-xs">
-          <span class="font-semibold text-foreground">Neha T., Delhi NCR</span>
-          <span class="inline-flex items-center gap-1 text-emerald-600 font-medium">
-            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Verified
-          </span>
+        <div class="mt-5 border-t border-border/50 pt-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-foreground">Neha T., Delhi NCR</span>
+            <span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
+          </div>
+          <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: TIL Chikki 1kg</div>
         </div>
-        <div class="mt-1 font-mono text-[10px] text-muted-foreground">Purchased: TIL Chikki 1kg</div>
       </div>
-    </div>
-
+    <?php endif; ?>
   </div>
-
-
 </section>
+<?php endif; ?>
 
 <!-- Homepage Interactive JS -->
 <script>

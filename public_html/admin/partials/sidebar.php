@@ -61,6 +61,19 @@ function sidebarCan(string $perm): bool {
       <?php endif; ?>
     </div>
 
+    <!-- Storefront CMS & Marketing -->
+    <?php if ($_role === 'superadmin' || $_role === 'admin'): ?>
+    <div class="sidebar-section">
+      <span class="sidebar-section-label">Storefront CMS</span>
+      <a href="<?= url('admin/modules.php') ?>" class="sidebar-link <?= sidebarActive('modules') ?>">
+        <span class="icon">🎛️</span> Modules &amp; Content
+      </a>
+      <a href="<?= url('admin/instagram-reels.php') ?>" class="sidebar-link <?= sidebarActive('instagram-reels') ?>">
+        <span class="icon">📸</span> Instagram Reels
+      </a>
+    </div>
+    <?php endif; ?>
+
     <!-- Orders -->
     <div class="sidebar-section">
       <span class="sidebar-section-label">Orders</span>

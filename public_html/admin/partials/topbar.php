@@ -33,10 +33,10 @@ if (!isset($pageBreadcrumbs)) $pageBreadcrumbs = [];
   </div>
 
   <div class="admin-topbar-actions">
-    <a href="<?= url() ?>" target="_blank" class="btn btn-ghost btn-sm" title="View storefront">
-      🌐 Storefront
+    <a href="<?= url() ?>" target="_blank" class="btn btn-sm" style="background: rgba(199, 97, 61, 0.08); color: var(--dc-terracotta); border: 1px solid rgba(199, 97, 61, 0.22); border-radius: 9999px; font-weight: 600; padding: 6px 14px; text-decoration: none;" title="View live storefront">
+      🌐 View Storefront ↗
     </a>
-    <a href="<?= url('logout.php') ?>" class="btn btn-ghost btn-sm">
+    <a href="<?= url('logout.php') ?>" class="btn btn-ghost btn-sm" style="border-radius: 9999px;">
       Sign out
     </a>
   </div>

@@ -14,7 +14,7 @@
       <!-- Brand Info & Address -->
       <div class="md:col-span-2">
         <a href="index.php" class="inline-block mb-3" aria-label="Dabhi Chikki Home">
-          <img src="assets/images/logo-light.svg" alt="Dabhi Chikki" class="h-10 w-auto object-contain md:h-12">
+          <img src="assets/images/logo.png" alt="Dabhi Chikki" class="h-10 w-auto object-contain md:h-12">
         </a>
         <p class="mt-3 max-w-sm text-sm opacity-80 leading-relaxed">
           Handcrafted chikki made with 100% pure sugarcane jaggery and premium roasted nuts. Delivering the authentic taste of tradition across India since 2009.
@@ -134,7 +134,12 @@
     </div>
   </div>
 
-  <!-- 10% OFF Welcome Promo Modal (Exact Yogurt Alley First-Time Promo) -->
+  <!-- 10% OFF Welcome Promo Modal (Module Controlled) -->
+  <?php if (function_exists('settingEnabled') && settingEnabled('module_welcome_popup', '1')): 
+    $popupHead   = getSetting('popup_headline', 'Get 10% Off Your First Box');
+    $popupSub    = getSetting('popup_subtext', 'Taste the authentic crunch of 100% pure jaggery chikki handcrafted since 2009. Use this coupon at checkout:');
+    $popupCoupon = getSetting('popup_coupon_code', 'FIRST10');
+  ?>
   <div id="welcome-modal-backdrop" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 pointer-events-none opacity-0 flex items-center justify-center p-4">
     <div class="relative w-full max-w-md overflow-hidden rounded-[28px] border border-border/60 bg-background p-6 sm:p-8 shadow-pop text-center">
       <!-- Close X Button -->
@@ -148,14 +153,14 @@
       </div>
 
       <span class="inline-block font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">Special Welcome Gift</span>
-      <h3 class="mt-2 font-display text-2xl sm:text-3xl text-foreground font-bold leading-tight">Get 10% Off Your First Box</h3>
+      <h3 class="mt-2 font-display text-2xl sm:text-3xl text-foreground font-bold leading-tight"><?= htmlspecialchars($popupHead) ?></h3>
       <p class="mt-2 text-sm text-foreground/75 leading-relaxed">
-        Taste the authentic crunch of 100% pure jaggery chikki handcrafted since 2009. Use this coupon at checkout:
+        <?= htmlspecialchars($popupSub) ?>
       </p>
 
       <!-- Coupon Code Box with Copy Button -->
       <div class="mt-5 flex items-center justify-between rounded-2xl border-2 border-dashed border-primary/40 bg-surface px-4 py-3">
-        <span class="font-mono text-lg font-bold tracking-[0.18em] text-secondary" id="coupon-code-text">FIRST10</span>
+        <span class="font-mono text-lg font-bold tracking-[0.18em] text-secondary" id="coupon-code-text"><?= htmlspecialchars($popupCoupon) ?></span>
         <button type="button" id="copy-coupon-btn" class="rounded-full bg-primary px-4 py-1.5 font-mono text-xs font-semibold text-primary-foreground shadow-soft transition hover:scale-105 active:scale-95">
           Copy Code
         </button>
@@ -164,7 +169,7 @@
       <!-- Action Button -->
       <div class="mt-6">
         <a href="index.php#products" id="welcome-shop-btn" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary py-3.5 text-sm font-semibold text-secondary-foreground shadow-pop transition hover:scale-[1.02] active:scale-98">
-          Claim 10% Off &amp; Shop Now →
+          Claim Offer &amp; Shop Now →
         </a>
       </div>
 
@@ -173,6 +178,7 @@
       </button>
     </div>
   </div>
+  <?php endif; ?>
 
   <!-- Sticky Floating Mobile Bottom Bar (Yogurt Alley Ae Component) -->
   <div id="mobile-bottom-bar" class="fixed inset-x-0 bottom-0 z-30 px-3 pb-3 md:hidden hidden animate-fade-up">

@@ -104,25 +104,46 @@ function e(?string $value): string
 /** Read a settings row from the `settings` table, with a default fallback. */
 function getSetting(string $key, ?string $default = null): ?string
 {
-    static $cache = [];
-    if (!array_key_exists($key, $cache)) {
-        $row = Database::fetchOne('SELECT setting_value FROM settings WHERE setting_key = ?', [$key]);
-        $cache[$key] = $row['setting_value'] ?? $default;
+    if (!isset($GLOBALS['__settings_cache'])) {
+        $GLOBALS['__settings_cache'] = [];
     }
-    return $cache[$key];
+    if (!array_key_exists($key, $GLOBALS['__settings_cache'])) {
+        $row = Database::fetchOne('SELECT setting_value FROM settings WHERE setting_key = ?', [$key]);
+        $GLOBALS['__settings_cache'][$key] = $row['setting_value'] ?? $default;
+    }
+    return $GLOBALS['__settings_cache'][$key];
 }
 
 /** Flush the settings cache (call after saving a setting). */
 function clearSettingCache(): void
 {
-    // PHP doesn't allow clearing static vars directly; trick: call with dummy to reset
-    // Best approach: use a global for the cache instead. For now, this is a no-op.
+    $GLOBALS['__settings_cache'] = [];
+}
+
+/** Save or update a setting in the `settings` table. */
+function setSetting(string $key, ?string $value, ?int $userId = null): void
+{
+    $exists = Database::fetchOne('SELECT id FROM settings WHERE setting_key = ?', [$key]);
+    if ($exists) {
+        Database::query(
+            'UPDATE settings SET setting_value = ?, updated_by = ?, updated_at = NOW() WHERE setting_key = ?',
+            [$value, $userId, $key]
+        );
+    } else {
+        Database::query(
+            'INSERT INTO settings (setting_key, setting_value, updated_by, updated_at) VALUES (?, ?, ?, NOW())',
+            [$key, $value, $userId]
+        );
+    }
+    if (isset($GLOBALS['__settings_cache'])) {
+        $GLOBALS['__settings_cache'][$key] = $value;
+    }
 }
 
 /** True/false helper for boolean-flavoured settings ('1'/'0'). */
-function settingEnabled(string $key): bool
+function settingEnabled(string $key, string $default = '0'): bool
 {
-    return getSetting($key, '0') === '1';
+    return getSetting($key, $default) === '1';
 }
 
 /** Indian financial year label for "today", e.g. '2026-2027'. FY runs Apr–Mar. */
