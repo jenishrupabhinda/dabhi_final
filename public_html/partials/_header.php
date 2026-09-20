@@ -91,6 +91,139 @@ $isLoggedIn = Auth::check();
     @media (max-width: 767px) {
       .site-logo-img { height: 38px !important; width: auto !important; }
     }
+    
+    /* ══ HEADER RESPONSIVE LAYOUT & MENU SYSTEM ══ */
+    .site-header-container {
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+    }
+    .site-brand-logo-container {
+      display: flex !important;
+      align-items: center !important;
+      flex-shrink: 0 !important;
+    }
+    .site-desktop-nav {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.35rem !important;
+      font-size: 0.875rem !important;
+      font-weight: 500 !important;
+    }
+    .header-nav-link {
+      font-family: var(--font-sans, 'Poppins', sans-serif);
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 0.375rem 0.875rem;
+      border-radius: 9999px;
+      color: rgba(255, 255, 255, 0.9) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.3rem !important;
+      text-decoration: none !important;
+    }
+    .header-nav-link:hover {
+      color: #f6dc94 !important;
+      background-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    .nav-dropdown-wrap {
+      position: relative !important;
+      display: inline-block !important;
+    }
+    .nav-dropdown-wrap:hover .dropdown-chevron {
+      transform: rotate(180deg);
+    }
+    .nav-dropdown-menu {
+      position: absolute !important;
+      left: 50% !important;
+      top: 100% !important;
+      transform: translateX(-50%) translateY(8px) !important;
+      padding-top: 8px !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s !important;
+      z-index: 999 !important;
+    }
+    .nav-dropdown-wrap:hover .nav-dropdown-menu,
+    .nav-dropdown-wrap:focus-within .nav-dropdown-menu {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: translateX(-50%) translateY(0) !important;
+      pointer-events: auto !important;
+    }
+
+    /* Mobile Breakpoint: < 1024px */
+    @media (max-width: 1023px) {
+      #mobile-menu-btn-wrap {
+        display: flex !important;
+      }
+      .site-desktop-nav {
+        display: none !important;
+      }
+      .site-brand-logo-container {
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 10 !important;
+      }
+    }
+
+    /* Desktop Breakpoint: >= 1024px */
+    @media (min-width: 1024px) {
+      #mobile-menu-btn-wrap {
+        display: none !important;
+      }
+      .site-desktop-nav {
+        display: flex !important;
+      }
+      .site-brand-logo-container {
+        position: static !important;
+        transform: none !important;
+      }
+    }
+
+    /* Mobile Navigation Drawer & Backdrop */
+    #mobile-drawer {
+      position: fixed !important;
+      left: 0 !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      width: 85% !important;
+      max-width: 320px !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      background-color: #210e0d !important;
+      color: #ffffff !important;
+      z-index: 99999 !important;
+      transform: translateX(-100%) !important;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      will-change: transform;
+    }
+    #mobile-drawer.drawer-open {
+      transform: translateX(0) !important;
+    }
+    #mobile-drawer-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+      background: rgba(0, 0, 0, 0.65) !important;
+      backdrop-filter: blur(4px) !important;
+      -webkit-backdrop-filter: blur(4px) !important;
+      z-index: 99998 !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    #mobile-drawer-overlay.overlay-open {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .reels-scroll::-webkit-scrollbar { display: none; }
@@ -171,42 +304,145 @@ $isLoggedIn = Auth::check();
       </div>
     <?php endif; ?>
 
-    <!-- ══ STICKY HEADER (Brown Header matching Brand Theme) ══ -->
+    <!-- ══ STICKY HEADER (Theme Matching Deep Roasted Jaggery Burgundy) ══ -->
     <header id="site-header" class="site-sticky-header header-unscrolled sticky top-0 z-40 transition-all duration-300">
-      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
+      <div class="site-header-container mx-auto max-w-6xl px-3 sm:px-4 py-2.5 md:px-6">
         
-        <!-- Brand Logo (Official Admin Emblem) -->
-        <a href="index.php" class="flex items-center gap-2.5 shrink-0" aria-label="Dabhi Chikki home">
-          <img src="assets/images/logo.png" alt="Dabhi Chikki" class="site-logo-img h-10 w-auto md:h-12 object-contain shrink-0" draggable="false"/>
-        </a>
+        <!-- ── Left: Hamburger Menu Button (Mobile View, Hidden on Desktop) ── -->
+        <div id="mobile-menu-btn-wrap" class="items-center z-10">
+          <button
+            id="mobile-menu-btn"
+            type="button"
+            class="flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:bg-white/10 active:scale-95"
+            aria-label="Open navigation menu"
+            title="Menu"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+              <line x1="4" x2="20" y1="12" y2="12"></line>
+              <line x1="4" x2="20" y1="6" y2="6"></line>
+              <line x1="4" x2="20" y1="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
 
-        <!-- Center Nav: Products & Track Order -->
-        <nav class="hidden sm:flex items-center gap-6">
-          <a href="index.php#products" class="text-sm font-medium text-white/90 hover:text-[#f6dc94] transition">Products</a>
-          <a href="track.php" class="text-sm font-medium text-white/90 hover:text-[#f6dc94] transition flex items-center gap-1.5">
-            <span>📦</span> Track Order
+        <!-- ── Brand Logo: Moved to Center in Mobile, Natural Left on Desktop ── -->
+        <div class="site-brand-logo-container z-10">
+          <a href="index.php" class="flex items-center gap-2.5" aria-label="Dabhi Chikki Home">
+            <img src="assets/images/logo.png" alt="Dabhi Chikki" class="site-logo-img h-10 w-auto md:h-12 object-contain shrink-0" draggable="false"/>
+          </a>
+        </div>
+
+        <!-- ── Center: Desktop Navigation Bar (Visible on lg+) ── -->
+        <nav class="site-desktop-nav">
+          <a href="index.php" class="header-nav-link">
+            <span>Home</span>
+          </a>
+
+          <!-- Our Chikki with Rich Dropdown -->
+          <div class="nav-dropdown-wrap">
+            <a href="index.php#products" class="header-nav-link cursor-pointer">
+              <span>Our Chikki</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="dropdown-chevron transition-transform duration-200"><path d="m6 9 6 6 6-6"/></svg>
+            </a>
+
+            <!-- Dropdown Menu Card -->
+            <div class="nav-dropdown-menu">
+              <div class="w-80 rounded-2xl border border-[#f6dc94]/30 bg-[#260f10] p-2.5 shadow-2xl backdrop-blur-xl">
+                <div class="flex items-center justify-between px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold border-b border-white/10">
+                  <span>Authentic Varieties</span>
+                  <span class="text-white/50">Pure Jaggery</span>
+                </div>
+                <div class="p-1 space-y-1 mt-1">
+                  <a href="product.php?slug=mandvi-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-lg">🥜</span>
+                      <div>
+                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">Mandvi Peanut Chikki</div>
+                        <div class="text-[11px] text-white/60">Classic Saurashtra crunch</div>
+                      </div>
+                    </div>
+                    <span class="rounded-full bg-[#c7613d] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-white">Bestseller</span>
+                  </a>
+
+                  <a href="product.php?slug=til-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-lg">⚪</span>
+                      <div>
+                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">TIL Sesame Chikki</div>
+                        <div class="text-[11px] text-white/60">Rich in natural calcium</div>
+                      </div>
+                    </div>
+                    <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-[#f6dc94]">Calcium</span>
+                  </a>
+
+                  <a href="product.php?slug=daliya-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-lg">🌾</span>
+                      <div>
+                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">Daliya Gram Chikki</div>
+                        <div class="text-[11px] text-white/60">Crispy roasted chickpea</div>
+                      </div>
+                    </div>
+                    <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-white/80">Crispy</span>
+                  </a>
+
+                  <a href="product.php?slug=3-mix-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-lg">✨</span>
+                      <div>
+                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">3 Mix Signature Box</div>
+                        <div class="text-[11px] text-white/60">Peanut, Til &amp; Coconut</div>
+                      </div>
+                    </div>
+                    <span class="rounded-full bg-[#f6dc94] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#541f21]">Signature</span>
+                  </a>
+                </div>
+
+                <div class="mt-1 border-t border-white/10 pt-2 px-1">
+                  <a href="index.php#products" class="flex items-center justify-center gap-1.5 w-full rounded-xl bg-white/10 py-1.5 text-center text-xs font-semibold text-[#f6dc94] hover:bg-[#c7613d] hover:text-white transition">
+                    <span>Explore All 4 Flavors</span>
+                    <span class="text-xs">→</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="index.php#our-story" class="header-nav-link">
+            <span>Our Craft</span>
+          </a>
+
+          <a href="index.php#reels-section" class="header-nav-link">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:9999px;background-color:#f87171;margin-right:2px;"></span>
+            <span>Reels</span>
+          </a>
+
+          <a href="index.php#reviews" class="header-nav-link">
+            <span>Reviews</span>
+          </a>
+
+          <a href="track.php" class="header-nav-link">
+            <span>📦</span>
+            <span>Track Order</span>
           </a>
         </nav>
 
-        <!-- Right Action Icons: User Account + Cart Bag -->
-        <div class="flex items-center gap-2 shrink-0">
-          <a href="track.php" class="flex sm:hidden h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Track Order" title="Track Order">
-            <span style="font-size:1.1rem;">📦</span>
-          </a>
+        <!-- ── Right Action Icons: User Account + Cart Bag ── -->
+        <div class="site-header-actions flex items-center gap-1.5 sm:gap-2 shrink-0 z-10">
           <!-- User profile link -->
           <?php if ($isLoggedIn): ?>
-            <a href="account.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Account">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-5 w-5" style="stroke:#ffffff !important;" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <a href="account.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Account" title="My Account">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </a>
           <?php else: ?>
-            <a href="auth.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Sign in">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-5 w-5" style="stroke:#ffffff !important;" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <a href="auth.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Sign in" title="Sign In">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </a>
           <?php endif; ?>
 
           <!-- Shopping Bag Button -->
-          <button id="cart-toggle-btn" class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Cart">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag h-5 w-5" style="stroke:#ffffff !important;" aria-hidden="true">
+          <button id="cart-toggle-btn" class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Cart" title="Cart Bag">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
               <path d="M16 10a4 4 0 0 1-8 0"></path>
               <path d="M3.103 6.034h17.794"></path>
               <path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"></path>
@@ -220,20 +456,199 @@ $isLoggedIn = Auth::check();
       </div>
     </header>
 
+    <!-- ══ MOBILE NAVIGATION DRAWER & BACKDROP ══ -->
+    <div id="mobile-drawer-overlay" class="site-drawer-backdrop" onclick="closeMobileDrawer()"></div>
+
+    <aside id="mobile-drawer" class="site-mobile-drawer border-r border-[#f6dc94]/20">
+      
+      <!-- Drawer Header -->
+      <div class="flex items-center justify-between border-b border-white/10 px-5 py-3.5 bg-[#2b1211]">
+        <a href="index.php" class="flex items-center gap-2" onclick="closeMobileDrawer()" aria-label="Dabhi Chikki Home">
+          <img src="assets/images/logo.png" alt="Dabhi Chikki" class="h-9 w-auto object-contain"/>
+        </a>
+        <button id="mobile-drawer-close-btn" type="button" class="flex h-9 w-9 items-center justify-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white" onclick="closeMobileDrawer()" aria-label="Close menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Drawer Scrollable Body -->
+      <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4" style="scrollbar-width:none">
+        
+        <!-- Section: Navigation -->
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold">Explore</p>
+          <div class="space-y-1">
+            <a href="index.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+              <span class="text-base">🏠</span>
+              <span>Home</span>
+            </a>
+            <a href="index.php#our-story" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+              <span class="text-base">📖</span>
+              <span>Our Story &amp; Craft</span>
+            </a>
+            <a href="index.php#reels-section" class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+              <div class="flex items-center gap-3">
+                <span class="text-base">🎬</span>
+                <span>Reels &amp; Videos</span>
+              </div>
+              <span class="rounded-full bg-red-500/20 text-red-300 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider">Live</span>
+            </a>
+            <a href="index.php#reviews" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+              <span class="text-base">⭐</span>
+              <span>Customer Reviews</span>
+            </a>
+            <a href="track.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+              <span class="text-base">📦</span>
+              <span>Track Order</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="border-t border-white/10"></div>
+
+        <!-- Section: Products / Flavors -->
+        <div>
+          <div class="flex items-center justify-between px-2 mb-1.5">
+            <p class="text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold">Our 4 Signature Chikkis</p>
+            <a href="index.php#products" class="text-[11px] text-[#f6dc94] hover:underline" onclick="closeMobileDrawer()">View All →</a>
+          </div>
+          <div class="space-y-1">
+            <a href="product.php?slug=mandvi-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
+              <div class="flex items-center gap-2.5">
+                <span class="text-base">🥜</span>
+                <div>
+                  <div class="text-xs font-semibold text-white">Mandvi Peanut Chikki</div>
+                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹200</div>
+                </div>
+              </div>
+              <span class="rounded-full bg-[#c7613d] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-white">Bestseller</span>
+            </a>
+
+            <a href="product.php?slug=til-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
+              <div class="flex items-center gap-2.5">
+                <span class="text-base">⚪</span>
+                <div>
+                  <div class="text-xs font-semibold text-white">TIL Sesame Chikki</div>
+                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹200</div>
+                </div>
+              </div>
+              <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-[#f6dc94]">Calcium</span>
+            </a>
+
+            <a href="product.php?slug=daliya-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
+              <div class="flex items-center gap-2.5">
+                <span class="text-base">🌾</span>
+                <div>
+                  <div class="text-xs font-semibold text-white">Daliya Gram Chikki</div>
+                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹200</div>
+                </div>
+              </div>
+              <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-white/80">Crispy</span>
+            </a>
+
+            <a href="product.php?slug=3-mix-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
+              <div class="flex items-center gap-2.5">
+                <span class="text-base">✨</span>
+                <div>
+                  <div class="text-xs font-semibold text-white">3 Mix Signature Box</div>
+                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹250</div>
+                </div>
+              </div>
+              <span class="rounded-full bg-[#f6dc94] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#541f21]">Signature</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="border-t border-white/10"></div>
+
+        <!-- Section: Account & Support -->
+        <div>
+          <p class="px-2 mb-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold">Account</p>
+          <div class="space-y-1">
+            <?php if ($isLoggedIn): ?>
+              <a href="account.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10" onclick="closeMobileDrawer()">
+                <span class="text-base">👤</span>
+                <span>My Profile &amp; Orders</span>
+              </a>
+              <a href="logout.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-300 transition hover:bg-white/10" onclick="closeMobileDrawer()">
+                <span class="text-base">🚪</span>
+                <span>Log Out</span>
+              </a>
+            <?php else: ?>
+              <a href="auth.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+                <span class="text-base">🔐</span>
+                <span>Sign In / Create Account</span>
+              </a>
+            <?php endif; ?>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Drawer Footer: WhatsApp & Quality Promise -->
+      <div class="border-t border-white/10 bg-[#1a0b0a] p-4 space-y-2">
+        <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" class="flex items-center justify-center gap-2 w-full rounded-xl bg-emerald-700/80 hover:bg-emerald-700 py-2.5 px-3 text-xs font-semibold text-white shadow-sm transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          <span>WhatsApp Support (+91 98765 43210)</span>
+        </a>
+        <div class="text-center text-[10px] text-white/50 font-mono">
+          100% Pure Jaggery • Handcrafted Since 2009
+        </div>
+      </div>
+
+    </aside>
+
     <script>
-    (function() {
-      const header = document.getElementById('site-header');
-      if (!header) return;
-      function updateHeader() {
-        if (window.scrollY > 10) {
-          header.classList.remove('header-unscrolled');
-          header.classList.add('header-scrolled');
-        } else {
-          header.classList.remove('header-scrolled');
-          header.classList.add('header-unscrolled');
-        }
+    function openMobileDrawer() {
+      const drawer = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      if (drawer && overlay) {
+        drawer.classList.add('drawer-open');
+        overlay.classList.add('overlay-open');
+        document.body.style.overflow = 'hidden';
       }
-      window.addEventListener('scroll', updateHeader, { passive: true });
-      updateHeader();
+    }
+
+    function closeMobileDrawer() {
+      const drawer = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      if (drawer && overlay) {
+        drawer.classList.remove('drawer-open');
+        overlay.classList.remove('overlay-open');
+        document.body.style.overflow = '';
+      }
+    }
+
+    (function() {
+      // Header scroll background effect
+      const header = document.getElementById('site-header');
+      if (header) {
+        function updateHeader() {
+          if (window.scrollY > 10) {
+            header.classList.remove('header-unscrolled');
+            header.classList.add('header-scrolled');
+          } else {
+            header.classList.remove('header-scrolled');
+            header.classList.add('header-unscrolled');
+          }
+        }
+        window.addEventListener('scroll', updateHeader, { passive: true });
+        updateHeader();
+      }
+
+      // Mobile Drawer event bindings
+      const menuBtn = document.getElementById('mobile-menu-btn');
+      if (menuBtn) {
+        menuBtn.addEventListener('click', openMobileDrawer);
+      }
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      if (overlay) {
+        overlay.addEventListener('click', closeMobileDrawer);
+      }
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          closeMobileDrawer();
+        }
+      });
     })();
     </script>

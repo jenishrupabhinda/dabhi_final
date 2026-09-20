@@ -420,7 +420,7 @@ function discountPct($mrp, $sell): int {
   $storyHeading = function_exists('getSetting') ? getSetting('story_heading', 'Dessert, reimagined with real ingredients.') : 'Dessert, reimagined with real ingredients.';
   $storySubhead = function_exists('getSetting') ? getSetting('story_subheading', 'A modern chikki brand built around wholesome indulgence without compromise.') : 'A modern chikki brand built around wholesome indulgence without compromise.';
 ?>
-<section class="px-4 py-16 md:px-6 md:py-24">
+<section id="our-story" class="px-4 py-16 md:px-6 md:py-24">
   <div class="mx-auto max-w-6xl rounded-[28px] border border-[#6e1f1f]/10 bg-[#f6dc94] px-5 py-14 shadow-[0_20px_60px_-30px_rgba(110,31,31,0.25)] md:px-14 md:py-20">
     
     <!-- Story Eyebrow & Headline Block -->
@@ -534,7 +534,7 @@ function discountPct($mrp, $sell): int {
     $approvedReviews = [];
   }
 ?>
-<section class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
+<section id="reviews" class="mx-auto max-w-6xl px-4 py-12 md:px-6 md:py-16">
   <!-- Section Header -->
   <div class="mb-8 text-center md:mb-12">
     <?php if (!empty($revBadge)): ?>
