@@ -68,6 +68,9 @@ function sidebarCan(string $perm): bool {
       <a href="<?= url('admin/modules.php') ?>" class="sidebar-link <?= sidebarActive('modules') ?>">
         <span class="icon">🎛️</span> Modules &amp; Content
       </a>
+      <a href="<?= url('admin/menus.php') ?>" class="sidebar-link <?= sidebarActive('menus') ?>">
+        <span class="icon">🧭</span> Navigation Menu
+      </a>
       <a href="<?= url('admin/instagram-reels.php') ?>" class="sidebar-link <?= sidebarActive('instagram-reels') ?>">
         <span class="icon">📸</span> Instagram Reels
       </a>

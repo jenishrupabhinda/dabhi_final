@@ -29,6 +29,16 @@ try {
     $cartCount = 0;
 }
 $isLoggedIn = Auth::check();
+
+// Fetch dynamic storefront navigation
+$navTree = [];
+try {
+    if (class_exists('Menu')) {
+        $navTree = Menu::getTree('primary', true);
+    }
+} catch (\Throwable $e) {
+    $navTree = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -153,6 +163,75 @@ $isLoggedIn = Auth::check();
       visibility: visible !important;
       transform: translateX(-50%) translateY(0) !important;
       pointer-events: auto !important;
+    }
+
+    /* 100% Solid, Non-Transparent Desktop Dropdown Card */
+    .nav-dropdown-card {
+      width: 330px !important;
+      border-radius: 1rem !important;
+      background-color: #2b0e0d !important;
+      background: #2b0e0d !important;
+      border: 1px solid rgba(246, 220, 148, 0.3) !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+      padding: 0.65rem !important;
+      color: #ffffff !important;
+      text-align: left !important;
+    }
+    .nav-dropdown-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 0.35rem 0.75rem 0.5rem 0.75rem !important;
+      font-family: var(--font-mono, 'Cascadia Code', monospace) !important;
+      font-size: 0.625rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.2em !important;
+      color: #f6dc94 !important;
+      font-weight: 600 !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+      margin-bottom: 0.35rem !important;
+    }
+    .nav-dropdown-item {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 0.625rem !important;
+      border-radius: 0.75rem !important;
+      padding: 0.5rem 0.75rem !important;
+      text-decoration: none !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      background-color: transparent !important;
+    }
+    .nav-dropdown-item:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    .nav-dropdown-item:hover .nav-item-title {
+      color: #f6dc94 !important;
+    }
+    .nav-item-title {
+      font-size: 0.775rem !important;
+      font-weight: 600 !important;
+      color: #ffffff !important;
+      transition: color 0.2s ease !important;
+      line-height: 1.2 !important;
+    }
+    .nav-item-sub {
+      font-size: 0.6875rem !important;
+      color: rgba(255, 255, 255, 0.6) !important;
+      margin-top: 2px !important;
+      line-height: 1.2 !important;
+    }
+    .nav-item-badge {
+      display: inline-block !important;
+      border-radius: 9999px !important;
+      padding: 0.125rem 0.5rem !important;
+      font-family: var(--font-mono, 'Cascadia Code', monospace) !important;
+      font-size: 0.5625rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      white-space: nowrap !important;
+      line-height: 1.4 !important;
     }
 
     /* Mobile Breakpoint: < 1024px */
@@ -334,97 +413,82 @@ $isLoggedIn = Auth::check();
 
         <!-- ── Center: Desktop Navigation Bar (Visible on lg+) ── -->
         <nav class="site-desktop-nav">
-          <a href="index.php" class="header-nav-link">
-            <span>Home</span>
-          </a>
+          <?php if (!empty($navTree)): ?>
+            <?php foreach ($navTree as $item): ?>
+              <?php if (!empty($item['children'])): ?>
+                <!-- Item with Dropdown Submenu -->
+                <div class="nav-dropdown-wrap">
+                  <a href="<?= htmlspecialchars($item['url']) ?>" target="<?= htmlspecialchars($item['target'] ?? '_self') ?>" class="header-nav-link cursor-pointer">
+                    <?php if (!empty($item['icon'])): ?>
+                      <span class="text-sm"><?= htmlspecialchars($item['icon']) ?></span>
+                    <?php endif; ?>
+                    <span><?= htmlspecialchars($item['title']) ?></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="dropdown-chevron transition-transform duration-200"><path d="m6 9 6 6 6-6"/></svg>
+                  </a>
 
-          <!-- Our Chikki with Rich Dropdown -->
-          <div class="nav-dropdown-wrap">
-            <a href="index.php#products" class="header-nav-link cursor-pointer">
-              <span>Our Chikki</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="dropdown-chevron transition-transform duration-200"><path d="m6 9 6 6 6-6"/></svg>
+                  <!-- 100% Solid Opaque Dropdown Menu Card -->
+                  <div class="nav-dropdown-menu">
+                    <div class="nav-dropdown-card">
+                      <div class="nav-dropdown-header">
+                        <span><?= htmlspecialchars($item['title']) ?></span>
+                        <span style="color:rgba(255,255,255,0.45);text-transform:none;letter-spacing:normal;font-size:10px;">Pure Jaggery</span>
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:3px;">
+                        <?php foreach ($item['children'] as $child): ?>
+                          <a href="<?= htmlspecialchars($child['url']) ?>" target="<?= htmlspecialchars($child['target'] ?? '_self') ?>" class="nav-dropdown-item">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                              <?php if (!empty($child['icon'])): ?>
+                                <span style="font-size:1.15rem;"><?= htmlspecialchars($child['icon']) ?></span>
+                              <?php endif; ?>
+                              <div>
+                                <div class="nav-item-title"><?= htmlspecialchars($child['title']) ?></div>
+                                <?php if (!empty($child['subtitle'])): ?>
+                                  <div class="nav-item-sub"><?= htmlspecialchars($child['subtitle']) ?></div>
+                                <?php endif; ?>
+                              </div>
+                            </div>
+                            <?php if (!empty($child['badge'])): ?>
+                              <span class="nav-item-badge" style="background-color:<?= htmlspecialchars($child['badge_color'] ?: '#c7613d') ?>;color:<?= ($child['badge_color'] ?? '') === '#f6dc94' ? '#541f21' : '#ffffff' ?>;">
+                                <?= htmlspecialchars($child['badge']) ?>
+                              </span>
+                            <?php endif; ?>
+                          </a>
+                        <?php endforeach; ?>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <?php else: ?>
+                <!-- Direct Nav Link -->
+                <a href="<?= htmlspecialchars($item['url']) ?>" target="<?= htmlspecialchars($item['target'] ?? '_self') ?>" class="header-nav-link">
+                  <?php if (!empty($item['icon'])): ?>
+                    <?php if ($item['icon'] === '🔴'): ?>
+                      <span style="display:inline-block;width:8px;height:8px;border-radius:9999px;background-color:#f87171;margin-right:2px;"></span>
+                    <?php else: ?>
+                      <span><?= htmlspecialchars($item['icon']) ?></span>
+                    <?php endif; ?>
+                  <?php endif; ?>
+                  <span><?= htmlspecialchars($item['title']) ?></span>
+                  <?php if (!empty($item['badge'])): ?>
+                    <span class="nav-item-badge" style="background-color:<?= htmlspecialchars($item['badge_color'] ?: '#c7613d') ?>;color:<?= ($item['badge_color'] ?? '') === '#f6dc94' ? '#541f21' : '#ffffff' ?>;">
+                      <?= htmlspecialchars($item['badge']) ?>
+                    </span>
+                  <?php endif; ?>
+                </a>
+              <?php endif; ?>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <!-- Fallback Static Nav Links -->
+            <a href="index.php" class="header-nav-link"><span>Home</span></a>
+            <a href="index.php#products" class="header-nav-link"><span>Our Chikki</span></a>
+            <a href="index.php#our-story" class="header-nav-link"><span>Our Craft</span></a>
+            <a href="index.php#reels-section" class="header-nav-link">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:9999px;background-color:#f87171;margin-right:2px;"></span>
+              <span>Reels</span>
             </a>
-
-            <!-- Dropdown Menu Card -->
-            <div class="nav-dropdown-menu">
-              <div class="w-80 rounded-2xl border border-[#f6dc94]/30 bg-[#260f10] p-2.5 shadow-2xl backdrop-blur-xl">
-                <div class="flex items-center justify-between px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold border-b border-white/10">
-                  <span>Authentic Varieties</span>
-                  <span class="text-white/50">Pure Jaggery</span>
-                </div>
-                <div class="p-1 space-y-1 mt-1">
-                  <a href="product.php?slug=mandvi-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
-                    <div class="flex items-center gap-2.5">
-                      <span class="text-lg">🥜</span>
-                      <div>
-                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">Mandvi Peanut Chikki</div>
-                        <div class="text-[11px] text-white/60">Classic Saurashtra crunch</div>
-                      </div>
-                    </div>
-                    <span class="rounded-full bg-[#c7613d] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-white">Bestseller</span>
-                  </a>
-
-                  <a href="product.php?slug=til-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
-                    <div class="flex items-center gap-2.5">
-                      <span class="text-lg">⚪</span>
-                      <div>
-                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">TIL Sesame Chikki</div>
-                        <div class="text-[11px] text-white/60">Rich in natural calcium</div>
-                      </div>
-                    </div>
-                    <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-[#f6dc94]">Calcium</span>
-                  </a>
-
-                  <a href="product.php?slug=daliya-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
-                    <div class="flex items-center gap-2.5">
-                      <span class="text-lg">🌾</span>
-                      <div>
-                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">Daliya Gram Chikki</div>
-                        <div class="text-[11px] text-white/60">Crispy roasted chickpea</div>
-                      </div>
-                    </div>
-                    <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-white/80">Crispy</span>
-                  </a>
-
-                  <a href="product.php?slug=3-mix-chikki" class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 transition hover:bg-white/10 text-left group/item">
-                    <div class="flex items-center gap-2.5">
-                      <span class="text-lg">✨</span>
-                      <div>
-                        <div class="text-xs font-semibold text-white group-hover/item:text-[#f6dc94] transition">3 Mix Signature Box</div>
-                        <div class="text-[11px] text-white/60">Peanut, Til &amp; Coconut</div>
-                      </div>
-                    </div>
-                    <span class="rounded-full bg-[#f6dc94] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#541f21]">Signature</span>
-                  </a>
-                </div>
-
-                <div class="mt-1 border-t border-white/10 pt-2 px-1">
-                  <a href="index.php#products" class="flex items-center justify-center gap-1.5 w-full rounded-xl bg-white/10 py-1.5 text-center text-xs font-semibold text-[#f6dc94] hover:bg-[#c7613d] hover:text-white transition">
-                    <span>Explore All 4 Flavors</span>
-                    <span class="text-xs">→</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <a href="index.php#our-story" class="header-nav-link">
-            <span>Our Craft</span>
-          </a>
-
-          <a href="index.php#reels-section" class="header-nav-link">
-            <span style="display:inline-block;width:8px;height:8px;border-radius:9999px;background-color:#f87171;margin-right:2px;"></span>
-            <span>Reels</span>
-          </a>
-
-          <a href="index.php#reviews" class="header-nav-link">
-            <span>Reviews</span>
-          </a>
-
-          <a href="track.php" class="header-nav-link">
-            <span>📦</span>
-            <span>Track Order</span>
-          </a>
+            <a href="index.php#reviews" class="header-nav-link"><span>Reviews</span></a>
+            <a href="track.php" class="header-nav-link"><span>📦</span><span>Track Order</span></a>
+          <?php endif; ?>
         </nav>
 
         <!-- ── Right Action Icons: User Account + Cart Bag ── -->
@@ -478,86 +542,80 @@ $isLoggedIn = Auth::check();
         <div>
           <p class="px-2 mb-1.5 text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold">Explore</p>
           <div class="space-y-1">
-            <a href="index.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
-              <span class="text-base">🏠</span>
-              <span>Home</span>
-            </a>
-            <a href="index.php#our-story" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
-              <span class="text-base">📖</span>
-              <span>Our Story &amp; Craft</span>
-            </a>
-            <a href="index.php#reels-section" class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
-              <div class="flex items-center gap-3">
-                <span class="text-base">🎬</span>
-                <span>Reels &amp; Videos</span>
-              </div>
-              <span class="rounded-full bg-red-500/20 text-red-300 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider">Live</span>
-            </a>
-            <a href="index.php#reviews" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
-              <span class="text-base">⭐</span>
-              <span>Customer Reviews</span>
-            </a>
-            <a href="track.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
-              <span class="text-base">📦</span>
-              <span>Track Order</span>
-            </a>
+            <?php if (!empty($navTree)): ?>
+              <?php foreach ($navTree as $item): ?>
+                <a href="<?= htmlspecialchars($item['url']) ?>" target="<?= htmlspecialchars($item['target'] ?? '_self') ?>" class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+                  <div class="flex items-center gap-3">
+                    <?php if (!empty($item['icon'])): ?>
+                      <span class="text-base"><?= htmlspecialchars($item['icon']) ?></span>
+                    <?php else: ?>
+                      <span class="text-xs text-[#f6dc94]">✦</span>
+                    <?php endif; ?>
+                    <span><?= htmlspecialchars($item['title']) ?></span>
+                  </div>
+                  <?php if (!empty($item['badge'])): ?>
+                    <span class="rounded-full px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider" style="background-color:<?= htmlspecialchars($item['badge_color'] ?: '#c7613d') ?>;color:<?= ($item['badge_color'] ?? '') === '#f6dc94' ? '#541f21' : '#ffffff' ?>;">
+                      <?= htmlspecialchars($item['badge']) ?>
+                    </span>
+                  <?php endif; ?>
+                </a>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <a href="index.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+                <span class="text-base">🏠</span><span>Home</span>
+              </a>
+              <a href="index.php#our-story" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+                <span class="text-base">📖</span><span>Our Story &amp; Craft</span>
+              </a>
+              <a href="index.php#reels-section" class="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+                <div class="flex items-center gap-3"><span class="text-base">🎬</span><span>Reels &amp; Videos</span></div>
+                <span class="rounded-full bg-red-500/20 text-red-300 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider">Live</span>
+              </a>
+              <a href="index.php#reviews" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+                <span class="text-base">⭐</span><span>Customer Reviews</span>
+              </a>
+              <a href="track.php" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-white/10 hover:text-[#f6dc94]" onclick="closeMobileDrawer()">
+                <span class="text-base">📦</span><span>Track Order</span>
+              </a>
+            <?php endif; ?>
           </div>
         </div>
 
-        <div class="border-t border-white/10"></div>
-
-        <!-- Section: Products / Flavors -->
-        <div>
-          <div class="flex items-center justify-between px-2 mb-1.5">
-            <p class="text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold">Our 4 Signature Chikkis</p>
-            <a href="index.php#products" class="text-[11px] text-[#f6dc94] hover:underline" onclick="closeMobileDrawer()">View All →</a>
+        <?php 
+        // Render any active submenu groups
+        $submenuGroups = array_filter($navTree, fn($t) => !empty($t['children']));
+        ?>
+        <?php foreach ($submenuGroups as $group): ?>
+          <div class="border-t border-white/10"></div>
+          <div>
+            <div class="flex items-center justify-between px-2 mb-1.5">
+              <p class="text-[10px] font-mono uppercase tracking-[0.2em] text-[#f6dc94] font-semibold"><?= htmlspecialchars($group['title']) ?></p>
+              <a href="<?= htmlspecialchars($group['url']) ?>" class="text-[11px] text-[#f6dc94] hover:underline" onclick="closeMobileDrawer()">View All →</a>
+            </div>
+            <div class="space-y-1">
+              <?php foreach ($group['children'] as $child): ?>
+                <a href="<?= htmlspecialchars($child['url']) ?>" target="<?= htmlspecialchars($child['target'] ?? '_self') ?>" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
+                  <div class="flex items-center gap-2.5">
+                    <?php if (!empty($child['icon'])): ?>
+                      <span class="text-base"><?= htmlspecialchars($child['icon']) ?></span>
+                    <?php endif; ?>
+                    <div>
+                      <div class="text-xs font-semibold text-white"><?= htmlspecialchars($child['title']) ?></div>
+                      <?php if (!empty($child['subtitle'])): ?>
+                        <div class="text-[10px] text-[#f6dc94]"><?= htmlspecialchars($child['subtitle']) ?></div>
+                      <?php endif; ?>
+                    </div>
+                  </div>
+                  <?php if (!empty($child['badge'])): ?>
+                    <span class="rounded-full px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider" style="background-color:<?= htmlspecialchars($child['badge_color'] ?: '#c7613d') ?>;color:<?= ($child['badge_color'] ?? '') === '#f6dc94' ? '#541f21' : '#ffffff' ?>;">
+                      <?= htmlspecialchars($child['badge']) ?>
+                    </span>
+                  <?php endif; ?>
+                </a>
+              <?php endforeach; ?>
+            </div>
           </div>
-          <div class="space-y-1">
-            <a href="product.php?slug=mandvi-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
-              <div class="flex items-center gap-2.5">
-                <span class="text-base">🥜</span>
-                <div>
-                  <div class="text-xs font-semibold text-white">Mandvi Peanut Chikki</div>
-                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹200</div>
-                </div>
-              </div>
-              <span class="rounded-full bg-[#c7613d] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-white">Bestseller</span>
-            </a>
-
-            <a href="product.php?slug=til-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
-              <div class="flex items-center gap-2.5">
-                <span class="text-base">⚪</span>
-                <div>
-                  <div class="text-xs font-semibold text-white">TIL Sesame Chikki</div>
-                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹200</div>
-                </div>
-              </div>
-              <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-[#f6dc94]">Calcium</span>
-            </a>
-
-            <a href="product.php?slug=daliya-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
-              <div class="flex items-center gap-2.5">
-                <span class="text-base">🌾</span>
-                <div>
-                  <div class="text-xs font-semibold text-white">Daliya Gram Chikki</div>
-                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹200</div>
-                </div>
-              </div>
-              <span class="rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider text-white/80">Crispy</span>
-            </a>
-
-            <a href="product.php?slug=3-mix-chikki" class="flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10" onclick="closeMobileDrawer()">
-              <div class="flex items-center gap-2.5">
-                <span class="text-base">✨</span>
-                <div>
-                  <div class="text-xs font-semibold text-white">3 Mix Signature Box</div>
-                  <div class="text-[10px] text-[#f6dc94] font-price">From ₹250</div>
-                </div>
-              </div>
-              <span class="rounded-full bg-[#f6dc94] px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#541f21]">Signature</span>
-            </a>
-          </div>
-        </div>
+        <?php endforeach; ?>
 
         <div class="border-t border-white/10"></div>
 
