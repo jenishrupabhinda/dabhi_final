@@ -67,6 +67,31 @@
   --header-h:  64px;
 }
 
+/* ── iOS Safari Stretch & Auto-Zoom Prevention ────────────────── */
+html {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+}
+body {
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+input, textarea, select, button, a, [role="button"] {
+  touch-action: manipulation;
+}
+input, textarea, select {
+  font-size: 16px !important;
+}
+@media screen and (max-width: 768px), screen and (-webkit-min-device-pixel-ratio: 0) {
+  input, textarea, select, .form-control {
+    font-size: 16px !important;
+  }
+}
+
 /* ── Subpage Component Styles (product, cart, checkout, auth) ── */
 .container {
   width: 100%;
@@ -209,11 +234,12 @@
   padding: 0.65rem 0.875rem;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 0.9375rem;
+  font-size: 1rem;
   background: var(--white);
   color: var(--text);
   transition: border-color var(--t), box-shadow var(--t);
   outline: none;
+  touch-action: manipulation;
 }
 .form-control:focus {
   border-color: var(--maroon);

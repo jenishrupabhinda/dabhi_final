@@ -47,7 +47,7 @@ try {
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <link rel="preload" as="image" href="assets/images/logo.png"/>
   <title><?= htmlspecialchars($pageTitle) ?></title>
   <meta name="format-detection" content="telephone=no"/>
@@ -73,11 +73,33 @@ try {
   <link rel="stylesheet" href="assets/css/yogurtalley.css"/>
 
   <style>
-    html, body {
+    html {
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+      overscroll-behavior-y: none;
+    }
+    body {
       overflow-x: clip !important;
       max-width: 100vw;
       width: 100%;
       position: relative;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+      overscroll-behavior-y: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Prevent iOS Safari auto-zoom on input focus & double-tap zoom */
+    input, textarea, select, button, a, [role="button"], .form-control {
+      touch-action: manipulation;
+    }
+    input, textarea, select, .form-control {
+      font-size: 16px !important;
+    }
+    @media screen and (max-width: 768px), screen and (-webkit-min-device-pixel-ratio: 0) {
+      input, textarea, select, .form-control {
+        font-size: 16px !important;
+      }
     }
     header.site-sticky-header {
       position: -webkit-sticky !important;
@@ -1146,5 +1168,24 @@ try {
           }
         });
       });
+
+      // Prevent iOS Safari auto-zoom on double tap
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function(e) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          const target = e.target;
+          const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable);
+          if (!isInput) {
+            e.preventDefault();
+          }
+        }
+        lastTouchEnd = now;
+      }, { passive: false });
+
+      // Prevent iOS Safari gesture zoom (pinch/stretch zoom)
+      document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+      document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
+      document.addEventListener('gestureend', function(e) { e.preventDefault(); });
     })();
     </script>

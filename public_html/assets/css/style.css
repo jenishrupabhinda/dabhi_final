@@ -73,6 +73,9 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -83,6 +86,24 @@ body {
   background: var(--dc-cream);
   color: var(--dc-black);
   -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+input, textarea, select, button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+@media screen and (max-width: 768px), screen and (-webkit-min-device-pixel-ratio: 0) {
+  input, textarea, select, .form-control {
+    font-size: 16px !important;
+  }
 }
 
 img,
@@ -405,11 +426,12 @@ ol {
   border: 1.5px solid var(--dc-border);
   border-radius: var(--dc-radius);
   font-family: var(--dc-font-body);
-  font-size: 0.95rem;
+  font-size: 1rem;
   background: var(--dc-white);
   color: var(--dc-black);
   transition: border-color var(--dc-transition), box-shadow var(--dc-transition);
   outline: none;
+  touch-action: manipulation;
 }
 
 .form-control::placeholder {

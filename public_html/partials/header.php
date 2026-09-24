@@ -41,7 +41,7 @@ $_navCategories = Database::fetchAll(
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title><?= e($pageTitle) ?> | <?= e(APP_NAME) ?></title>
   <meta name="description" content="<?= e($pageDesc) ?>">
   <link rel="canonical" href="<?= e(APP_URL . $_SERVER['REQUEST_URI']) ?>">

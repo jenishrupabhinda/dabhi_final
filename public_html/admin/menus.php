@@ -98,7 +98,7 @@ $csrfToken  = csrfToken();
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Navigation Menus | <?= e(APP_NAME) ?> Admin</title>
   <meta name="robots" content="noindex">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -348,6 +348,7 @@ $csrfToken  = csrfToken();
           </div>
 
           <form action="<?= url('admin/menus.php') ?>" method="POST" style="padding:20px;">
+            <?= csrfField() ?>
             <input type="hidden" name="_token" value="<?= $csrfToken ?>">
             <input type="hidden" name="menu_id" value="<?= e($editRow['id'] ?? '') ?>">
 

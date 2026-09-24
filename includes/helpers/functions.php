@@ -176,10 +176,21 @@ function csrfField(): string
 /** Verify the CSRF token from POST; dies with 403 if invalid. */
 function csrfVerify(): void
 {
-    $submitted = $_POST['csrf_token'] ?? '';
+    $submitted = $_POST['csrf_token'] ?? $_POST['_token'] ?? '';
     if (!hash_equals(csrfToken(), $submitted)) {
         http_response_code(403);
         die('Request validation failed. Please go back and try again.');
+    }
+}
+
+/** Verify an explicit CSRF token (e.g. from GET query _token); dies with 403 if invalid. */
+if (!function_exists('csrfVerifyToken')) {
+    function csrfVerifyToken(?string $token): void
+    {
+        if (!$token || !hash_equals(csrfToken(), $token)) {
+            http_response_code(403);
+            die('Request validation failed. Please go back and try again.');
+        }
     }
 }
 
