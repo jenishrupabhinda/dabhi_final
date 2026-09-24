@@ -64,12 +64,16 @@ class Database
 
     public static function beginTransaction(): void
     {
-        self::getInstance()->beginTransaction();
+        if (!self::getInstance()->inTransaction()) {
+            self::getInstance()->beginTransaction();
+        }
     }
 
     public static function commit(): void
     {
-        self::getInstance()->commit();
+        if (self::getInstance()->inTransaction()) {
+            self::getInstance()->commit();
+        }
     }
 
     public static function rollback(): void

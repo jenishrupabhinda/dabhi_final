@@ -59,9 +59,9 @@ class Auth
         if (!self::check()) {
             $uri = $_SERVER['REQUEST_URI'] ?? '';
             if (str_contains($uri, '/admin/')) {
-                redirect('/admin/login.php');
+                redirect('/auth.php?redirect=' . urlencode('admin/index.php'));
             }
-            redirect('/login.php');
+            redirect('/auth.php');
         }
         if (!in_array(self::role(), $allowedRoles, true)) {
             http_response_code(403);
@@ -162,11 +162,33 @@ class Auth
         $email = strtolower(trim($email));
         $phone = trim($phone);
 
-        if (Database::fetchOne('SELECT id FROM users WHERE email = ?', [$email])) {
-            return ['ok' => false, 'error' => 'An account with this email already exists.', 'userId' => null];
+        $existingUser = Database::fetchOne('SELECT id, role, full_name, phone FROM users WHERE email = ?', [$email]);
+        if ($existingUser) {
+            if ($existingUser['role'] === 'buyer') {
+                // Existing guest buyer account — set their chosen password and activate
+                $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+                Database::query(
+                    'UPDATE users SET full_name = ?, phone = COALESCE(NULLIF(?, ""), phone), password_hash = ?, is_active = 1, last_login_at = NOW() WHERE id = ?',
+                    [$fullName, $phone, $hash, $existingUser['id']]
+                );
+                return ['ok' => true, 'error' => '', 'userId' => (int)$existingUser['id']];
+            }
+            return ['ok' => false, 'error' => 'An account with this email already exists. Please login.', 'userId' => null];
         }
-        if (Database::fetchOne('SELECT id FROM users WHERE phone = ?', [$phone])) {
-            return ['ok' => false, 'error' => 'An account with this phone number already exists.', 'userId' => null];
+
+        if (!empty($phone)) {
+            $existingPhone = Database::fetchOne('SELECT id, role FROM users WHERE phone = ?', [$phone]);
+            if ($existingPhone) {
+                if ($existingPhone['role'] === 'buyer') {
+                    $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+                    Database::query(
+                        'UPDATE users SET full_name = ?, email = COALESCE(NULLIF(?, ""), email), password_hash = ?, is_active = 1, last_login_at = NOW() WHERE id = ?',
+                        [$fullName, $email, $hash, $existingPhone['id']]
+                    );
+                    return ['ok' => true, 'error' => '', 'userId' => (int)$existingPhone['id']];
+                }
+                return ['ok' => false, 'error' => 'An account with this phone number already exists.', 'userId' => null];
+            }
         }
 
         $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);

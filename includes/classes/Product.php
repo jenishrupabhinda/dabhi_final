@@ -255,12 +255,14 @@ class Product
             Database::query(
                 'UPDATE products SET
                     category_id=?, name=?, slug=?, short_description=?, description=?,
+                    custom_badges=?, custom_card_badges=?,
                     hsn_code=?, gst_rate_percent=?, is_active=?, is_featured=?,
                     meta_title=?, meta_description=?
                  WHERE id=?',
                 [
                     (int)$data['category_id'], $data['name'], $slug,
                     $data['short_description'] ?? null, $data['description'] ?? null,
+                    $data['custom_badges'] ?? null, $data['custom_card_badges'] ?? null,
                     $data['hsn_code'] ?? null, (float)($data['gst_rate_percent'] ?? 5),
                     (int)($data['is_active'] ?? 1), (int)($data['is_featured'] ?? 0),
                     $data['meta_title'] ?? null, $data['meta_description'] ?? null,
@@ -271,12 +273,14 @@ class Product
         } else {
             Database::query(
                 'INSERT INTO products
-                    (category_id, name, slug, short_description, description, hsn_code,
-                     gst_rate_percent, is_active, is_featured, meta_title, meta_description, created_by)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    (category_id, name, slug, short_description, description,
+                     custom_badges, custom_card_badges,
+                     hsn_code, gst_rate_percent, is_active, is_featured, meta_title, meta_description, created_by)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                     (int)$data['category_id'], $data['name'], $slug,
                     $data['short_description'] ?? null, $data['description'] ?? null,
+                    $data['custom_badges'] ?? null, $data['custom_card_badges'] ?? null,
                     $data['hsn_code'] ?? null, (float)($data['gst_rate_percent'] ?? 5),
                     (int)($data['is_active'] ?? 1), (int)($data['is_featured'] ?? 0),
                     $data['meta_title'] ?? null, $data['meta_description'] ?? null,

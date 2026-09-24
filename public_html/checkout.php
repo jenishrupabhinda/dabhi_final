@@ -2,12 +2,9 @@
 /**
  * checkout.php — Checkout Page for Dabhi Chikki
  */
-$pageTitle    = 'Checkout — Dabhi Chikki';
-$pageDesc     = 'Complete your order securely.';
-$extraScripts = ['assets/js/checkout.js'];
-require_once __DIR__ . '/partials/_header.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
 
-// Redirect if cart is empty
+// Redirect if cart is empty (must execute before sending any HTML)
 try {
     $cart  = Cart::getOrCreate();
     $items = Cart::getItems((int)$cart['id']);
@@ -17,9 +14,17 @@ try {
         exit;
     }
 } catch (\Throwable $e) {
-    $items = [];
-    $sum   = ['subtotal'=>0,'item_count'=>0,'total_weight'=>0];
+    header('Location: cart.php');
+    exit;
 }
+
+$pageTitle    = 'Checkout — Dabhi Chikki';
+$pageDesc     = 'Complete your order securely.';
+$extraScripts = [
+    'https://sdk.cashfree.com/js/v3/cashfree.js',
+    'assets/js/checkout.js'
+];
+require_once __DIR__ . '/partials/_header.php';
 
 $freeAbove   = (float)getSetting('free_shipping_threshold', '999');
 if ($freeAbove <= 0) $freeAbove = (float)getSetting('free_shipping_above', '999');

@@ -281,24 +281,74 @@
           headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
           body: JSON.stringify(payload)
         });
-        const data = await res.json();
+
+        let data;
+        const resText = await res.text();
+        try {
+          data = JSON.parse(resText);
+        } catch (jsonErr) {
+          console.error('Server returned non-JSON response:', resText);
+          throw new Error('Server returned an unexpected response. Please try again.');
+        }
+
         if (data.ok) {
+          if (data.payment_mode === 'cashfree' && data.payment_session_id) {
+            const text = btn.querySelector('.btn-text');
+            if (text) text.textContent = 'Opening Cashfree Gateway…';
+
+            if (typeof Cashfree === 'undefined') {
+              const msg = 'Payment gateway SDK could not be loaded. Please check your connection and reload.';
+              if (typeof showToast === 'function') {
+                showToast(msg, 'error');
+              } else {
+                alert(msg);
+              }
+              setLoading(btn, false);
+              return;
+            }
+
+            try {
+              const cashfree = Cashfree({
+                mode: data.cashfree_mode || 'sandbox'
+              });
+
+              cashfree.checkout({
+                paymentSessionId: data.payment_session_id,
+                redirectTarget: '_self'
+              });
+              return;
+            } catch (cfErr) {
+              console.error('Cashfree checkout initialization error:', cfErr);
+              const errMsg = 'Could not open Cashfree checkout: ' + (cfErr.message || cfErr);
+              if (typeof showToast === 'function') {
+                showToast(errMsg, 'error');
+              } else {
+                alert(errMsg);
+              }
+              setLoading(btn, false);
+              return;
+            }
+          }
+
           window.location.href = 'order-success.php?id=' + data.order_id;
         } else if (data.redirect) {
           window.location.href = data.redirect;
         } else {
+          const errMsg = data.error || 'Order could not be placed. Please try again.';
           if (typeof showToast === 'function') {
-            showToast(data.error || 'Order could not be placed. Please try again.', 'error');
+            showToast(errMsg, 'error');
           } else {
-            alert(data.error || 'Order could not be placed. Please try again.');
+            alert(errMsg);
           }
           setLoading(btn, false);
         }
-      } catch (_) {
+      } catch (err) {
+        console.error('Checkout error:', err);
+        const errMsg = (err && err.message) ? err.message : 'Network error. Please check your connection and try again.';
         if (typeof showToast === 'function') {
-          showToast('Network error. Please try again.', 'error');
+          showToast(errMsg, 'error');
         } else {
-          alert('Network error. Please try again.');
+          alert(errMsg);
         }
         setLoading(btn, false);
       }

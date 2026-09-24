@@ -85,6 +85,40 @@ if (isPost()) {
             setSetting('gst_enabled', post('gst_enabled') ? '1' : '0');
         }
 
+        // 10. Product Detail Page Badges & Capsules Module
+        if (isset($_POST['has_product_badges_module'])) {
+            setSetting('module_product_badges', post('module_product_badges') ? '1' : '0');
+            setSetting('product_badges_list', trim(post('product_badges_list', '100% PURE JAGGERY, ZERO REFINED SUGAR, ROASTED NUTS, HIGH PROTEIN, HANDCRAFTED')));
+            setSetting('product_supertitle_enabled', post('product_supertitle_enabled') ? '1' : '0');
+            setSetting('product_supertitle_text', trim(post('product_supertitle_text', 'CHIKKI')));
+            setSetting('product_rating_enabled', post('product_rating_enabled') ? '1' : '0');
+        }
+
+        // 11. Homepage Card Badges & Ratings Module
+        if (isset($_POST['has_card_badges_module'])) {
+            setSetting('module_card_badges', post('module_card_badges') ? '1' : '0');
+            setSetting('card_badges_list', trim(post('card_badges_list', 'Pure Jaggery, 100% Natural')));
+            setSetting('module_card_ratings', post('module_card_ratings') ? '1' : '0');
+            setSetting('card_rating_fallback_enabled', post('card_rating_fallback_enabled') ? '1' : '0');
+            setSetting('card_default_rating', trim(post('card_default_rating', '4.7')));
+            setSetting('card_default_reviews', trim(post('card_default_reviews', '3')));
+        }
+
+        // 12. Tax & HSN Pricing Note Module
+        if (isset($_POST['has_tax_note_module'])) {
+            setSetting('module_tax_note', post('module_tax_note') ? '1' : '0');
+            setSetting('tax_note_text', trim(post('tax_note_text', 'Inclusive of all taxes (GST {rate}% included)')));
+            setSetting('tax_hsn_enabled', post('tax_hsn_enabled') ? '1' : '0');
+        }
+
+        // 13. Live Inventory & Stock Indicator Module
+        if (isset($_POST['has_stock_badge_module'])) {
+            setSetting('module_stock_badge', post('module_stock_badge') ? '1' : '0');
+            setSetting('stock_in_stock_text', trim(post('stock_in_stock_text', 'In Stock (Fresh Batch Ready to Ship)')));
+            setSetting('stock_low_stock_text', trim(post('stock_low_stock_text', '⚠️ Only {qty} left in stock — order soon!')));
+            setSetting('stock_out_of_stock_text', trim(post('stock_out_of_stock_text', '❌ Currently Out of Stock')));
+        }
+
         clearSettingCache();
         flashSet('success', 'Modules & storefront contents updated successfully.');
         redirect('/admin/modules.php');
@@ -128,6 +162,29 @@ $pincodeHelp    = getSetting('pincode_helper_text', 'Enter 6-digit pincode for d
 $mCod           = settingEnabled('cod_enabled', '1');
 $mGstBreakdown  = settingEnabled('module_gst_breakdown', '1');
 $mGstMaster     = settingEnabled('gst_enabled', '1');
+
+// Modules 10-13 Values
+$mProdBadges     = settingEnabled('module_product_badges', '1');
+$prodBadgesList  = getSetting('product_badges_list', '100% PURE JAGGERY, ZERO REFINED SUGAR, ROASTED NUTS, HIGH PROTEIN, HANDCRAFTED');
+$mProdSuper      = settingEnabled('product_supertitle_enabled', '1');
+$prodSuperText   = getSetting('product_supertitle_text', 'CHIKKI');
+$mProdRating     = settingEnabled('product_rating_enabled', '1');
+
+$mCardBadges     = settingEnabled('module_card_badges', '1');
+$cardBadgesList  = getSetting('card_badges_list', 'Pure Jaggery, 100% Natural');
+$mCardRatings    = settingEnabled('module_card_ratings', '1');
+$mCardRatingFall = settingEnabled('card_rating_fallback_enabled', '1');
+$cardDefRating   = getSetting('card_default_rating', '4.7');
+$cardDefReviews  = getSetting('card_default_reviews', '3');
+
+$mTaxNote        = settingEnabled('module_tax_note', '1');
+$taxNoteText     = getSetting('tax_note_text', 'Inclusive of all taxes (GST {rate}% included)');
+$mTaxHsn         = settingEnabled('tax_hsn_enabled', '1');
+
+$mStockBadge     = settingEnabled('module_stock_badge', '1');
+$stockInStock    = getSetting('stock_in_stock_text', 'In Stock (Fresh Batch Ready to Ship)');
+$stockLowStock   = getSetting('stock_low_stock_text', '⚠️ Only {qty} left in stock — order soon!');
+$stockOutOfStock = getSetting('stock_out_of_stock_text', '❌ Currently Out of Stock');
 
 // Review counts for helpful stats badge
 $pendingReviewsCount = (int) (Database::fetchOne("SELECT COUNT(*) AS c FROM reviews WHERE is_approved = 0")['c'] ?? 0);
@@ -500,6 +557,183 @@ require_once __DIR__ . '/partials/page-start.php';
             <a href="<?= url('admin/gst-settings.php') ?>" class="btn btn-sm btn-outline">
               Configure GST Rates →
             </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE 10: PRODUCT DETAIL BADGES & TRUST CAPSULES ══ -->
+      <div class="card module-box">
+        <input type="hidden" name="has_product_badges_module" value="1">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="module-icon" style="background: rgba(199, 97, 61, 0.12); color: var(--dc-terracotta);">🏷️</div>
+            <div>
+              <h3 class="card-title" style="margin: 0;">Product Detail Badges &amp; Capsules</h3>
+              <span style="font-size: 0.8rem; color: var(--dc-muted);">Feature capsules, category supertitle &amp; review stars on product page</span>
+            </div>
+          </div>
+          <!-- Toggle -->
+          <label class="dc-switch-label" title="Toggle Product Page Badges ON/OFF">
+            <input type="checkbox" name="module_product_badges" value="1" <?= $mProdBadges ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+            <span class="dc-switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="product_badges_list">
+              Feature Badges (Capsules)
+              <span style="font-size:0.75rem;font-weight:normal;color:var(--dc-muted);">(Separated by commas)</span>
+            </label>
+            <textarea id="product_badges_list" name="product_badges_list" class="form-control" rows="2" placeholder="100% PURE JAGGERY, ZERO REFINED SUGAR, ROASTED NUTS, HIGH PROTEIN, HANDCRAFTED"><?= e($prodBadgesList) ?></textarea>
+            <p class="form-hint">Displayed as uppercase pills below price on the product page (e.g. <code>100% PURE JAGGERY</code>, <code>ROASTED NUTS</code>, etc.).</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label" for="product_supertitle_text">Category Eyebrow / Supertitle</label>
+              <input type="text" id="product_supertitle_text" name="product_supertitle_text" class="form-control" value="<?= e($prodSuperText) ?>" placeholder="CHIKKI">
+            </div>
+
+            <div class="form-group" style="margin: 0; padding-top: 24px;">
+              <label class="form-check">
+                <input type="checkbox" name="product_supertitle_enabled" value="1" <?= $mProdSuper ? 'checked' : '' ?>>
+                <span style="font-weight: 600; font-size: 0.85rem;">Show Category Supertitle</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px; margin-bottom: 0;">
+            <label class="form-check">
+              <input type="checkbox" name="product_rating_enabled" value="1" <?= $mProdRating ? 'checked' : '' ?>>
+              <span style="font-weight: 600; font-size: 0.85rem;">Show Star Rating &amp; Review Count on Product Detail Page</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE 11: HOMEPAGE PRODUCT CARDS (RATINGS & BADGES) ══ -->
+      <div class="card module-box">
+        <input type="hidden" name="has_card_badges_module" value="1">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="module-icon" style="background: rgba(246, 220, 148, 0.35); color: #8a481c;">🌟</div>
+            <div>
+              <h3 class="card-title" style="margin: 0;">Homepage Product Card Badges &amp; Ratings</h3>
+              <span style="font-size: 0.8rem; color: var(--dc-muted);">Customizable mini badges (Pure Jaggery) &amp; star ratings</span>
+            </div>
+          </div>
+          <!-- Toggle -->
+          <label class="dc-switch-label" title="Toggle Card Badges ON/OFF">
+            <input type="checkbox" name="module_card_badges" value="1" <?= $mCardBadges ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+            <span class="dc-switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="card_badges_list">
+              Homepage Feature Badges
+              <span style="font-size:0.75rem;font-weight:normal;color:var(--dc-muted);">(Separated by commas)</span>
+            </label>
+            <input type="text" id="card_badges_list" name="card_badges_list" class="form-control" value="<?= e($cardBadgesList) ?>" placeholder="Pure Jaggery, 100% Natural">
+            <p class="form-hint">Displayed beneath each product title on homepage cards (e.g. <code>Pure Jaggery</code>, <code>100% Natural</code>).</p>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label class="form-check">
+              <input type="checkbox" name="module_card_ratings" value="1" <?= $mCardRatings ? 'checked' : '' ?>>
+              <span style="font-weight: 600; font-size: 0.85rem;">Show Star Ratings on Homepage Product Cards</span>
+            </label>
+          </div>
+
+          <div style="background: var(--dc-cream); padding: 12px 14px; border-radius: 10px; border: 1px solid var(--dc-border); margin-top: 12px;">
+            <label class="form-check" style="margin-bottom: 8px;">
+              <input type="checkbox" name="card_rating_fallback_enabled" value="1" <?= $mCardRatingFall ? 'checked' : '' ?>>
+              <span style="font-weight: 600; font-size: 0.85rem;">Display Default Rating (e.g. 4.7 ★) when no reviews exist yet</span>
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" for="card_default_rating">Default Rating (e.g. 4.7)</label>
+                <input type="text" id="card_default_rating" name="card_default_rating" class="form-control" value="<?= e($cardDefRating) ?>" placeholder="4.7">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" for="card_default_reviews">Default Review Count (e.g. 3)</label>
+                <input type="text" id="card_default_reviews" name="card_default_reviews" class="form-control" value="<?= e($cardDefReviews) ?>" placeholder="3">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE 12: TAX & HSN PRICING NOTICE ══ -->
+      <div class="card module-box">
+        <input type="hidden" name="has_tax_note_module" value="1">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="module-icon" style="background: rgba(27, 138, 90, 0.12); color: #1b8a5a;">💰</div>
+            <div>
+              <h3 class="card-title" style="margin: 0;">Tax &amp; HSN Pricing Notice</h3>
+              <span style="font-size: 0.8rem; color: var(--dc-muted);">"Inclusive of all taxes (GST 5% included) · HSN: 1704" note</span>
+            </div>
+          </div>
+          <!-- Toggle -->
+          <label class="dc-switch-label" title="Toggle Tax Note ON/OFF">
+            <input type="checkbox" name="module_tax_note" value="1" <?= $mTaxNote ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+            <span class="dc-switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="tax_note_text">Tax Notice Text Template</label>
+            <input type="text" id="tax_note_text" name="tax_note_text" class="form-control" value="<?= e($taxNoteText) ?>" placeholder="Inclusive of all taxes (GST {rate}% included)">
+            <p class="form-hint">Use <code>{rate}</code> as placeholder for the product's GST percentage (e.g. 5).</p>
+          </div>
+
+          <div class="form-group" style="margin: 0; padding-top: 8px;">
+            <label class="form-check">
+              <input type="checkbox" name="tax_hsn_enabled" value="1" <?= $mTaxHsn ? 'checked' : '' ?>>
+              <span style="font-weight: 600; font-size: 0.85rem;">Display HSN Code tag (e.g. · HSN: 1704) if product has HSN set</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE 13: LIVE INVENTORY & STOCK BADGES ══ -->
+      <div class="card module-box">
+        <input type="hidden" name="has_stock_badge_module" value="1">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="module-icon" style="background: rgba(43, 112, 168, 0.12); color: #2b70a8;">📦</div>
+            <div>
+              <h3 class="card-title" style="margin: 0;">Live Inventory &amp; Stock Badges</h3>
+              <span style="font-size: 0.8rem; color: var(--dc-muted);">Fresh batch stock status indicator on product pages</span>
+            </div>
+          </div>
+          <!-- Toggle -->
+          <label class="dc-switch-label" title="Toggle Stock Indicator ON/OFF">
+            <input type="checkbox" name="module_stock_badge" value="1" <?= $mStockBadge ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+            <span class="dc-switch-slider"></span>
+          </label>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="stock_in_stock_text">In Stock Label Text</label>
+            <input type="text" id="stock_in_stock_text" name="stock_in_stock_text" class="form-control" value="<?= e($stockInStock) ?>" placeholder="In Stock (Fresh Batch Ready to Ship)">
+            <p class="form-hint">Shown in green pulse badge when stock &gt; 10 units.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="stock_low_stock_text">Low Stock Alert Text</label>
+            <input type="text" id="stock_low_stock_text" name="stock_low_stock_text" class="form-control" value="<?= e($stockLowStock) ?>" placeholder="⚠️ Only {qty} left in stock — order soon!">
+            <p class="form-hint">Use <code>{qty}</code> as placeholder for remaining stock units.</p>
+          </div>
+
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" for="stock_out_of_stock_text">Out of Stock Label Text</label>
+            <input type="text" id="stock_out_of_stock_text" name="stock_out_of_stock_text" class="form-control" value="<?= e($stockOutOfStock) ?>" placeholder="❌ Currently Out of Stock">
           </div>
         </div>
       </div>

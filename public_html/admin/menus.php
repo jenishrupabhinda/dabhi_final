@@ -386,9 +386,17 @@ $csrfToken  = csrfToken();
             <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div class="form-group">
                 <label class="form-label" style="font-weight:600;">Icon / Emoji</label>
-                <input type="text" name="icon" class="form-control"
-                       value="<?= e($editRow['icon'] ?? '') ?>"
-                       placeholder="e.g. 🥜, 📦, ✨, 🔴">
+                <div style="display:flex;gap:6px;">
+                  <input type="text" name="icon" id="menu_icon_input" class="form-control"
+                         value="<?= e($editRow['icon'] ?? '') ?>"
+                         placeholder="e.g. 🥜, 📦, ✨, 🔴 (leave blank for no icon)">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('menu_icon_input').value='';" title="Clear Icon" style="white-space:nowrap;padding:0 12px;font-size:12px;">
+                    ✕ Clear
+                  </button>
+                </div>
+                <p class="form-hint" style="font-size:11px;color:#888;margin-top:4px;">
+                  Leave blank or click <strong>Clear</strong> to remove icon from menu bar.
+                </p>
               </div>
               <div class="form-group">
                 <label class="form-label" style="font-weight:600;">Sort Order</label>

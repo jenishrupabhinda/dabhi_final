@@ -61,8 +61,8 @@ class GST
         $breakdown = [];
 
         foreach ($items as $item) {
-            $lineTotal = (float)$item['selling_price'] * (int)$item['quantity'];
-            $rate      = (float)$item['gst_rate_percent'];
+            $lineTotal = (float)($item['selling_price'] ?? 0) * (int)($item['quantity'] ?? 1);
+            $rate      = (float)($item['gst_rate_percent'] ?? 5.0);
 
             if ($isIntraState) {
                 $half = round($lineTotal * ($rate / 2) / 100, 2);

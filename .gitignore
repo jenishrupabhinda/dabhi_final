@@ -1,8 +1,11 @@
 # Environment / temporary
 *.log
+*.zip
+scratch/
 storage/logs/*
 storage/php-error.log
 .DS_Store
 Thumbs.db
 node_modules/
 vendor/
+

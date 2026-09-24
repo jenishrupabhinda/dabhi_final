@@ -30,6 +30,8 @@ if (isPost()) {
         'slug'              => post('slug'),
         'short_description' => post('short_description'),
         'description'       => post('description'),
+        'custom_badges'     => trim(post('custom_badges') ?? ''),
+        'custom_card_badges'=> trim(post('custom_card_badges') ?? ''),
         'hsn_code'          => post('hsn_code'),
         'gst_rate_percent'  => (float)post('gst_rate_percent') ?: 5.0,
         'is_active'         => (int)post('is_active'),
@@ -344,6 +346,25 @@ $images = $product ? $product['images'] : [];
                 <a href="<?= url('admin/inventory-batch.php?variant_id=' . (int)$editId) ?>" class="btn btn-ghost btn-sm">📦 Manage Stock</a>
               </div>
               <?php endif; ?>
+            </div>
+
+            <!-- Custom Storefront Badges -->
+            <div class="card" style="margin-bottom:20px;">
+              <div class="card-header"><h3 class="card-title">🏷️ Custom Badges (Optional)</h3></div>
+              <div class="form-group">
+                <label class="form-label">Product Page Capsules</label>
+                <input type="text" name="custom_badges" class="form-control"
+                  value="<?= e($product['custom_badges'] ?? '') ?>"
+                  placeholder="e.g. ROASTED PEANUTS, HIGH PROTEIN">
+                <p class="form-hint">Leave blank to use default store badges from <a href="<?= url('admin/modules.php') ?>" target="_blank">Modules &amp; Content</a>.</p>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Homepage Card Badges</label>
+                <input type="text" name="custom_card_badges" class="form-control"
+                  value="<?= e($product['custom_card_badges'] ?? '') ?>"
+                  placeholder="e.g. Pure Jaggery, 100% Natural">
+                <p class="form-hint">Leave blank to use default store card badges.</p>
+              </div>
             </div>
 
             <!-- Images -->

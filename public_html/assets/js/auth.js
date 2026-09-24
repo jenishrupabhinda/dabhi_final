@@ -42,8 +42,20 @@
         });
         const data = await res.json();
         if (data.ok) {
-          showToast('Logged in! Redirecting…', 'success');
-          const redirect = new URLSearchParams(window.location.search).get('redirect') || 'account.php';
+          if (data.is_staff) {
+            showToast('Welcome Admin! Redirecting to dashboard…', 'success');
+          } else {
+            showToast('Logged in! Redirecting…', 'success');
+          }
+          const urlParamRedirect = new URLSearchParams(window.location.search).get('redirect');
+          let redirect = data.redirect || 'account.php';
+          if (urlParamRedirect) {
+            if (data.is_staff && (urlParamRedirect === 'account.php' || urlParamRedirect === '/account.php')) {
+              redirect = data.redirect || 'admin/index.php';
+            } else {
+              redirect = urlParamRedirect;
+            }
+          }
           setTimeout(() => window.location.href = redirect, 800);
         } else {
           showError(errEl, data.error || 'Login failed. Check your credentials.');

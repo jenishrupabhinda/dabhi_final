@@ -216,7 +216,11 @@ require_once __DIR__ . '/partials/_header.php';
     <div class="flex flex-col">
 
       <!-- Category / Supertitle Tag -->
-      <p class="text-[10px] md:text-xs font-semibold uppercase tracking-[0.2em] text-primary">CHIKKI</p>
+      <?php if (function_exists('settingEnabled') ? settingEnabled('product_supertitle_enabled', '1') : true): 
+        $supertitleText = function_exists('getSetting') ? getSetting('product_supertitle_text', 'CHIKKI') : 'CHIKKI';
+      ?>
+        <p class="text-[10px] md:text-xs font-semibold uppercase tracking-[0.2em] text-primary"><?= htmlspecialchars($supertitleText) ?></p>
+      <?php endif; ?>
 
       <!-- Recoleta Product Title -->
       <h1 class="mt-1 font-display text-3xl leading-tight md:text-4xl text-foreground font-normal">
@@ -224,6 +228,7 @@ require_once __DIR__ . '/partials/_header.php';
       </h1>
 
       <!-- Rating Stars & Reviews Count Link -->
+      <?php if (function_exists('settingEnabled') ? settingEnabled('product_rating_enabled', '1') : true): ?>
       <div class="mt-2 flex items-center gap-2">
         <div class="flex items-center text-amber-500 text-sm">
           <?php for ($s = 1; $s <= 5; $s++): ?>
@@ -234,6 +239,7 @@ require_once __DIR__ . '/partials/_header.php';
           <?= number_format($avgRating, 1) ?> (<?= $reviewCount ?> customer reviews)
         </a>
       </div>
+      <?php endif; ?>
 
       <!-- Description Paragraph -->
       <p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
@@ -267,25 +273,33 @@ require_once __DIR__ . '/partials/_header.php';
         <?php endforeach; ?>
       </div>
 
-      <!-- Live Inventory Stock Status Indicator (Driven by FIFO Batches) -->
-      <div class="mt-2.5" id="detail-stock-indicator">
+      <!-- Live Inventory Stock Status Indicator (Driven by FIFO Batches & Admin Settings) -->
+      <?php
+      $stockBadgeEnabled = function_exists('settingEnabled') ? settingEnabled('module_stock_badge', '1') : true;
+      $stockInStockText  = function_exists('getSetting') ? getSetting('stock_in_stock_text', 'In Stock (Fresh Batch Ready to Ship)') : 'In Stock (Fresh Batch Ready to Ship)';
+      $stockLowStockText = function_exists('getSetting') ? getSetting('stock_low_stock_text', '⚠️ Only {qty} left in stock — order soon!') : '⚠️ Only {qty} left in stock — order soon!';
+      $stockOutOfStockText = function_exists('getSetting') ? getSetting('stock_out_of_stock_text', '❌ Currently Out of Stock') : '❌ Currently Out of Stock';
+      ?>
+      <div class="mt-2.5 <?= $stockBadgeEnabled ? '' : 'hidden' ?>" id="detail-stock-indicator">
         <?php
-        $firstStock = (int)($firstVar['stock'] ?? 50);
-        if ($firstStock > 10):
-        ?>
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/80">
-            <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock (Fresh Batch Ready to Ship)
-          </span>
-        <?php elseif ($firstStock > 0): ?>
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200/80">
-            ⚠️ Only <?= $firstStock ?> left in stock — order soon!
-          </span>
-        <?php else: ?>
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 border border-rose-200/80">
-            ❌ Currently Out of Stock
-          </span>
-        <?php endif; ?>
+        if ($stockBadgeEnabled):
+          $firstStock = (int)($firstVar['stock'] ?? 50);
+          if ($firstStock > 10):
+          ?>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/80">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <?= htmlspecialchars($stockInStockText) ?>
+            </span>
+          <?php elseif ($firstStock > 0): ?>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200/80">
+              <?= htmlspecialchars(str_replace('{qty}', (string)$firstStock, $stockLowStockText)) ?>
+            </span>
+          <?php else: ?>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 border border-rose-200/80">
+              <?= htmlspecialchars($stockOutOfStockText) ?>
+            </span>
+          <?php endif;
+        endif; ?>
       </div>
 
       <!-- Price Section -->
@@ -296,19 +310,35 @@ require_once __DIR__ . '/partials/_header.php';
           <span class="rounded-full bg-secondary/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-secondary" id="detail-off"><?= $discOff ?>% OFF</span>
         <?php endif; ?>
       </div>
-      <p class="mt-1 text-[11px] text-muted-foreground">
-        Inclusive of all taxes (GST <?= (float)($prod['gst_rate_percent'] ?? 5) ?>% included)
-        <?php if (!empty($prod['hsn_code'])): ?> · HSN: <?= htmlspecialchars($prod['hsn_code']) ?><?php endif; ?>
-      </p>
 
-      <!-- Feature Capsules (Exact Yogurt Alley Architecture) -->
+      <!-- Tax & HSN Note (Admin Configurable) -->
+      <?php if (function_exists('settingEnabled') ? settingEnabled('module_tax_note', '1') : true):
+        $taxNoteTpl = function_exists('getSetting') ? getSetting('tax_note_text', 'Inclusive of all taxes (GST {rate}% included)') : 'Inclusive of all taxes (GST {rate}% included)';
+        $gstRateVal = (float)($prod['gst_rate_percent'] ?? 5);
+        $taxNoteStr = str_replace('{rate}', (string)$gstRateVal, $taxNoteTpl);
+        $hsnEnabled = function_exists('settingEnabled') ? settingEnabled('tax_hsn_enabled', '1') : true;
+      ?>
+      <p class="mt-1 text-[11px] text-muted-foreground">
+        <?= htmlspecialchars($taxNoteStr) ?>
+        <?php if ($hsnEnabled && !empty($prod['hsn_code'])): ?> · HSN: <?= htmlspecialchars($prod['hsn_code']) ?><?php endif; ?>
+      </p>
+      <?php endif; ?>
+
+      <!-- Feature Capsules (Admin Configurable & Per-Product Customizable) -->
+      <?php
+      $prodBadgesEnabled = function_exists('settingEnabled') ? settingEnabled('module_product_badges', '1') : true;
+      $prodBadgesRaw     = !empty($prod['custom_badges']) ? $prod['custom_badges'] : (function_exists('getSetting') ? getSetting('product_badges_list', '100% PURE JAGGERY, ZERO REFINED SUGAR, ROASTED NUTS, HIGH PROTEIN, HANDCRAFTED') : '100% PURE JAGGERY, ZERO REFINED SUGAR, ROASTED NUTS, HIGH PROTEIN, HANDCRAFTED');
+      $prodBadgesList    = array_filter(array_map('trim', preg_split('/[,\r\n]+/', (string)$prodBadgesRaw)));
+      ?>
+      <?php if ($prodBadgesEnabled && !empty($prodBadgesList)): ?>
       <div class="mt-4 flex flex-wrap gap-1.5">
-        <span class="rounded-full bg-accent/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">100% PURE JAGGERY</span>
-        <span class="rounded-full bg-accent/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">ZERO REFINED SUGAR</span>
-        <span class="rounded-full bg-accent/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">ROASTED NUTS</span>
-        <span class="rounded-full bg-accent/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">HIGH PROTEIN</span>
-        <span class="rounded-full bg-accent/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">HANDCRAFTED</span>
+        <?php foreach ($prodBadgesList as $b): ?>
+          <span class="rounded-full bg-accent/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">
+            <?= htmlspecialchars($b) ?>
+          </span>
+        <?php endforeach; ?>
       </div>
+      <?php endif; ?>
 
       <!-- Desktop Inline Counter & Add to Bag Button (Hidden on Mobile) -->
       <div class="mt-6 hidden items-center gap-3 md:flex">
@@ -607,6 +637,17 @@ let currentUnitPrice = <?= (float)($firstVar['selling_price'] ?? 120) ?>;
 let detailQuantity = 1;
 const currentProductName = <?= json_encode($prod['name']) ?>;
 
+const stockBadgeEnabled  = <?= json_encode($stockBadgeEnabled) ?>;
+const stockInStockTpl    = <?= json_encode($stockInStockText) ?>;
+const stockLowStockTpl   = <?= json_encode($stockLowStockText) ?>;
+const stockOutOfStockTpl = <?= json_encode($stockOutOfStockText) ?>;
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 function selectDetailVariant(chip) {
   document.querySelectorAll('.detail-variant-chip').forEach(c => {
     c.className = 'detail-variant-chip rounded-full border border-border/80 bg-surface px-3.5 py-1.5 text-xs font-semibold text-foreground/75 hover:bg-muted transition-all';
@@ -651,16 +692,22 @@ function selectDetailVariant(chip) {
   const mobBtn = document.getElementById('detail-add-btn-mobile');
 
   if (stockIndicator) {
-    if (stock > 10) {
-      stockIndicator.innerHTML = '<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/80"><span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> In Stock (Fresh Batch Ready to Ship)</span>';
+    if (!stockBadgeEnabled) {
+      stockIndicator.style.display = 'none';
+    } else if (stock > 10) {
+      stockIndicator.style.display = 'block';
+      stockIndicator.innerHTML = '<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/80"><span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> ' + escapeHtml(stockInStockTpl) + '</span>';
       if (deskBtn) { deskBtn.disabled = false; deskBtn.style.opacity = '1'; }
       if (mobBtn) { mobBtn.disabled = false; mobBtn.style.opacity = '1'; }
     } else if (stock > 0) {
-      stockIndicator.innerHTML = '<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200/80">⚠️ Only ' + stock + ' left in stock — order soon!</span>';
+      stockIndicator.style.display = 'block';
+      const lowMsg = stockLowStockTpl.replace('{qty}', stock);
+      stockIndicator.innerHTML = '<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200/80">' + escapeHtml(lowMsg) + '</span>';
       if (deskBtn) { deskBtn.disabled = false; deskBtn.style.opacity = '1'; }
       if (mobBtn) { mobBtn.disabled = false; mobBtn.style.opacity = '1'; }
     } else {
-      stockIndicator.innerHTML = '<span class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 border border-rose-200/80">❌ Currently Out of Stock</span>';
+      stockIndicator.style.display = 'block';
+      stockIndicator.innerHTML = '<span class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 border border-rose-200/80">' + escapeHtml(stockOutOfStockTpl) + '</span>';
       if (deskBtn) { deskBtn.disabled = true; deskBtn.style.opacity = '0.5'; }
       if (mobBtn) { mobBtn.disabled = true; mobBtn.style.opacity = '0.5'; }
     }

@@ -2,14 +2,16 @@
 /**
  * account.php — Customer Account Page
  */
-$pageTitle = 'My Account — Dabhi Chikki';
-require_once __DIR__ . '/partials/_header.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
 
-// Redirect if not logged in
+// Redirect if not logged in (must execute before sending any HTML)
 if (!Auth::check()) {
     header('Location: auth.php?redirect=' . urlencode('account.php'));
     exit;
 }
+
+$pageTitle = 'My Account — Dabhi Chikki';
+require_once __DIR__ . '/partials/_header.php';
 
 $section = $_GET['section'] ?? 'orders';
 $user    = null;
@@ -58,6 +60,13 @@ $statusColors = [
           <div style="font-size:0.8rem;color:var(--text-muted)"><?= htmlspecialchars($user['email'] ?? '') ?></div>
         </div>
 
+        <?php if (in_array(Auth::role(), ['superadmin', 'admin', 'employee'], true)): ?>
+          <a href="admin/index.php" class="account-nav-item" style="color:#541f21;font-weight:700;background:rgba(246,220,148,0.35);border:1px solid rgba(199,97,61,0.3);margin-bottom:0.75rem;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5v2a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2V7a5 5 0 0 0-5-5z"></path><circle cx="12" cy="14" r="2"></circle></svg>
+            ⚡ Admin Dashboard
+          </a>
+        <?php endif; ?>
+
         <a href="?section=orders" class="account-nav-item <?= $section === 'orders' ? 'active' : '' ?>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
           My Orders
@@ -71,7 +80,7 @@ $statusColors = [
           Profile
         </a>
         <hr class="divider" style="margin:0.5rem 0">
-        <a href="api/auth.php?action=logout" class="account-nav-item" style="color:var(--error)">
+        <a href="logout.php" class="account-nav-item" style="color:var(--error)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Sign Out
         </a>

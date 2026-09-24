@@ -239,6 +239,13 @@ function isPost(): bool
     return $_SERVER['REQUEST_METHOD'] === 'POST';
 }
 
+/** Returns true if the current request is an AJAX / JSON request. */
+function isAjax(): bool
+{
+    return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+        || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
+}
+
 /** Basic input validation helper — returns list of error strings. */
 function validateRequired(array $fields, array $labels = []): array
 {

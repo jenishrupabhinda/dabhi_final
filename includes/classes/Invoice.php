@@ -8,10 +8,13 @@ class Invoice
     /** Return e.g. "DC/2026-27/000123" — increments inside a row-level lock. */
     public static function generate(int $orderId): array
     {
-        $fy = currentFinancialYear(); // e.g. "2026-2027"
+        $fy    = currentFinancialYear(); // e.g. "2026-2027"
+        $ownTx = !Database::inTransaction();
 
         try {
-            Database::beginTransaction();
+            if ($ownTx) {
+                Database::beginTransaction();
+            }
 
             // Upsert counter row with row lock
             Database::query(
@@ -35,11 +38,15 @@ class Invoice
                 [$orderId, $invNum, $fy, $pdfPath]
             );
 
-            Database::commit();
+            if ($ownTx) {
+                Database::commit();
+            }
             return ['ok' => true, 'invoice_number' => $invNum, 'pdf_path' => $pdfPath];
 
         } catch (\Throwable $e) {
-            Database::rollback();
+            if ($ownTx) {
+                Database::rollback();
+            }
             error_log('Invoice::generate error: ' . $e->getMessage());
             return ['ok' => false, 'error' => 'Invoice generation failed.'];
         }

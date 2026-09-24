@@ -2,39 +2,16 @@
 /**
  * track.php — Order Tracking Page for Dabhi Chikki
  * Real-time order tracking connected to admin shipping, order status, courier info, and invoices.
+ * Supports tracking by Order Number (DC-2026-...), Order ID, Customer Email Address, or Mobile Number.
  */
 $pageTitle = 'Track Your Order — Dabhi Chikki';
 require_once __DIR__ . '/partials/_header.php';
 
-$queryInput = trim($_GET['order'] ?? $_GET['id'] ?? '');
-$order      = null;
-$error      = '';
-
-if ($queryInput !== '') {
-    try {
-        if (is_numeric($queryInput)) {
-            $order = Order::getById((int)$queryInput);
-        }
-        if (!$order) {
-            $order = Order::getByNumber(strtoupper($queryInput));
-        }
-
-        if (!$order) {
-            $error = 'No order found with number or ID "' . htmlspecialchars($queryInput) . '". Please verify and try again.';
-        } else {
-            // If logged in, protect private orders from other users
-            if (Auth::check() && $order['user_id'] && (int)$order['user_id'] !== (int)Auth::id()) {
-                $userRole = Auth::user()['role'] ?? '';
-                if (!in_array($userRole, ['superadmin', 'admin', 'employee'])) {
-                    $order = null;
-                    $error = 'You do not have permission to view this order.';
-                }
-            }
-        }
-    } catch (\Throwable $e) {
-        $error = 'Could not load order tracking: ' . $e->getMessage();
-    }
-}
+$queryInput     = trim($_GET['order'] ?? $_GET['email'] ?? $_GET['phone'] ?? $_GET['id'] ?? $_GET['q'] ?? '');
+$order          = null;
+$multipleOrders = [];
+$error          = '';
+$matchedBy      = ''; // 'email', 'phone', 'number'
 
 // Flow of actual statuses used by Dabhi Admin
 $flowStatuses = [
@@ -45,6 +22,98 @@ $flowStatuses = [
     'out_for_delivery' => ['label' => 'Out for Delivery',    'icon' => '🏍️', 'desc' => 'Arriving today at your doorstep.'],
     'delivered'        => ['label' => 'Delivered',           'icon' => '🎉', 'desc' => 'Delivered successfully! Enjoy your fresh chikki.'],
 ];
+
+$statusColors = [
+    'placed'            => '#d97706',
+    'confirmed'         => '#0284c7',
+    'packed'            => '#7c3aed',
+    'shipped'           => '#2563eb',
+    'out_for_delivery'  => '#9333ea',
+    'delivered'         => '#16a34a',
+    'cancelled'         => '#dc2626',
+    'return_requested'  => '#ea580c',
+    'returned'          => '#6b7280',
+];
+
+if ($queryInput !== '') {
+    try {
+        // 1. Search by Email Address
+        if (strpos($queryInput, '@') !== false || filter_var($queryInput, FILTER_VALIDATE_EMAIL)) {
+            $matchedBy   = 'email';
+            $foundOrders = Order::getByEmail($queryInput);
+
+            // If logged in, protect private orders belonging to other registered accounts
+            if (!empty($foundOrders) && Auth::check()) {
+                $userRole = Auth::user()['role'] ?? '';
+                if (!in_array($userRole, ['superadmin', 'admin', 'employee'], true)) {
+                    $currentUserId = (int)Auth::id();
+                    $foundOrders = array_values(array_filter($foundOrders, function($o) use ($currentUserId) {
+                        return empty($o['user_id']) || (int)$o['user_id'] === $currentUserId;
+                    }));
+                }
+            }
+
+            if (empty($foundOrders)) {
+                $error = 'No orders found matching email address "' . htmlspecialchars($queryInput) . '". Please check your email or search with your Order Reference Number.';
+            } elseif (count($foundOrders) === 1) {
+                $order = Order::getById((int)$foundOrders[0]['id']);
+            } else {
+                $multipleOrders = $foundOrders;
+            }
+        }
+        // 2. Search by Phone Number (10+ digits without alphabetic characters)
+        elseif (strlen(preg_replace('/\D/', '', $queryInput)) >= 10 && !preg_match('/[a-zA-Z]/', $queryInput)) {
+            $matchedBy   = 'phone';
+            $foundOrders = Order::getByPhone($queryInput);
+
+            if (!empty($foundOrders) && Auth::check()) {
+                $userRole = Auth::user()['role'] ?? '';
+                if (!in_array($userRole, ['superadmin', 'admin', 'employee'], true)) {
+                    $currentUserId = (int)Auth::id();
+                    $foundOrders = array_values(array_filter($foundOrders, function($o) use ($currentUserId) {
+                        return empty($o['user_id']) || (int)$o['user_id'] === $currentUserId;
+                    }));
+                }
+            }
+
+            if (empty($foundOrders)) {
+                $error = 'No orders found matching phone number "' . htmlspecialchars($queryInput) . '". Please check your phone number or search with your Order Reference Number.';
+            } elseif (count($foundOrders) === 1) {
+                $order = Order::getById((int)$foundOrders[0]['id']);
+            } else {
+                $multipleOrders = $foundOrders;
+            }
+        }
+        // 3. Search by Order Reference Number or Order ID
+        else {
+            $matchedBy = 'number';
+            if (is_numeric($queryInput)) {
+                $order = Order::getById((int)$queryInput);
+            }
+            if (!$order) {
+                $order = Order::getByNumber(strtoupper($queryInput));
+            }
+            if (!$order) {
+                $order = Order::getByNumber($queryInput);
+            }
+
+            if (!$order) {
+                $error = 'No order found with number or ID "' . htmlspecialchars($queryInput) . '". You can track using your Order Number (e.g. DC-' . date('Y') . '-000001), Email ID, or Mobile Number.';
+            } else {
+                // If logged in, protect private orders from other users
+                if (Auth::check() && !empty($order['user_id']) && (int)$order['user_id'] !== (int)Auth::id()) {
+                    $userRole = Auth::user()['role'] ?? '';
+                    if (!in_array($userRole, ['superadmin', 'admin', 'employee'], true)) {
+                        $order = null;
+                        $error = 'You do not have permission to view this order.';
+                    }
+                }
+            }
+        }
+    } catch (\Throwable $e) {
+        $error = 'Could not load order tracking: ' . $e->getMessage();
+    }
+}
 
 $orderStatus = $order['status'] ?? 'placed';
 $statusKeys  = array_keys($flowStatuses);
@@ -62,25 +131,34 @@ $placedDate    = !empty($order['placed_at']) ? date('d M Y, g:i A', strtotime($o
     
     <div style="text-align:center;margin-bottom:2.25rem;">
       <h1 class="font-display" style="font-size:2.25rem;color:var(--foreground);margin-bottom:0.5rem;">📦 Track Your Order</h1>
-      <p style="color:var(--text-muted);font-size:0.95rem;">Enter your Order Number (e.g. <strong>DC-<?= date('Y') ?>-000001</strong>) or Order ID</p>
+      <p style="color:var(--text-muted);font-size:0.95rem;">
+        Enter your <strong>Email ID</strong>, <strong>Order Number</strong> (e.g. DC-<?= date('Y') ?>-000001), or <strong>Mobile Number</strong>
+      </p>
     </div>
 
     <!-- Search Form -->
-    <div style="max-width:540px;margin:0 auto 2.5rem;">
-      <form method="GET" action="track.php" style="display:flex;gap:0.75rem;">
+    <div style="max-width:580px;margin:0 auto 2.5rem;">
+      <form method="GET" action="track.php" style="display:flex;gap:0.75rem;box-shadow:var(--shadow-sm);border-radius:9999px;background:var(--card-bg);padding:0.35rem 0.35rem 0.35rem 1rem;border:1px solid var(--border);">
         <input
           type="text"
           name="order"
           class="form-control"
-          placeholder="e.g. DC-2026-000001 or Order ID"
+          placeholder="Enter Email, Order # (DC-...), or Mobile"
           value="<?= htmlspecialchars($queryInput) ?>"
           required
-          style="flex:1;font-size:1rem;padding:0.75rem 1.125rem;border-radius:9999px;"
+          style="flex:1;font-size:1rem;border:none;background:transparent;outline:none;padding:0.5rem 0.5rem;min-width:0;"
         >
-        <button type="submit" class="btn btn-primary" style="border-radius:9999px;padding:0.75rem 1.5rem;font-weight:600;">
-          Track Order
+        <button type="submit" class="btn btn-primary" style="border-radius:9999px;padding:0.75rem 1.6rem;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:0.5rem;">
+          <span>🔍</span> Track Order
         </button>
       </form>
+      <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:0.75rem;font-size:0.8rem;color:var(--text-muted);flex-wrap:wrap;">
+        <span>✉️ Email Address</span>
+        <span>·</span>
+        <span>🏷️ Order Number</span>
+        <span>·</span>
+        <span>📱 Mobile Number</span>
+      </div>
     </div>
 
     <?php if ($error): ?>
@@ -89,9 +167,101 @@ $placedDate    = !empty($order['placed_at']) ? date('d M Y, g:i A', strtotime($o
       </div>
     <?php endif; ?>
 
+    <!-- Multiple Orders List (When searched by Email or Phone with multiple orders) -->
+    <?php if (!empty($multipleOrders)): ?>
+      <div style="background:var(--card-bg);border-radius:var(--radius-lg);padding:1.75rem;border:1px solid var(--border-light);box-shadow:var(--shadow);margin-bottom:2rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;border-bottom:1px solid var(--border-light);padding-bottom:1.25rem;">
+          <div>
+            <div style="font-size:0.8125rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Search Results</div>
+            <h2 class="font-display" style="font-size:1.35rem;color:var(--foreground);margin:0.2rem 0 0;">
+              Found <?= count($multipleOrders) ?> Orders for <span style="color:var(--primary);"><?= htmlspecialchars($queryInput) ?></span>
+            </h2>
+            <p style="font-size:0.875rem;color:var(--text-muted);margin:0.25rem 0 0;">
+              Select an order below to view its live delivery timeline and shipment status.
+            </p>
+          </div>
+          <a href="track.php" class="btn btn-outline btn-sm" style="border-radius:9999px;">Clear Search</a>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+          <?php foreach ($multipleOrders as $ord):
+            $stKey  = $ord['status'] ?? 'placed';
+            $stClr  = $statusColors[$stKey] ?? '#6b7280';
+            $stInfo = $flowStatuses[$stKey] ?? ['icon' => '📦', 'label' => ucfirst($stKey)];
+            $pDate  = !empty($ord['placed_at']) ? date('d M Y, g:i A', strtotime($ord['placed_at'])) : '';
+            
+            $itemsList = [];
+            if (!empty($ord['items'])) {
+                foreach ($ord['items'] as $it) {
+                    $name = $it['product_name_snapshot'] ?? $it['product_name'] ?? 'Item';
+                    $lbl  = $it['variant_label_snapshot'] ?? $it['variant_label'] ?? '';
+                    $itemsList[] = htmlspecialchars($name) . ($lbl ? ' (' . htmlspecialchars($lbl) . ')' : '') . ' × ' . (int)$it['quantity'];
+                }
+            }
+          ?>
+            <div style="border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:1.35rem;background:var(--bg-alt, #faf8f5);">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+                <div>
+                  <div style="font-size:0.775rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:700;">Order Reference</div>
+                  <div style="font-size:1.25rem;font-weight:800;color:var(--primary);margin-top:0.15rem;">
+                    #<?= htmlspecialchars($ord['order_number']) ?>
+                  </div>
+                  <?php if ($pDate): ?>
+                    <div style="font-size:0.825rem;color:var(--text-muted);margin-top:0.25rem;">Placed on <?= $pDate ?></div>
+                  <?php endif; ?>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                  <span style="background:<?= $stClr ?>18;color:<?= $stClr ?>;padding:0.4rem 0.9rem;border-radius:9999px;font-size:0.825rem;font-weight:700;display:inline-flex;align-items:center;gap:0.4rem;">
+                    <span><?= $stInfo['icon'] ?></span>
+                    <span><?= $stInfo['label'] ?></span>
+                  </span>
+                  <div style="text-align:right;">
+                    <div style="font-size:1.25rem;font-weight:800;color:var(--foreground);">
+                      ₹<?= number_format((float)($ord['total_amount'] ?? $ord['total'] ?? 0), 2) ?>
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;">
+                      <?= strtoupper($ord['payment_method']) ?> · <span style="color:var(--success);"><?= ucfirst($ord['payment_status']) ?></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <?php if (!empty($itemsList)): ?>
+                <div style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted);background:var(--card-bg);padding:0.75rem 1rem;border-radius:var(--radius);border:1px dashed var(--border-light);">
+                  <strong style="color:var(--foreground);">Items:</strong> <?= implode(', ', $itemsList) ?>
+                </div>
+              <?php endif; ?>
+
+              <div style="display:flex;justify-content:flex-end;align-items:center;gap:0.75rem;margin-top:1.25rem;border-top:1px solid var(--border-light);padding-top:1rem;flex-wrap:wrap;">
+                <a href="invoice.php?order=<?= urlencode($ord['order_number']) ?>" target="_blank" class="btn btn-outline btn-sm" style="border-radius:9999px;font-size:0.825rem;">
+                  🧾 Tax Invoice
+                </a>
+                <a href="track.php?order=<?= urlencode($ord['order_number']) ?>" class="btn btn-primary btn-sm" style="border-radius:9999px;font-weight:700;font-size:0.825rem;padding:0.5rem 1.25rem;">
+                  Track Delivery Timeline →
+                </a>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    <?php endif; ?>
+
     <?php if ($order): ?>
-      <!-- Order Found Container -->
+      <!-- Single Order Found Container -->
       <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+        <?php if ($matchedBy === 'email'): ?>
+          <div style="background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.3);border-radius:var(--radius);padding:0.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;font-size:0.9rem;">
+            <span>✉️ Showing order matching email: <strong><?= htmlspecialchars($queryInput) ?></strong></span>
+            <a href="track.php" style="color:var(--primary);font-weight:600;font-size:0.85rem;text-decoration:underline;">Search another</a>
+          </div>
+        <?php elseif ($matchedBy === 'phone'): ?>
+          <div style="background:rgba(2,132,199,0.1);border:1px solid rgba(2,132,199,0.3);border-radius:var(--radius);padding:0.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;font-size:0.9rem;">
+            <span>📱 Showing order matching phone: <strong><?= htmlspecialchars($queryInput) ?></strong></span>
+            <a href="track.php" style="color:var(--primary);font-weight:600;font-size:0.85rem;text-decoration:underline;">Search another</a>
+          </div>
+        <?php endif; ?>
 
         <!-- Status Card -->
         <div style="background:var(--card-bg);border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow);border:1px solid var(--border-light);">

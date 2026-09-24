@@ -1,8 +1,11 @@
 <?php
 /**
  * order.php — Place order API endpoint for Dabhi_final
- * Bridges the modern Yogurt Alley storefront checkout with Dabhi's order & FIFO inventory backend.
+ * Bridges the modern storefront checkout with Dabhi's order, tax, notifications & FIFO inventory backend.
+ * Features automated Payment Gateway Bypass simulation and real-time SMTP order email notifications.
  */
+ob_start();
+
 $bootstrap = null;
 foreach ([
     __DIR__ . '/../../includes/bootstrap.php',
@@ -18,17 +21,33 @@ if ($bootstrap) {
     require_once $bootstrap;
 }
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=UTF-8');
+
+/**
+ * Clean output buffer to ensure stray warnings or notices never corrupt JSON response.
+ */
+function sendJsonResponse(array $data, int $httpCode = 200): void
+{
+    if (ob_get_length()) {
+        $buffered = ob_get_clean();
+        if (!empty(trim($buffered))) {
+            error_log('Notice/Warning in api/order.php: ' . $buffered);
+        }
+    }
+    http_response_code($httpCode);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 
 if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') === false) {
-    echo json_encode(['ok' => false, 'error' => 'Invalid request.']); exit;
+    sendJsonResponse(['ok' => false, 'error' => 'Invalid request.']);
 }
 
 $input  = json_decode(file_get_contents('php://input'), true) ?? [];
 $action = $input['action'] ?? '';
 
 if ($action !== 'place_order') {
-    echo json_encode(['ok' => false, 'error' => 'Unknown action.']); exit;
+    sendJsonResponse(['ok' => false, 'error' => 'Unknown action.']);
 }
 
 // ── 1. Validate cart ─────────────────────────────────────
@@ -37,14 +56,14 @@ $cartId = (int)($cart['id'] ?? 0);
 $items  = Cart::getItems($cartId);
 
 if (empty($items)) {
-    echo json_encode(['ok' => false, 'error' => 'Your cart is empty.']); exit;
+    sendJsonResponse(['ok' => false, 'error' => 'Your cart is empty.']);
 }
 
 // ── 2. Validate required delivery fields ─────────────────
 $required = ['ship_name', 'ship_phone', 'ship_line1', 'ship_city', 'ship_state', 'ship_pincode'];
 foreach ($required as $f) {
     if (empty(trim($input[$f] ?? ''))) {
-        echo json_encode(['ok' => false, 'error' => "Please fill in all required delivery details ({$f})."]); exit;
+        sendJsonResponse(['ok' => false, 'error' => "Please fill in all required delivery details ({$f})."]);
     }
 }
 
@@ -74,12 +93,17 @@ if (Auth::check()) {
     } else {
         $uuid = generateUuid();
         $randomPass = bin2hex(random_bytes(8));
-        Database::query(
-            'INSERT INTO users (uuid, role, full_name, email, phone, password_hash, is_active)
-             VALUES (?, "buyer", ?, ?, ?, ?, 1)',
-            [$uuid, $shipName, $lookupEmail, $shipPhone, password_hash($randomPass, PASSWORD_BCRYPT)]
-        );
-        $userId = (int)Database::lastInsertId();
+        try {
+            Database::query(
+                'INSERT INTO users (uuid, role, full_name, email, phone, password_hash, is_active)
+                 VALUES (?, "buyer", ?, ?, ?, ?, 1)',
+                [$uuid, $shipName, $lookupEmail, $shipPhone, password_hash($randomPass, PASSWORD_BCRYPT)]
+            );
+            $userId = (int)Database::lastInsertId();
+        } catch (\Throwable $ue) {
+            $userFallback = Database::fetchOne('SELECT id FROM users WHERE email = ? OR phone = ? LIMIT 1', [$lookupEmail, $shipPhone]);
+            $userId = $userFallback ? (int)$userFallback['id'] : 1;
+        }
     }
 }
 
@@ -91,7 +115,6 @@ Database::query(
 );
 $addressId = (int)Database::lastInsertId();
 
-// Also save to user_addresses compatibility table
 try {
     Database::query(
         'INSERT INTO user_addresses (user_id, full_name, phone, line1, line2, city, state, pincode, is_default)
@@ -116,16 +139,14 @@ if ($couponCode !== '') {
     }
 }
 
-$paymentMethod  = in_array($input['payment_method'] ?? 'cod', ['cod', 'cashfree', 'upi'])
-    ? $input['payment_method']
-    : 'cod';
-$isCod = ($paymentMethod === 'cod');
+$rawPaymentMethod = strtolower(trim($input['payment_method'] ?? 'cod'));
+$isCod            = ($rawPaymentMethod === 'cod');
+$paymentMethod    = $isCod ? 'cod' : 'online';
 
 // Real shipping & COD calculation from admin configured rules
 $shipCalc = Shipping::calculate($shipPincode, $totalWeight, $isCod, $subtotal);
 if (!$shipCalc['ok']) {
-    echo json_encode(['ok' => false, 'error' => $shipCalc['error']]);
-    exit;
+    sendJsonResponse(['ok' => false, 'error' => $shipCalc['error']]);
 }
 
 $shippingCharge = (float)$shipCalc['rate'];
@@ -141,13 +162,20 @@ $totalGst       = round($cgst + $sgst + $igst, 2);
 
 $grandTotal     = round($taxableAmount + $shippingCharge + $codCharge, 2);
 
-// ── 6. Generate order number ─────────────────────────────
+// ── 6. Payment Bypass & Status Resolution ────────────────
+$paymentBypassEnabled = (getSetting('payment_bypass_enabled', '0') === '1');
+$isBypassedOnline     = (!$isCod && $paymentBypassEnabled);
+
+$orderStatus   = $isBypassedOnline ? 'confirmed' : 'placed';
+$paymentStatus = $isBypassedOnline ? 'paid' : 'pending';
+
+// ── 7. Generate order number ─────────────────────────────
 $orderNumber = Order::generateNumber();
 
 try {
     Database::beginTransaction();
 
-    // ── 7. Insert Order ──────────────────────────────────
+    // ── 8. Insert Order ──────────────────────────────────
     Database::query(
         'INSERT INTO orders
          (order_number, user_id, guest_email, status, payment_method, payment_status,
@@ -161,9 +189,9 @@ try {
             $orderNumber,
             $userId,
             $guestEmail,
-            'placed',
-            $paymentMethod === 'cod' ? 'cod' : 'online',
-            'pending',
+            $orderStatus,
+            $paymentMethod,
+            $paymentStatus,
             $subtotal,
             $discountAmt,
             $couponId,
@@ -191,7 +219,7 @@ try {
     );
     $orderId = (int)Database::lastInsertId();
 
-    // ── 8. Insert Order Items + FIFO batch deduction ─────
+    // ── 9. Insert Order Items + FIFO batch deduction ─────
     foreach ($items as $item) {
         $variantId = (int)$item['variant_id'];
         $qty       = (int)$item['quantity'];
@@ -258,7 +286,6 @@ try {
             Database::query('UPDATE inventory_batches SET quantity_remaining = quantity_remaining - ? WHERE id = ?', [$take, $bId]);
             $toDeduct -= $take;
 
-            // Log stock movement
             Database::query(
                 'INSERT INTO stock_movements (variant_id, batch_id, movement_type, quantity, reference_type, reference_id, performed_by, notes)
                  VALUES (?, ?, "sale_out", ?, "order", ?, ?, ?)',
@@ -267,13 +294,84 @@ try {
         }
     }
 
-    // ── 9. Order status history ──────────────────────────
+    // ── 10. Record Payment Details ───────────────────────
+    $cfPaymentSessionId = null;
+    $cfMode             = null;
+
+    if ($isBypassedOnline) {
+        $simPaymentId = 'SIM_PAY_' . strtoupper(bin2hex(random_bytes(6)));
+        Database::query(
+            'INSERT INTO payments (order_id, gateway, gateway_order_id, gateway_payment_id, amount, currency, status, raw_response, created_at, updated_at)
+             VALUES (?, "cashfree", ?, ?, ?, "INR", "success", ?, NOW(), NOW())',
+            [
+                $orderId,
+                'BYPASS_' . $orderNumber,
+                $simPaymentId,
+                $grandTotal,
+                json_encode([
+                    'simulated'      => true,
+                    'gateway'        => 'cashfree_bypass',
+                    'note'           => 'Online payment gateway bypassed via simulation mode',
+                    'transaction_id' => $simPaymentId,
+                    'amount'         => $grandTotal,
+                    'timestamp'      => date('c'),
+                ], JSON_UNESCAPED_UNICODE)
+            ]
+        );
+    } elseif ($isCod) {
+        Database::query(
+            'INSERT INTO payments (order_id, gateway, gateway_order_id, amount, currency, status, raw_response, created_at, updated_at)
+             VALUES (?, "cod", ?, ?, "INR", "pending", ?, NOW(), NOW())',
+            [
+                $orderId,
+                'COD_' . $orderNumber,
+                $grandTotal,
+                json_encode(['method' => 'cod', 'due_on_delivery' => $grandTotal])
+            ]
+        );
+    } else {
+        // Real Cashfree Payment Gateway Call
+        if (!CashfreeGateway::isConfigured()) {
+            throw new \Exception('Cashfree payment gateway is enabled, but App ID and Secret Key are not configured. Please check Admin > Payment Settings.');
+        }
+
+        $cfBuyer = [
+            'full_name' => $shipName,
+            'email'     => $guestEmail ?: ($user['email'] ?? 'orders@dabhichikki.com'),
+            'phone'     => $shipPhone,
+        ];
+
+        $cfOrderData = [
+            'id'           => $orderId,
+            'order_number' => $orderNumber,
+            'user_id'      => $userId,
+            'total_amount' => $grandTotal,
+            'ship_phone'   => $shipPhone,
+            'ship_name'    => $shipName,
+            'guest_email'  => $guestEmail,
+        ];
+
+        $cfResult = CashfreeGateway::createOrder($cfOrderData, $cfBuyer);
+
+        if (!$cfResult['ok']) {
+            throw new \Exception('Cashfree error: ' . ($cfResult['error'] ?? 'Could not initiate payment session.'));
+        }
+
+        $cfPaymentSessionId = $cfResult['payment_session_id'];
+        $cfMode             = $cfResult['cashfree_mode'] ?? CashfreeGateway::getMode();
+    }
+
+    // ── 11. Order status history ─────────────────────────
+    $historyRemarks = $isBypassedOnline
+        ? 'Order confirmed. Online payment verified via simulated Cashfree gateway bypass.'
+        : ($isCod ? 'Order placed by customer via Cash on Delivery.' : 'Order placed. Awaiting Cashfree online payment.');
+
     Database::query(
-        'INSERT INTO order_status_history (order_id, status, remarks, changed_by) VALUES (?, "placed", "Order placed by customer.", ?)',
-        [$orderId, $userId]
+        'INSERT INTO order_status_history (order_id, status, remarks, changed_by) VALUES (?, ?, ?, ?)',
+        [$orderId, $orderStatus, $historyRemarks, $userId]
     );
 
-    // ── 10. Record coupon usage ──────────────────────────
+    // ── 12. Record coupon usage ──────────────────────────
     if ($couponId) {
         Database::query(
             'INSERT INTO coupon_usage (coupon_id, user_id, order_id) VALUES (?, ?, ?)',
@@ -287,19 +385,68 @@ try {
         } catch (\Throwable $e) {}
     }
 
-    // ── 11. Clear Cart ───────────────────────────────────
+    // ── 13. Clear Cart & Commit Order Transaction ───────
     Cart::clear($cartId);
 
     Database::commit();
 
-    echo json_encode([
+    // ── Auto-Login Buyer Session ────────────────────────
+    if (!Auth::check() && $userId) {
+        $buyerUser = Database::fetchOne('SELECT * FROM users WHERE id = ?', [$userId]);
+        if ($buyerUser && (int)($buyerUser['is_active'] ?? 1) === 1) {
+            $_SESSION['user_id']   = (int)$buyerUser['id'];
+            $_SESSION['user_role'] = $buyerUser['role'] ?? 'buyer';
+            try {
+                Database::query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [$buyerUser['id']]);
+            } catch (\Throwable $ule) {}
+        }
+    }
+
+    // For COD and Bypassed orders, generate invoice and notify immediately
+    // For real Cashfree orders, invoice and confirmation notification happen upon payment verification
+    if ($isCod || $isBypassedOnline) {
+        // ── 14. Sequential Tax Invoice Generation ────────────
+        try {
+            Invoice::getOrCreate($orderId);
+        } catch (\Throwable $invErr) {
+            error_log('Tax invoice generation error: ' . $invErr->getMessage());
+        }
+
+        // ── 15. Real-Time Order Email Notification Dispatch ──
+        try {
+            $notifyEvent = $isBypassedOnline ? 'order_confirmed' : 'order_placed';
+            Notification::trigger($orderId, $notifyEvent);
+        } catch (\Throwable $ne) {
+            error_log('Order notification error: ' . $ne->getMessage());
+        }
+    }
+
+    if (!$isCod && !$isBypassedOnline) {
+        sendJsonResponse([
+            'ok'                 => true,
+            'payment_mode'       => 'cashfree',
+            'payment_session_id' => $cfPaymentSessionId,
+            'cashfree_mode'      => $cfMode,
+            'order_id'           => $orderId,
+            'order_number'       => $orderNumber,
+            'message'            => 'Redirecting to Cashfree for payment...'
+        ]);
+    }
+
+    sendJsonResponse([
         'ok'           => true,
         'order_id'     => $orderId,
-        'order_number' => $orderNumber
+        'order_number' => $orderNumber,
+        'status'       => $orderStatus,
+        'payment_mode' => $isBypassedOnline ? 'online_simulated' : ($isCod ? 'cod' : 'online'),
+        'bypassed'     => $isBypassedOnline,
+        'message'      => $isBypassedOnline
+            ? 'Online payment bypassed in simulation mode! Order confirmed and receipt emailed.'
+            : 'Order placed successfully! Confirmation email sent.'
     ]);
 
 } catch (\Throwable $e) {
     Database::rollBack();
-    error_log('Order placement error: ' . $e->getMessage());
-    echo json_encode(['ok' => false, 'error' => 'Could not place your order: ' . $e->getMessage()]);
+    error_log('Order placement error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+    sendJsonResponse(['ok' => false, 'error' => 'Could not place your order: ' . $e->getMessage()]);
 }

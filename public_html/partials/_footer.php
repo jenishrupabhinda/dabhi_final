@@ -9,7 +9,7 @@
 
   <!-- Site Footer (Exact Yogurt Alley Architecture) -->
   <footer class="bg-secondary text-secondary-foreground mt-16" style="--footer-hover:#f6dc94">
-    <div class="mx-auto grid max-w-6xl px-4 py-12 gap-10 md:grid-cols-4 md:px-6 md:py-16">
+    <div class="mx-auto grid max-w-6xl px-4 py-12 gap-10 md:grid-cols-3 md:px-6 md:py-16">
       
       <!-- Brand Info & Address -->
       <div class="md:col-span-2">
@@ -48,18 +48,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
           </a>
         </div>
-      </div>
-
-      <!-- Shop Links -->
-      <div>
-        <h4 class="font-display text-lg text-[#f6dc94] font-semibold">Menu</h4>
-        <ul class="mt-3 space-y-2 text-sm opacity-90">
-          <li><a href="product.php?slug=mandvi-chikki" class="footer-link transition-colors hover:text-[#f6dc94]">Mandvi Chikki (Groundnut)</a></li>
-          <li><a href="product.php?slug=til-chikki" class="footer-link transition-colors hover:text-[#f6dc94]">TIL Chikki (Sesame)</a></li>
-          <li><a href="product.php?slug=daliya-chikki" class="footer-link transition-colors hover:text-[#f6dc94]">Daliya Chikki (Split Gram)</a></li>
-          <li><a href="product.php?slug=3-mix-chikki" class="footer-link transition-colors hover:text-[#f6dc94]">3 Mix Chikki (Signature)</a></li>
-          <li><a href="index.php#products" class="footer-link transition-colors hover:text-[#f6dc94]">All 4 Signature Varieties</a></li>
-        </ul>
       </div>
 
       <!-- Help & Legal Links -->

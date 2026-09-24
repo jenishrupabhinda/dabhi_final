@@ -1,12 +1,10 @@
 <?php
-/**
- * auth.php — Login / Register Page for Dabhi Chikki
- */
-require_once __DIR__ . '/partials/_header.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
 
-// Redirect if already logged in
+// Redirect if already logged in (must execute before sending any HTML)
 if (Auth::check()) {
-    $redirect = $_GET['redirect'] ?? 'account.php';
+    $defaultRedirect = in_array(Auth::role(), ['superadmin', 'admin', 'employee'], true) ? 'admin/index.php' : 'account.php';
+    $redirect = $_GET['redirect'] ?? $defaultRedirect;
     header('Location: ' . $redirect);
     exit;
 }
@@ -14,6 +12,7 @@ if (Auth::check()) {
 $pageTitle    = 'Login or Register — Dabhi Chikki';
 $extraScripts = ['assets/js/auth.js'];
 $activeTab    = $_GET['tab'] ?? 'login'; // login | register
+require_once __DIR__ . '/partials/_header.php';
 ?>
 
 <section class="auth-page">
@@ -22,6 +21,14 @@ $activeTab    = $_GET['tab'] ?? 'login'; // login | register
       <img src="assets/images/logo.png" alt="Dabhi Chikki" width="64" height="64">
       <h2>Welcome back</h2>
       <p>Login or create your Dabhi Chikki account</p>
+    </div>
+
+    <!-- Guest Order Helper Banner -->
+    <div style="background:rgba(199,97,61,0.08);border:1px solid rgba(199,97,61,0.25);border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:1.25rem;font-size:0.85rem;color:var(--text);display:flex;align-items:center;gap:0.625rem;">
+      <span style="font-size:1.15rem;">📦</span>
+      <div>
+        Placed an order as a guest? <a href="track.php" style="color:var(--primary);font-weight:600;text-decoration:underline;">Track Order by Email or Number</a> or register below with your checkout email to set your password.
+      </div>
     </div>
 
     <!-- Tabs -->

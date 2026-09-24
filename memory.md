@@ -206,6 +206,12 @@ CREATE TABLE `menu_items` (
 ## 6. Admin Panel Details & Credentials
 
 - **Admin Login URL**: `http://localhost/dabhi_final/public_html/admin/login.php`
+- **Storefront & Unified Login**:
+  - The main page header profile icon features a right-aligned dropdown (`.profile-dropdown-wrap`):
+    - **Guest**: Offers quick access to Customer Login (`auth.php`) and Admin & Staff Login (`admin/login.php`).
+    - **Admin / Staff**: Displays a golden star indicator (`★`), links directly to `admin/index.php`, and provides quick dropdown links to Admin Dashboard, Storefront View, and Sign Out.
+    - **Buyer**: Links to `account.php` with dropdown shortcuts to My Account, My Orders, and Sign Out.
+  - `api/auth.php` and `assets/js/auth.js` automatically detect if credentials belong to staff (`superadmin`, `admin`, `employee`) or `buyer`, and dynamically route to `admin/index.php` or `account.php` with appropriate feedback.
 - **Default Superadmin Account**:
   - Email: `jenish@gmail.com`
   - Role: `superadmin`

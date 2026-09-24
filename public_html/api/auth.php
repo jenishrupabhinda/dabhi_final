@@ -18,14 +18,14 @@ if ($bootstrap) {
     require_once $bootstrap;
 }
 
-header('Content-Type: application/json');
-
 // Handle GET logout (simple link click)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['action'] ?? '') === 'logout') {
     Auth::logout();
-    header('Location: ../index.php');
+    header('Location: ../logout.php');
     exit;
 }
+
+header('Content-Type: application/json');
 
 if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     echo json_encode(['ok' => false, 'error' => 'Invalid request.']);
@@ -49,9 +49,28 @@ switch ($action) {
 
         $result = Auth::attempt($email, $password);
         if ($result['ok']) {
-            // Merge guest cart
-            Cart::mergeGuestCart(Auth::id());
-            echo json_encode(['ok' => true, 'user_id' => Auth::id()]);
+            $user = $result['user'] ?? Auth::user();
+            $role = $user['role'] ?? 'buyer';
+            $isStaff = in_array($role, ['superadmin', 'admin', 'employee'], true);
+
+            // Merge guest cart for customer/buyer accounts
+            if (!$isStaff) {
+                Cart::mergeGuestCart(Auth::id());
+            }
+
+            // Route staff to Admin Dashboard and buyers to Account
+            $redirect = $isStaff ? 'admin/index.php' : 'account.php';
+            if (!empty($input['redirect'])) {
+                $redirect = $input['redirect'];
+            }
+
+            echo json_encode([
+                'ok' => true,
+                'user_id' => Auth::id(),
+                'role' => $role,
+                'is_staff' => $isStaff,
+                'redirect' => $redirect
+            ]);
         } else {
             echo json_encode(['ok' => false, 'error' => $result['error'] ?? 'Invalid credentials.']);
         }

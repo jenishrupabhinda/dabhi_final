@@ -5,9 +5,10 @@ require_once __DIR__ . '/../../includes/bootstrap.php';
 if (Auth::check() && in_array(Auth::role(), ['superadmin', 'admin', 'employee'])) {
     redirect('/admin/index.php');
 }
-// Buyer logged in tries to access admin — logout and show form
-if (Auth::check() && Auth::role() === 'buyer') {
-    Auth::logout();
+
+// Forward to unified login page
+if (!isPost()) {
+    redirect('/auth.php?redirect=' . urlencode('admin/index.php'));
 }
 
 $errors    = [];

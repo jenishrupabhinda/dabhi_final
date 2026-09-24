@@ -95,7 +95,7 @@ class Order
                 $variantId   = (int)$item['variant_id'];
                 $qty         = (int)$item['quantity'];
                 $unitPrice   = (float)$item['selling_price'];
-                $gstRate     = (float)$item['gst_rate_percent'];
+                $gstRate     = (float)($item['gst_rate_percent'] ?? 5.0);
                 $gstAmt      = round($unitPrice * $qty * $gstRate / 100, 2);
                 $lineTotal   = round($unitPrice * $qty, 2);
                 $batchId     = self::allocateFIFO($variantId, $qty);
@@ -149,6 +149,13 @@ class Order
             Database::query('DELETE FROM cart_items WHERE cart_id = ?', [$cartId]);
 
             Database::commit();
+
+            // Trigger notifications (Email, WhatsApp, SMS)
+            try {
+                Notification::trigger($orderId, 'order_placed');
+            } catch (\Throwable $ne) {
+                error_log('Order placed notification error: ' . $ne->getMessage());
+            }
 
             return ['ok' => true, 'order_id' => $orderId, 'order_number' => $orderNumber];
 
@@ -289,6 +296,72 @@ class Order
         return $row ? self::getById((int)$row['id']) : null;
     }
 
+    // ── Get orders by email (matches guest_email or users.email) ──────
+    public static function getByEmail(string $email): array
+    {
+        $email = strtolower(trim($email));
+        if ($email === '') return [];
+
+        $rows = Database::fetchAll(
+            "SELECT o.*, 
+                    COALESCE(u.full_name, o.ship_name, 'Guest Customer') AS full_name,
+                    COALESCE(u.email, o.guest_email, '') AS email,
+                    COALESCE(u.phone, o.ship_phone, '') AS phone
+             FROM orders o
+             LEFT JOIN users u ON u.id = o.user_id
+             WHERE LOWER(TRIM(o.guest_email)) = ? OR LOWER(TRIM(u.email)) = ?
+             ORDER BY o.placed_at DESC, o.id DESC",
+            [$email, $email]
+        );
+
+        foreach ($rows as &$r) {
+            $r['items'] = Database::fetchAll(
+                "SELECT oi.*, pv.sku FROM order_items oi
+                 LEFT JOIN product_variants pv ON pv.id = oi.variant_id
+                 WHERE oi.order_id = ?",
+                [(int)$r['id']]
+            );
+        }
+        unset($r);
+
+        return $rows;
+    }
+
+    // ── Get orders by phone number (matches ship_phone or users.phone) ──
+    public static function getByPhone(string $phone): array
+    {
+        $clean = preg_replace('/\D/', '', $phone);
+        if (strlen($clean) > 10 && str_starts_with($clean, '91')) {
+            $clean = substr($clean, 2);
+        }
+        if (strlen($clean) < 10) return [];
+        $clean10 = substr($clean, -10);
+
+        $rows = Database::fetchAll(
+            "SELECT o.*, 
+                    COALESCE(u.full_name, o.ship_name, 'Guest Customer') AS full_name,
+                    COALESCE(u.email, o.guest_email, '') AS email,
+                    COALESCE(u.phone, o.ship_phone, '') AS phone
+             FROM orders o
+             LEFT JOIN users u ON u.id = o.user_id
+             WHERE o.ship_phone LIKE ? OR u.phone LIKE ?
+             ORDER BY o.placed_at DESC, o.id DESC",
+            ['%' . $clean10, '%' . $clean10]
+        );
+
+        foreach ($rows as &$r) {
+            $r['items'] = Database::fetchAll(
+                "SELECT oi.*, pv.sku FROM order_items oi
+                 LEFT JOIN product_variants pv ON pv.id = oi.variant_id
+                 WHERE oi.order_id = ?",
+                [(int)$r['id']]
+            );
+        }
+        unset($r);
+
+        return $rows;
+    }
+
     // ── Order list (admin) ────────────────────────────────────────────
     public static function adminList(array $filters = [], int $page = 1, int $perPage = 20): array
     {
@@ -348,6 +421,22 @@ class Order
             'INSERT INTO order_status_history (order_id, status, remarks, changed_by) VALUES (?,?,?,?)',
             [$orderId, $status, $remarks, $changedBy]
         );
+
+        // Dispatch notification events on status change
+        $notifyEvents = [
+            'confirmed' => 'order_confirmed',
+            'shipped'   => 'order_shipped',
+            'delivered' => 'order_delivered',
+            'cancelled' => 'order_cancelled',
+        ];
+        if (isset($notifyEvents[$status])) {
+            try {
+                Notification::trigger($orderId, $notifyEvents[$status]);
+            } catch (\Throwable $ne) {
+                error_log('Order status notification error: ' . $ne->getMessage());
+            }
+        }
+
         return true;
     }
 
@@ -378,6 +467,118 @@ class Order
 
         self::updateStatus($orderId, 'cancelled', $userId, 'Cancelled by customer.');
         return ['ok' => true];
+    }
+
+    /**
+     * Cancel an order due to failed or cancelled Cashfree payment.
+     * Restores inventory FIFO batches, releases any applied coupon,
+     * updates order and payment status to failed/cancelled, and re-adds all items back to the user's active bag.
+     * Idempotent: safe against multiple calls / page refreshes.
+     */
+    public static function cancelAndRecart(int $orderId, string $failureReason = ''): array
+    {
+        $order = Database::fetchOne('SELECT * FROM orders WHERE id = ?', [$orderId]);
+        if (!$order) {
+            return ['ok' => false, 'error' => 'Order not found.'];
+        }
+
+        // 1. Only restore inventory and status if not already cancelled
+        if ($order['status'] !== 'cancelled') {
+            try {
+                Database::beginTransaction();
+
+                // Restore stock from stock_movements (exact FIFO batches)
+                $movements = Database::fetchAll(
+                    "SELECT variant_id, batch_id, quantity FROM stock_movements
+                     WHERE reference_type = 'order' AND reference_id = ? AND movement_type = 'sale_out'",
+                    [$orderId]
+                );
+
+                if (!empty($movements)) {
+                    foreach ($movements as $m) {
+                        $bId = (int)($m['batch_id'] ?? 0);
+                        $qty = (int)$m['quantity'];
+                        $vId = (int)$m['variant_id'];
+
+                        if ($bId > 0 && $qty > 0) {
+                            Database::query(
+                                'UPDATE inventory_batches SET quantity_remaining = quantity_remaining + ? WHERE id = ?',
+                                [$qty, $bId]
+                            );
+                        }
+
+                        Database::query(
+                            'INSERT INTO stock_movements (variant_id, batch_id, movement_type, quantity, reference_type, reference_id, performed_by, notes)
+                             VALUES (?, ?, "return_in", ?, "order_cancel", ?, ?, ?)',
+                            [$vId, $bId ?: null, $qty, $orderId, $order['user_id'] ?: null, 'Restored stock: payment failed (' . substr($failureReason, 0, 100) . ')']
+                        );
+                    }
+                } else {
+                    // Fallback to order_items if no stock_movements found
+                    $orderItems = Database::fetchAll('SELECT variant_id, batch_id, quantity FROM order_items WHERE order_id = ?', [$orderId]);
+                    foreach ($orderItems as $oi) {
+                        $bId = (int)($oi['batch_id'] ?? 0);
+                        $qty = (int)$oi['quantity'];
+                        $vId = (int)$oi['variant_id'];
+                        if ($bId > 0 && $qty > 0) {
+                            Database::query('UPDATE inventory_batches SET quantity_remaining = quantity_remaining + ? WHERE id = ?', [$qty, $bId]);
+                            Database::query(
+                                'INSERT INTO stock_movements (variant_id, batch_id, movement_type, quantity, reference_type, reference_id, performed_by, notes)
+                                 VALUES (?, ?, "return_in", ?, "order_cancel", ?, ?, ?)',
+                                [$vId, $bId, $qty, $orderId, $order['user_id'] ?: null, 'Restored stock: payment failed fallback']
+                            );
+                        }
+                    }
+                }
+
+                // Release applied coupon so customer can re-use it
+                Database::query('DELETE FROM coupon_usage WHERE order_id = ?', [$orderId]);
+                try {
+                    Database::query('DELETE FROM coupon_uses WHERE order_id = ?', [$orderId]);
+                } catch (\Throwable $ce) {}
+
+                // Mark payment as failed
+                Database::query(
+                    "UPDATE payments SET status = 'failed', updated_at = NOW() WHERE order_id = ? AND gateway = 'cashfree' AND status != 'success'",
+                    [$orderId]
+                );
+
+                // Update order status to cancelled and payment_status to failed
+                Database::query(
+                    "UPDATE orders SET status = 'cancelled', payment_status = 'failed' WHERE id = ?",
+                    [$orderId]
+                );
+
+                // Add status history entry
+                $reasonRemark = 'Order cancelled due to Cashfree payment failure: ' . ($failureReason ?: 'Transaction declined or abandoned.');
+                Database::query(
+                    'INSERT INTO order_status_history (order_id, status, remarks, changed_by) VALUES (?, "cancelled", ?, ?)',
+                    [$orderId, $reasonRemark, $order['user_id'] ?: null]
+                );
+
+                Database::commit();
+            } catch (\Throwable $e) {
+                Database::rollBack();
+                error_log('Order::cancelAndRecart error: ' . $e->getMessage());
+            }
+        }
+
+        // 2. Re-cart products back into active bag
+        $restoredCount = Cart::restoreItemsFromOrder($orderId);
+
+        // Pre-fill coupon in session if order had one
+        if (!empty($order['coupon_id'])) {
+            $coupon = Database::fetchOne('SELECT code FROM coupons WHERE id = ?', [$order['coupon_id']]);
+            if ($coupon && !empty($coupon['code'])) {
+                $_SESSION['applied_coupon_code'] = $coupon['code'];
+            }
+        }
+
+        return [
+            'ok'             => true,
+            'restored_count' => $restoredCount,
+            'reason'         => $failureReason,
+        ];
     }
 
     // ── Dashboard stats (admin) ───────────────────────────────────────

@@ -43,7 +43,6 @@ function discountPct($mrp, $sell): int {
 <section id="products" class="mx-auto max-w-6xl px-5 pb-10 pt-6 sm:px-6 md:px-8">
   <div class="mb-4 flex items-end justify-between">
     <div>
-      <p class="text-xs font-semibold uppercase tracking-wider text-primary font-mono">Order</p>
       <h2 class="font-display text-3xl md:text-4xl text-foreground">Pick your chikki craving!</h2>
     </div>
   </div>
@@ -109,23 +108,40 @@ function discountPct($mrp, $sell): int {
           </h3>
         </a>
 
-        <?php if (!empty($prod['avg_rating']) && (float)$prod['avg_rating'] > 0): ?>
+        <!-- Rating Stars & Reviews Count (Admin Configurable) -->
+        <?php
+        $cardRatingsEnabled  = function_exists('settingEnabled') ? settingEnabled('module_card_ratings', '1') : true;
+        $cardFallbackEnabled = function_exists('settingEnabled') ? settingEnabled('card_rating_fallback_enabled', '1') : true;
+        $defaultRating       = function_exists('getSetting') ? getSetting('card_default_rating', '4.7') : '4.7';
+        $defaultReviews      = function_exists('getSetting') ? getSetting('card_default_reviews', '3') : '3';
+
+        $hasDbRating  = (!empty($prod['avg_rating']) && (float)$prod['avg_rating'] > 0);
+        $finalRating  = $hasDbRating ? (float)$prod['avg_rating'] : ($cardFallbackEnabled ? (float)$defaultRating : 0);
+        $finalReviews = $hasDbRating ? (int)($prod['review_count'] ?? 0) : ($cardFallbackEnabled ? (int)$defaultReviews : 0);
+        ?>
+        <?php if ($cardRatingsEnabled && $finalRating > 0): ?>
           <div class="flex items-center gap-1 text-[11px] text-amber-500 font-medium">
             <span>★</span>
-            <span class="text-foreground font-semibold"><?= number_format((float)$prod['avg_rating'], 1) ?></span>
-            <span class="text-muted-foreground text-[10px]">(<?= (int)($prod['review_count'] ?? 0) ?>)</span>
+            <span class="text-foreground font-semibold"><?= number_format($finalRating, 1) ?></span>
+            <span class="text-muted-foreground text-[10px]">(<?= $finalReviews ?>)</span>
           </div>
         <?php endif; ?>
 
-        <!-- Feature Badges -->
-        <div class="flex flex-wrap gap-1">
-          <span class="rounded-full bg-accent/60 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">
-            Pure Jaggery
-          </span>
-          <span class="rounded-full bg-accent/60 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">
-            100% Natural
-          </span>
-        </div>
+        <!-- Feature Badges (Admin Configurable & Per-Product Customizable) -->
+        <?php
+        $cardBadgesEnabled = function_exists('settingEnabled') ? settingEnabled('module_card_badges', '1') : true;
+        $cardBadgesRaw     = !empty($prod['custom_card_badges']) ? $prod['custom_card_badges'] : (function_exists('getSetting') ? getSetting('card_badges_list', 'Pure Jaggery, 100% Natural') : 'Pure Jaggery, 100% Natural');
+        $cardBadgesList    = array_filter(array_map('trim', preg_split('/[,\r\n]+/', (string)$cardBadgesRaw)));
+        ?>
+        <?php if ($cardBadgesEnabled && !empty($cardBadgesList)): ?>
+          <div class="flex flex-wrap gap-1">
+            <?php foreach ($cardBadgesList as $badgeText): ?>
+              <span class="rounded-full bg-accent/60 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-foreground">
+                <?= htmlspecialchars($badgeText) ?>
+              </span>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
 
         <!-- Weight Variant Selector Chips (500g, 1kg) -->
         <div class="weight-selector-chips flex flex-wrap items-center gap-1 mt-1" data-product-id="<?= $pId ?>">

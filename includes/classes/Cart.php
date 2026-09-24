@@ -86,6 +86,7 @@ class Cart
             "SELECT ci.id, ci.variant_id, ci.quantity, ci.box_group_id,
                     v.sku, v.weight_grams, v.mrp, v.selling_price,
                     p.name AS product_name, p.slug AS product_slug,
+                    COALESCE(p.gst_rate_percent, 5.00) AS gst_rate_percent,
                     (SELECT pi.image_path FROM product_images pi
                      WHERE pi.product_id = p.id AND pi.is_primary = 1 LIMIT 1) AS product_image,
                     COALESCE(SUM(b.quantity_remaining), 0) AS stock_available
@@ -210,5 +211,58 @@ class Cart
             'SELECT COALESCE(SUM(quantity),0) as cnt FROM cart_items WHERE cart_id = ?', [$cartId]
         );
         return (int)($row['cnt'] ?? 0);
+    }
+
+    /**
+     * Restore items from an order back into the customer's active bag (for failed payments/cancellations).
+     * Re-inserts or merges the items with their weights and quantities.
+     */
+    public static function restoreItemsFromOrder(int $orderId): int
+    {
+        $items = Database::fetchAll(
+            'SELECT variant_id, quantity, box_group_id FROM order_items WHERE order_id = ?',
+            [$orderId]
+        );
+        if (empty($items)) {
+            return 0;
+        }
+
+        $cart   = self::getOrCreate();
+        $cartId = (int)$cart['id'];
+        $restoredUnits = 0;
+
+        foreach ($items as $item) {
+            $variantId  = (int)$item['variant_id'];
+            $qty        = (int)$item['quantity'];
+            $boxGroupId = $item['box_group_id'] ?: null;
+
+            if ($variantId <= 0 || $qty <= 0) {
+                continue;
+            }
+
+            // Check if this variant is already present in the active cart
+            $existing = Database::fetchOne(
+                'SELECT id, quantity FROM cart_items WHERE cart_id = ? AND variant_id = ? AND ' .
+                ($boxGroupId ? 'box_group_id = ?' : 'box_group_id IS NULL'),
+                $boxGroupId ? [$cartId, $variantId, $boxGroupId] : [$cartId, $variantId]
+            );
+
+            if ($existing) {
+                // Ensure the quantity is at least the order's quantity
+                $newQty = max((int)$existing['quantity'], $qty);
+                Database::query(
+                    'UPDATE cart_items SET quantity = ? WHERE id = ?',
+                    [$newQty, $existing['id']]
+                );
+            } else {
+                Database::query(
+                    'INSERT INTO cart_items (cart_id, variant_id, quantity, box_group_id) VALUES (?, ?, ?, ?)',
+                    [$cartId, $variantId, $qty, $boxGroupId]
+                );
+            }
+            $restoredUnits += $qty;
+        }
+
+        return $restoredUnits;
     }
 }
