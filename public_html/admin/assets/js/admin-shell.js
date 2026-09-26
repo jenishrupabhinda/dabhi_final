@@ -154,26 +154,16 @@
     if (activeItem) {
       activeItem.setAttribute('aria-current', 'page');
 
-      // Verify active item is within visible scroll bounds of sidebar
-      requestAnimationFrame(() => {
-        setTimeout(() => {
+      // On desktop, keep active item in visible bounds without ever invoking window scrollIntoView
+      if (window.innerWidth >= 992) {
+        requestAnimationFrame(() => {
           const container = sidebar.querySelector('.sidebar-nav') || sidebar;
-          const containerRect = container.getBoundingClientRect();
-          const itemRect = activeItem.getBoundingClientRect();
-
-          const isFullyVisible = (
-            itemRect.top >= containerRect.top + 10 &&
-            itemRect.bottom <= containerRect.bottom - 10
-          );
-
-          if (!isFullyVisible) {
-            activeItem.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-            try {
-              sessionStorage.setItem(STORAGE_KEY_SCROLL, container.scrollTop || sidebar.scrollTop);
-            } catch (e) {}
+          const itemTop = activeItem.offsetTop;
+          if (itemTop < container.scrollTop || itemTop > container.scrollTop + container.clientHeight - 60) {
+            container.scrollTop = Math.max(0, itemTop - 40);
           }
-        }, 60);
-      });
+        });
+      }
     }
 
     // Tooltip data attribute initialization
