@@ -43,7 +43,7 @@ function discountPct($mrp, $sell): int {
 <section id="products" class="mx-auto max-w-6xl px-5 pb-10 pt-6 sm:px-6 md:px-8">
   <div class="mb-4 flex items-end justify-between">
     <div>
-      <h2 class="font-display text-3xl md:text-4xl text-foreground">Pick your chikki craving!</h2>
+      <h2 class="font-display text-3xl md:text-4xl text-foreground">Sweet Tooth Bliss!</h2>
     </div>
   </div>
 

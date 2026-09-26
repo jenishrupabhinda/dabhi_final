@@ -123,23 +123,29 @@ require_once __DIR__ . '/partials/page-start.php';
 
   <!-- Alerts -->
   <?php if ($lowStockItems): ?>
-  <div class="alert alert-warning" style="margin-bottom:16px;">
-    ⚠️ <strong><?= count($lowStockItems) ?> variant(s)</strong> are at or below reorder level.
-    <?php foreach ($lowStockItems as $ls): ?><br>&nbsp;&nbsp;· <?= e($ls['product']) ?> (<?= e($ls['sku']) ?>) — <?= $ls['total_stock'] ?> units remaining<?php endforeach; ?>
+  <div class="adm-alert adm-alert-warning">
+    <span class="adm-alert-icon">⚠️</span>
+    <div class="adm-alert-content">
+      <strong><?= count($lowStockItems) ?> variant(s)</strong> are at or below reorder level.
+      <?php foreach ($lowStockItems as $ls): ?><br>&bull; <?= e($ls['product']) ?> (<?= e($ls['sku']) ?>) — <?= $ls['total_stock'] ?> units remaining<?php endforeach; ?>
+    </div>
   </div>
   <?php endif; ?>
 
   <?php if ($expiringBatches): ?>
-  <div class="alert alert-error" style="margin-bottom:16px;">
-    🔴 <strong><?= count($expiringBatches) ?> batch(es)</strong> expire within 30 days.
-    <?php foreach ($expiringBatches as $eb): ?><br>&nbsp;&nbsp;· <?= e($eb['product']) ?> (<?= e($eb['sku']) ?>) — expires <?= $eb['expiry_date'] ?>, <?= $eb['quantity_remaining'] ?> units<?php endforeach; ?>
+  <div class="adm-alert adm-alert-danger">
+    <span class="adm-alert-icon">🔴</span>
+    <div class="adm-alert-content">
+      <strong><?= count($expiringBatches) ?> batch(es)</strong> expire within 30 days.
+      <?php foreach ($expiringBatches as $eb): ?><br>&bull; <?= e($eb['product']) ?> (<?= e($eb['sku']) ?>) — expires <?= $eb['expiry_date'] ?>, <?= $eb['quantity_remaining'] ?> units remaining<?php endforeach; ?>
+    </div>
   </div>
   <?php endif; ?>
 
   <!-- Product selector -->
   <form method="GET" style="display:flex;gap:10px;margin-bottom:20px;">
-    <select name="product_id" class="form-control" style="max-width:320px;" onchange="this.form.submit()">
-      <option value="">— Select a product —</option>
+    <select name="product_id" class="form-control" style="max-width:340px;" onchange="this.form.submit()">
+      <option value="">— Select a product to manage inventory —</option>
       <?php foreach ($products as $p): ?>
       <option value="<?= $p['id'] ?>" <?= $productId === (int)$p['id'] ? 'selected' : '' ?>><?= e($p['name']) ?></option>
       <?php endforeach; ?>
@@ -151,98 +157,102 @@ require_once __DIR__ . '/partials/page-start.php';
   <!-- Add batch form -->
   <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h3 class="card-title">Add Stock Batch</h3></div>
-    <form method="POST" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-      <?= csrfField() ?><input type="hidden" name="action" value="add_batch">
-      <div class="form-group">
-        <label class="form-label">Variant</label>
-        <select name="variant_id" class="form-control" required>
-          <?php foreach ($variants as $v): ?>
-          <option value="<?= $v['id'] ?>"><?= e($v['sku']) ?> (<?= e($v['weight_grams']) ?>g)</option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Batch Number</label>
-        <input type="text" name="batch_number" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Qty Received</label>
-        <input type="number" name="quantity_received" class="form-control" min="1" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Manufacture Date</label>
-        <input type="date" name="manufacture_date" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Expiry Date *</label>
-        <input type="date" name="expiry_date" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Cost Price (₹)</label>
-        <input type="number" name="cost_price" step="0.01" class="form-control">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Supplier</label>
-        <input type="text" name="supplier_name" class="form-control">
-      </div>
-      <div class="form-group" style="grid-column:2/-1;">
-        <label class="form-label">Notes</label>
-        <input type="text" name="notes" class="form-control">
-      </div>
-      <div class="form-group" style="grid-column:1/-1;">
-        <button type="submit" class="btn btn-primary">Add Batch</button>
-      </div>
-    </form>
+    <div class="card-body">
+      <form method="POST" class="adm-form-grid-3">
+        <?= csrfField() ?><input type="hidden" name="action" value="add_batch">
+        <div class="form-group">
+          <label class="form-label">Variant</label>
+          <select name="variant_id" class="form-control" required>
+            <?php foreach ($variants as $v): ?>
+            <option value="<?= $v['id'] ?>"><?= e($v['sku']) ?> (<?= e($v['weight_grams']) ?>g)</option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Batch Number</label>
+          <input type="text" name="batch_number" class="form-control" placeholder="e.g. BATCH-01" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Qty Received</label>
+          <input type="number" name="quantity_received" class="form-control" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Manufacture Date</label>
+          <input type="date" name="manufacture_date" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Expiry Date *</label>
+          <input type="date" name="expiry_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cost Price (₹)</label>
+          <input type="number" name="cost_price" step="0.01" class="form-control" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supplier</label>
+          <input type="text" name="supplier_name" class="form-control" placeholder="Supplier name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <input type="text" name="notes" class="form-control" placeholder="Optional notes">
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-end;">
+          <button type="submit" class="btn btn-primary" style="height:42px;width:100%;">Add Batch</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Variants & batches -->
   <?php foreach ($variants as $v): ?>
-  <div class="card" style="margin-bottom:16px;">
-    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
       <h3 class="card-title"><?= e($v['sku']) ?> — <?= e($v['weight_grams']) ?>g</h3>
-      <div>
+      <div style="font-size:0.86rem;">
         Total Stock: <strong><?= (int)$v['total_stock'] ?></strong> units
         <?php if ((int)$v['total_stock'] <= (int)$v['reorder_level']): ?>
         <span class="badge badge-danger" style="margin-left:8px;">Low Stock</span>
         <?php endif; ?>
         <?php if ($v['nearest_expiry']): ?>
-        · Nearest Expiry: <span style="font-weight:600;color:var(--dc-danger);"><?= $v['nearest_expiry'] ?></span>
+        · Nearest Expiry: <span style="font-weight:600;color:var(--adm-terracotta);"><?= $v['nearest_expiry'] ?></span>
         <?php endif; ?>
       </div>
     </div>
 
     <?php if (!empty($batches[$v['id']])): ?>
-    <table class="admin-table">
-      <thead><tr><th>Batch</th><th>Mfg Date</th><th>Expiry</th><th>Received</th><th>Remaining</th><th>Cost</th><th>Adjust</th></tr></thead>
-      <tbody>
-      <?php foreach ($batches[$v['id']] as $b): ?>
-      <tr style="<?= $b['quantity_remaining'] == 0 ? 'opacity:0.5;' : '' ?>">
-        <td><?= e($b['batch_number']) ?></td>
-        <td><?= $b['manufacture_date'] ?? '—' ?></td>
-        <td style="<?= $b['expiry_date'] <= date('Y-m-d', strtotime('+30 days')) ? 'color:var(--dc-danger);font-weight:700;' : '' ?>"><?= $b['expiry_date'] ?></td>
-        <td><?= $b['quantity_received'] ?></td>
-        <td><?= $b['quantity_remaining'] ?></td>
-        <td><?= $b['cost_price'] ? '₹' . number_format($b['cost_price'], 2) : '—' ?></td>
-        <td>
-          <form method="POST" style="display:flex;gap:4px;align-items:center;">
-            <?= csrfField() ?><input type="hidden" name="action" value="adjust">
-            <input type="hidden" name="variant_id" value="<?= $v['id'] ?>">
-            <input type="hidden" name="batch_id" value="<?= $b['id'] ?>">
-            <select name="movement_type" class="form-control" style="width:130px;font-size:0.78rem;">
-              <option value="adjustment_in">+ Add</option>
-              <option value="adjustment_out">− Remove</option>
-              <option value="damage_out">⚠ Damage</option>
-            </select>
-            <input type="number" name="quantity" class="form-control" min="1" style="width:60px;" required>
-            <button type="submit" class="btn btn-ghost btn-sm">OK</button>
-          </form>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Batch</th><th>Mfg Date</th><th>Expiry</th><th>Received</th><th>Remaining</th><th>Cost</th><th>Adjust</th></tr></thead>
+        <tbody>
+        <?php foreach ($batches[$v['id']] as $b): ?>
+        <tr style="<?= $b['quantity_remaining'] == 0 ? 'opacity:0.5;' : '' ?>">
+          <td><strong><?= e($b['batch_number']) ?></strong></td>
+          <td><?= $b['manufacture_date'] ?? '—' ?></td>
+          <td style="<?= $b['expiry_date'] <= date('Y-m-d', strtotime('+30 days')) ? 'color:var(--adm-terracotta);font-weight:700;' : '' ?>"><?= $b['expiry_date'] ?></td>
+          <td><?= $b['quantity_received'] ?></td>
+          <td><strong><?= $b['quantity_remaining'] ?></strong></td>
+          <td><?= $b['cost_price'] ? '₹' . number_format($b['cost_price'], 2) : '—' ?></td>
+          <td>
+            <form method="POST" style="display:flex;gap:4px;align-items:center;">
+              <?= csrfField() ?><input type="hidden" name="action" value="adjust">
+              <input type="hidden" name="variant_id" value="<?= $v['id'] ?>">
+              <input type="hidden" name="batch_id" value="<?= $b['id'] ?>">
+              <select name="movement_type" class="form-control" style="width:120px;font-size:0.78rem;height:34px;padding:4px 8px;">
+                <option value="adjustment_in">+ Add</option>
+                <option value="adjustment_out">− Remove</option>
+                <option value="damage_out">⚠ Damage</option>
+              </select>
+              <input type="number" name="quantity" class="form-control" min="1" style="width:55px;height:34px;padding:4px 8px;" required>
+              <button type="submit" class="btn btn-secondary btn-sm" style="height:34px;">OK</button>
+            </form>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
     <?php else: ?>
-    <p class="text-muted" style="padding:12px;">No batches yet for this variant.</p>
+    <p class="text-muted" style="padding:16px 20px;margin:0;">No batches yet for this variant.</p>
     <?php endif; ?>
   </div>
   <?php endforeach; ?>

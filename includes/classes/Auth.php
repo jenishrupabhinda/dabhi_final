@@ -284,18 +284,49 @@ class Auth
 
     /**
      * Create an admin or employee account.
-     * @param string $role 'superadmin' | 'admin' | 'employee'
-     * @return array{ok:bool, error:string, userId:int|null}
+     * Supports both array argument or positional arguments.
+     * @param string|array $fullName
+     * @param string|int $email
+     * @param string $phone
+     * @param string $role
+     * @param int $createdBy
+     * @return array{ok:bool, error:string, userId:int|null, temp_password:string, tempPass:string}
      */
     public static function createStaffAccount(
-        string $fullName,
-        string $email,
-        string $phone,
-        string $role,
+        $fullName,
+        $email = '',
+        string $phone = '',
+        string $role = 'employee',
         int    $createdBy = 0
     ): array {
-        $email = strtolower(trim($email));
-        $phone = trim($phone);
+        if (is_array($fullName)) {
+            $data      = $fullName;
+            $createdBy = is_int($email) ? $email : (int)($data['created_by'] ?? 0);
+            $fullName  = trim((string)($data['full_name'] ?? ''));
+            $email     = trim((string)($data['email'] ?? ''));
+            $phone     = trim((string)($data['phone'] ?? ''));
+            $role      = trim((string)($data['role'] ?? 'employee'));
+        } else {
+            $fullName  = trim((string)$fullName);
+            $email     = trim((string)$email);
+            $phone     = trim($phone);
+            $role      = trim($role);
+        }
+
+        if (empty($fullName)) {
+            return ['ok' => false, 'error' => 'Full name is required.', 'userId' => null];
+        }
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['ok' => false, 'error' => 'A valid email address is required.', 'userId' => null];
+        }
+        if (empty($phone)) {
+            return ['ok' => false, 'error' => 'Phone number is required.', 'userId' => null];
+        }
+        if (!in_array($role, ['superadmin', 'admin', 'employee'], true)) {
+            return ['ok' => false, 'error' => 'Invalid role specified.', 'userId' => null];
+        }
+
+        $email = strtolower($email);
 
         if (Database::fetchOne('SELECT id FROM users WHERE email = ?', [$email])) {
             return ['ok' => false, 'error' => 'Email already in use.', 'userId' => null];
@@ -316,11 +347,14 @@ class Auth
             [$uuid, $role, $fullName, $email, $phone, $hash, $cb]
         );
 
+        $newId = (int) Database::lastInsertId();
+
         return [
-            'ok'       => true,
-            'error'    => '',
-            'userId'   => (int) Database::lastInsertId(),
-            'tempPass' => $tempPass,  // caller must communicate this to the new user
+            'ok'            => true,
+            'error'         => '',
+            'userId'        => $newId,
+            'temp_password' => $tempPass,
+            'tempPass'      => $tempPass,
         ];
     }
 

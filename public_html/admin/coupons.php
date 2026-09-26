@@ -67,91 +67,100 @@ require_once __DIR__ . '/partials/page-start.php';
   <!-- Create / Edit Form -->
   <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h3 class="card-title"><?= $editItem ? 'Edit Coupon' : 'Create Coupon' ?></h3></div>
-    <form method="POST" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
-      <?= csrfField() ?><input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $editItem['id'] ?? 0 ?>">
-      <div class="form-group">
-        <label class="form-label">Code *</label>
-        <input type="text" name="code" class="form-control" value="<?= e($editItem['code'] ?? '') ?>" style="text-transform:uppercase;" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Type *</label>
-        <select name="discount_type" class="form-control" required>
-          <option value="flat" <?= ($editItem['discount_type'] ?? '') === 'flat' ? 'selected' : '' ?>>Flat ₹</option>
-          <option value="percent" <?= ($editItem['discount_type'] ?? '') === 'percent' ? 'selected' : '' ?>>Percent %</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Discount Value *</label>
-        <input type="number" name="discount_value" class="form-control" step="0.01" min="0" value="<?= $editItem['discount_value'] ?? '' ?>" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Min Order (₹)</label>
-        <input type="number" name="min_order_value" class="form-control" step="0.01" min="0" value="<?= $editItem['min_order_value'] ?? 0 ?>">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Max Discount (₹, blank = unlimited)</label>
-        <input type="number" name="max_discount_amount" class="form-control" step="0.01" value="<?= $editItem['max_discount_amount'] ?? '' ?>">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Total Usage Limit (blank = unlimited)</label>
-        <input type="number" name="usage_limit_total" class="form-control" value="<?= $editItem['usage_limit_total'] ?? '' ?>">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Per User Limit</label>
-        <input type="number" name="usage_limit_per_user" class="form-control" value="<?= $editItem['usage_limit_per_user'] ?? 1 ?>">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Valid From *</label>
-        <input type="datetime-local" name="valid_from" class="form-control" value="<?= $editItem ? date('Y-m-d\TH:i', strtotime($editItem['valid_from'])) : '' ?>" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Valid To *</label>
-        <input type="datetime-local" name="valid_to" class="form-control" value="<?= $editItem ? date('Y-m-d\TH:i', strtotime($editItem['valid_to'])) : '' ?>" required>
-      </div>
-      <div class="form-group" style="grid-column:1/-1;">
-        <label class="form-label">Description</label>
-        <input type="text" name="description" class="form-control" value="<?= e($editItem['description'] ?? '') ?>">
-      </div>
-      <div class="form-group" style="grid-column:1/-1;">
-        <label><input type="checkbox" name="is_active" value="1" <?= ($editItem['is_active'] ?? 1) ? 'checked' : '' ?>> Active</label>
-      </div>
-      <div style="grid-column:1/-1;display:flex;gap:8px;">
-        <button type="submit" class="btn btn-primary"><?= $editItem ? 'Update' : 'Create Coupon' ?></button>
-        <?php if ($editItem): ?><a href="/admin/coupons.php" class="btn btn-ghost">Cancel</a><?php endif; ?>
-      </div>
-    </form>
+    <div class="card-body">
+      <form method="POST" class="adm-form-grid-3">
+        <?= csrfField() ?><input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $editItem['id'] ?? 0 ?>">
+        <div class="form-group">
+          <label class="form-label">Code *</label>
+          <input type="text" name="code" class="form-control" value="<?= e($editItem['code'] ?? '') ?>" style="text-transform:uppercase;" placeholder="e.g. DIWALI20" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type *</label>
+          <select name="discount_type" class="form-control" required>
+            <option value="flat" <?= ($editItem['discount_type'] ?? '') === 'flat' ? 'selected' : '' ?>>Flat ₹</option>
+            <option value="percent" <?= ($editItem['discount_type'] ?? '') === 'percent' ? 'selected' : '' ?>>Percent %</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Discount Value *</label>
+          <input type="number" name="discount_value" class="form-control" step="0.01" min="0" value="<?= $editItem['discount_value'] ?? '' ?>" placeholder="e.g. 50" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Min Order (₹)</label>
+          <input type="number" name="min_order_value" class="form-control" step="0.01" min="0" value="<?= $editItem['min_order_value'] ?? 0 ?>">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Discount (₹, blank = unlimited)</label>
+          <input type="number" name="max_discount_amount" class="form-control" step="0.01" value="<?= $editItem['max_discount_amount'] ?? '' ?>" placeholder="Unlimited">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total Usage Limit (blank = unlimited)</label>
+          <input type="number" name="usage_limit_total" class="form-control" value="<?= $editItem['usage_limit_total'] ?? '' ?>" placeholder="Unlimited">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Per User Limit</label>
+          <input type="number" name="usage_limit_per_user" class="form-control" value="<?= $editItem['usage_limit_per_user'] ?? 1 ?>">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valid From *</label>
+          <input type="datetime-local" name="valid_from" class="form-control" value="<?= $editItem ? date('Y-m-d\TH:i', strtotime($editItem['valid_from'])) : '' ?>" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valid To *</label>
+          <input type="datetime-local" name="valid_to" class="form-control" value="<?= $editItem ? date('Y-m-d\TH:i', strtotime($editItem['valid_to'])) : '' ?>" required>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Description</label>
+          <input type="text" name="description" class="form-control" value="<?= e($editItem['description'] ?? '') ?>" placeholder="Customer-facing description of discount...">
+        </div>
+        <div class="form-group" style="grid-column:1/-1;margin-bottom:8px;">
+          <label style="cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600;">
+            <input type="checkbox" name="is_active" value="1" <?= ($editItem['is_active'] ?? 1) ? 'checked' : '' ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+            <span>Coupon Active</span>
+          </label>
+        </div>
+        <div style="grid-column:1/-1;display:flex;gap:10px;">
+          <button type="submit" class="btn btn-primary"><?= $editItem ? 'Update Coupon' : 'Create Coupon' ?></button>
+          <?php if ($editItem): ?><a href="<?= url('admin/coupons.php') ?>" class="btn btn-secondary">Cancel</a><?php endif; ?>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- List -->
   <div class="card">
     <div class="card-header"><h3 class="card-title">All Coupons (<?= count($coupons) ?>)</h3></div>
-    <table class="admin-table">
-      <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Validity</th><th>Used</th><th>Status</th><th></th></tr></thead>
-      <tbody>
-      <?php foreach ($coupons as $c): ?>
-      <tr>
-        <td><strong><?= e($c['code']) ?></strong></td>
-        <td><?= $c['discount_type'] === 'flat' ? 'Flat ₹' : 'Percent %' ?></td>
-        <td><?= $c['discount_type'] === 'flat' ? '₹' . number_format($c['discount_value'],2) : $c['discount_value'] . '%' ?></td>
-        <td><?= $c['min_order_value'] > 0 ? '₹' . number_format($c['min_order_value']) : '—' ?></td>
-        <td style="font-size:0.78rem;"><?= date('d M Y', strtotime($c['valid_from'])) ?> – <?= date('d M Y', strtotime($c['valid_to'])) ?></td>
-        <td><?= $c['use_count'] ?><?= $c['usage_limit_total'] ? '/' . $c['usage_limit_total'] : '' ?></td>
-        <td><span class="badge badge-<?= $c['is_active'] ? 'success' : 'secondary' ?>"><?= $c['is_active'] ? 'Active' : 'Inactive' ?></span></td>
-        <td>
-          <a href="/admin/coupons.php?edit=<?= $c['id'] ?>" class="btn btn-ghost btn-sm">Edit</a>
-          <form method="POST" style="display:inline;">
-            <?= csrfField() ?><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="<?= $c['id'] ?>">
-            <button type="submit" class="btn btn-ghost btn-sm"><?= $c['is_active'] ? 'Disable' : 'Enable' ?></button>
-          </form>
-          <form method="POST" style="display:inline;" onsubmit="return confirm('Delete coupon <?= e($c['code']) ?>?')">
-            <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= $c['id'] ?>">
-            <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--dc-danger);">🗑</button>
-          </form>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Validity</th><th>Used</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
+        <tbody>
+        <?php foreach ($coupons as $c): ?>
+        <tr>
+          <td><strong><?= e($c['code']) ?></strong></td>
+          <td><?= $c['discount_type'] === 'flat' ? 'Flat ₹' : 'Percent %' ?></td>
+          <td><?= $c['discount_type'] === 'flat' ? '₹' . number_format($c['discount_value'],2) : $c['discount_value'] . '%' ?></td>
+          <td><?= $c['min_order_value'] > 0 ? '₹' . number_format($c['min_order_value']) : '—' ?></td>
+          <td style="font-size:0.78rem;white-space:nowrap;"><?= date('d M Y', strtotime($c['valid_from'])) ?> – <?= date('d M Y', strtotime($c['valid_to'])) ?></td>
+          <td><?= $c['use_count'] ?><?= $c['usage_limit_total'] ? '/' . $c['usage_limit_total'] : '' ?></td>
+          <td><span class="badge badge-<?= $c['is_active'] ? 'success' : 'secondary' ?>"><?= $c['is_active'] ? 'Active' : 'Inactive' ?></span></td>
+          <td>
+            <div style="display:flex;gap:6px;justify-content:flex-end;">
+              <a href="/admin/coupons.php?edit=<?= $c['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
+              <form method="POST" style="display:inline;">
+                <?= csrfField() ?><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value="<?= $c['id'] ?>">
+                <button type="submit" class="btn btn-secondary btn-sm"><?= $c['is_active'] ? 'Disable' : 'Enable' ?></button>
+              </form>
+              <form method="POST" style="display:inline;" onsubmit="return confirm('Delete coupon <?= e($c['code']) ?>?')">
+                <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= $c['id'] ?>">
+                <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 <?php require_once __DIR__ . '/partials/page-end.php'; ?>

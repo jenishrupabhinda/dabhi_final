@@ -73,76 +73,101 @@ require_once __DIR__ . '/partials/page-start.php';
     <!-- App -->
     <div class="card" style="margin-bottom:20px;">
       <div class="card-header"><h3 class="card-title">🏪 Store Info</h3></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div class="form-group"><label class="form-label">App / Store Name</label>
-          <input type="text" name="app_name" class="form-control" value="<?= s('app_name','Dabhi Chikki') ?>"></div>
-        <div class="form-group"><label class="form-label">Support Email</label>
-          <input type="email" name="support_email" class="form-control" value="<?= s('support_email') ?>"></div>
-        <div class="form-group"><label class="form-label">Support Phone</label>
-          <input type="text" name="support_phone" class="form-control" value="<?= s('support_phone') ?>"></div>
-        <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Business Address (for labels/invoices)</label>
-          <input type="text" name="business_address" class="form-control" value="<?= s('business_address') ?>"></div>
+      <div class="card-body">
+        <div class="adm-form-grid-2">
+          <div class="form-group"><label class="form-label">App / Store Name</label>
+            <input type="text" name="app_name" class="form-control" value="<?= s('app_name','Dabhi Chikki') ?>"></div>
+          <div class="form-group"><label class="form-label">Support Email</label>
+            <input type="email" name="support_email" class="form-control" value="<?= s('support_email') ?>"></div>
+          <div class="form-group"><label class="form-label">Support Phone</label>
+            <input type="text" name="support_phone" class="form-control" value="<?= s('support_phone') ?>"></div>
+          <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Business Address (for labels/invoices)</label>
+            <input type="text" name="business_address" class="form-control" value="<?= s('business_address') ?>"></div>
+        </div>
       </div>
     </div>
 
     <!-- Notifications -->
     <div class="card" style="margin-bottom:20px;">
       <div class="card-header"><h3 class="card-title">🔔 Notification Channels</h3></div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <label><input type="checkbox" name="email_notifications_enabled" value="1" <?= sc('email_notifications_enabled') ?>> Email Notifications</label>
-        <label><input type="checkbox" name="whatsapp_enabled" value="1" <?= sc('whatsapp_enabled','0') ?>> WhatsApp Notifications</label>
-        <label><input type="checkbox" name="sms_enabled" value="1" <?= sc('sms_enabled','0') ?>> SMS Notifications</label>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <label style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;">
+            <input type="checkbox" name="email_notifications_enabled" value="1" <?= sc('email_notifications_enabled') ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+            <span>Email Notifications</span>
+          </label>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;">
+            <input type="checkbox" name="whatsapp_enabled" value="1" <?= sc('whatsapp_enabled','0') ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+            <span>WhatsApp Notifications</span>
+          </label>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;">
+            <input type="checkbox" name="sms_enabled" value="1" <?= sc('sms_enabled','0') ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+            <span>SMS Notifications</span>
+          </label>
+        </div>
       </div>
     </div>
 
     <!-- Commerce -->
     <div class="card" style="margin-bottom:20px;">
       <div class="card-header"><h3 class="card-title">🛒 Commerce Settings</h3></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div class="form-group">
-          <label><input type="checkbox" name="cod_enabled" value="1" <?= sc('cod_enabled') ?>> Enable Cash on Delivery</label>
+      <div class="card-body">
+        <div class="adm-form-grid-2">
+          <div class="form-group" style="grid-column:1/-1;">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;">
+              <input type="checkbox" name="cod_enabled" value="1" <?= sc('cod_enabled') ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+              <span>Enable Cash on Delivery</span>
+            </label>
+          </div>
+          <div class="form-group"><label class="form-label">Free Shipping Threshold (₹)</label>
+            <input type="number" name="free_shipping_threshold" class="form-control" value="<?= s('free_shipping_threshold','0') ?>" step="1"></div>
+          <div class="form-group"><label class="form-label">Default Shipping Charge (₹)</label>
+            <input type="number" name="default_shipping_charge" class="form-control" value="<?= s('default_shipping_charge','50') ?>" step="1"></div>
+          <div class="form-group"><label class="form-label">Box Weight Limit (grams)</label>
+            <input type="number" name="box_weight_limit_grams" class="form-control" value="<?= s('box_weight_limit_grams','1000') ?>"></div>
         </div>
-        <div></div>
-        <div class="form-group"><label class="form-label">Free Shipping Threshold (₹)</label>
-          <input type="number" name="free_shipping_threshold" class="form-control" value="<?= s('free_shipping_threshold','0') ?>" step="1"></div>
-        <div class="form-group"><label class="form-label">Default Shipping Charge (₹)</label>
-          <input type="number" name="default_shipping_charge" class="form-control" value="<?= s('default_shipping_charge','50') ?>" step="1"></div>
-        <div class="form-group"><label class="form-label">Box Weight Limit (grams)</label>
-          <input type="number" name="box_weight_limit_grams" class="form-control" value="<?= s('box_weight_limit_grams','1000') ?>"></div>
       </div>
     </div>
 
     <!-- GST -->
     <div class="card" style="margin-bottom:20px;">
       <div class="card-header"><h3 class="card-title">📋 GST Configuration</h3></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div class="form-group" style="grid-column:1/-1;">
-          <label><input type="checkbox" name="is_gst_enabled" value="1"
-            <?= ($gstCfg['is_gst_enabled'] ?? 1) ? 'checked' : '' ?>> GST Enabled on all orders</label>
+      <div class="card-body">
+        <div class="adm-form-grid-2">
+          <div class="form-group" style="grid-column:1/-1;">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;">
+              <input type="checkbox" name="is_gst_enabled" value="1" <?= ($gstCfg['is_gst_enabled'] ?? 1) ? 'checked' : '' ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+              <span>GST Enabled on all orders</span>
+            </label>
+          </div>
+          <div class="form-group"><label class="form-label">Business Name (on invoice)</label>
+            <input type="text" name="gst_business_name" class="form-control" value="<?= htmlspecialchars($gstCfg['business_name'] ?? '') ?>"></div>
+          <div class="form-group"><label class="form-label">GSTIN</label>
+            <input type="text" name="gstin" class="form-control" placeholder="22AAAAA0000A1Z5" value="<?= htmlspecialchars($gstCfg['gstin'] ?? '') ?>"></div>
+          <div class="form-group"><label class="form-label">Business State (for CGST/IGST split)</label>
+            <input type="text" name="business_state" class="form-control" placeholder="Gujarat" value="<?= htmlspecialchars($gstCfg['business_state'] ?? 'Gujarat') ?>"></div>
+          <div class="form-group"><label class="form-label">Business Address (invoice footer)</label>
+            <input type="text" name="gst_address" class="form-control" value="<?= htmlspecialchars($gstCfg['address'] ?? '') ?>"></div>
         </div>
-        <div class="form-group"><label class="form-label">Business Name (on invoice)</label>
-          <input type="text" name="gst_business_name" class="form-control" value="<?= htmlspecialchars($gstCfg['business_name'] ?? '') ?>"></div>
-        <div class="form-group"><label class="form-label">GSTIN</label>
-          <input type="text" name="gstin" class="form-control" placeholder="22AAAAA0000A1Z5" value="<?= htmlspecialchars($gstCfg['gstin'] ?? '') ?>"></div>
-        <div class="form-group"><label class="form-label">Business State (for CGST/IGST split)</label>
-          <input type="text" name="business_state" class="form-control" placeholder="Gujarat" value="<?= htmlspecialchars($gstCfg['business_state'] ?? 'Gujarat') ?>"></div>
-        <div class="form-group"><label class="form-label">Business Address (invoice footer)</label>
-          <input type="text" name="gst_address" class="form-control" value="<?= htmlspecialchars($gstCfg['address'] ?? '') ?>"></div>
       </div>
     </div>
 
     <!-- Security -->
     <div class="card" style="margin-bottom:20px;">
       <div class="card-header"><h3 class="card-title">🔐 Security</h3></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div class="form-group"><label class="form-label">Max Login Attempts</label>
-          <input type="number" name="login_max_attempts" class="form-control" value="<?= s('login_max_attempts','5') ?>" min="3" max="20"></div>
-        <div class="form-group"><label class="form-label">Lockout Duration (minutes)</label>
-          <input type="number" name="login_lockout_minutes" class="form-control" value="<?= s('login_lockout_minutes','15') ?>" min="5" max="180"></div>
+      <div class="card-body">
+        <div class="adm-form-grid-2">
+          <div class="form-group"><label class="form-label">Max Login Attempts</label>
+            <input type="number" name="login_max_attempts" class="form-control" value="<?= s('login_max_attempts','5') ?>" min="3" max="20"></div>
+          <div class="form-group"><label class="form-label">Lockout Duration (minutes)</label>
+            <input type="number" name="login_lockout_minutes" class="form-control" value="<?= s('login_lockout_minutes','15') ?>" min="5" max="180"></div>
+        </div>
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-lg">Save All Settings</button>
+    <div style="margin-bottom:28px;">
+      <button type="submit" class="btn btn-primary btn-lg">Save All Settings</button>
+    </div>
   </form>
 </div>
 <?php require_once __DIR__ . '/partials/page-end.php'; ?>

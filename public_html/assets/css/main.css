@@ -71,13 +71,11 @@
 html {
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
-  overscroll-behavior: none;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: contain;
 }
 body {
   touch-action: manipulation;
-  overscroll-behavior: none;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 input, textarea, select, button, a, [role="button"] {

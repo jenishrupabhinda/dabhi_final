@@ -8,68 +8,84 @@
   </div><!-- closes pb-24 md:pb-0 -->
 
   <!-- Site Footer (Exact Yogurt Alley Architecture) -->
-  <footer class="bg-secondary text-secondary-foreground mt-16" style="--footer-hover:#f6dc94">
-    <div class="mx-auto grid max-w-6xl px-4 py-12 gap-10 md:grid-cols-3 md:px-6 md:py-16">
+  <footer class="bg-secondary mt-16" style="background-color: #541f21 !important; color: #f6e9de !important; --footer-hover: #f6dc94;">
+    <div class="mx-auto grid max-w-6xl px-4 py-12 gap-10 grid-cols-1 md:grid-cols-3 md:px-6 md:py-16">
       
-      <!-- Brand Info & Address -->
-      <div class="md:col-span-2">
-        <a href="index.php" class="inline-block mb-3" aria-label="Dabhi Chikki Home">
-          <img src="assets/images/logo.png" alt="Dabhi Chikki" class="h-10 w-auto object-contain md:h-12">
+      <!-- 1. Brand Logo & 4 Social Icons (Centered in mobile view) -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <!-- Footer Logo centered in mobile -->
+        <a href="index.php" class="inline-block mb-4" aria-label="Dabhi Chikki Home">
+          <img src="assets/images/logo.png" alt="Dabhi Chikki" class="h-10 w-auto object-contain md:h-12 mx-auto md:mx-0">
         </a>
-        <p class="mt-3 max-w-sm text-sm opacity-80 leading-relaxed">
-          Handcrafted chikki made with 100% pure sugarcane jaggery and premium roasted nuts. Delivering the authentic taste of tradition across India since 2009.
-        </p>
 
-        <!-- Contact details -->
-        <ul class="mt-5 space-y-2.5 text-sm leading-relaxed opacity-85 sm:space-y-3">
-          <li class="grid grid-cols-[64px_1fr] items-baseline gap-x-3 sm:grid-cols-[72px_1fr]">
-            <span class="text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70 font-mono">Mail</span>
-            <a href="mailto:care@dabhichikki.com" class="break-all hover:underline hover:text-[#f6dc94] transition">care@dabhichikki.com</a>
-          </li>
-          <li class="grid grid-cols-[64px_1fr] items-baseline gap-x-3 sm:grid-cols-[72px_1fr]">
-            <span class="text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70 font-mono">Phone</span>
-            <a href="tel:+919876543210" class="hover:underline hover:text-[#f6dc94] transition">+91 98765 43210</a>
-          </li>
-          <li class="grid grid-cols-[64px_1fr] items-baseline gap-x-3 sm:grid-cols-[72px_1fr]">
-            <span class="text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70 font-mono">Office</span>
-            <span class="leading-[1.65]">Station Road, Dabhi Sweets &amp; Confectionery, Rajkot, Gujarat — 360001</span>
-          </li>
-        </ul>
-
-        <!-- Social Links -->
-        <div class="mt-5 flex flex-wrap gap-3">
-          <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20 hover:scale-105 text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+        <!-- Total 4 Social Media Icons below logo & centered in mobile: a. Facebook, b. Instagram, c. Phone, d. WhatsApp -->
+        <div class="flex items-center justify-center md:justify-start gap-3 mt-1">
+          <!-- a. Facebook -->
+          <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" class="flex h-10 w-10 items-center justify-center rounded-full transition hover:scale-105" style="background: rgba(246, 233, 222, 0.12); color: #f6e9de;" title="Facebook">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            </svg>
           </a>
-          <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20 hover:scale-105 text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+          <!-- b. Instagram -->
+          <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" class="flex h-10 w-10 items-center justify-center rounded-full transition hover:scale-105" style="background: rgba(246, 233, 222, 0.12); color: #f6e9de;" title="Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+            </svg>
           </a>
-          <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" aria-label="WhatsApp" class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20 hover:scale-105 text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          <!-- c. Phone -->
+          <a href="tel:+919876543210" aria-label="Phone" class="flex h-10 w-10 items-center justify-center rounded-full transition hover:scale-105" style="background: rgba(246, 233, 222, 0.12); color: #f6e9de;" title="Call Us">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </a>
+          <!-- d. WhatsApp -->
+          <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" aria-label="WhatsApp" class="flex h-10 w-10 items-center justify-center rounded-full transition hover:scale-105" style="background: rgba(246, 233, 222, 0.12); color: #f6e9de;" title="WhatsApp">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 18.15c-1.5 0-2.97-.4-4.24-1.16l-.3-.18-3.15.83.84-3.07-.2-.31a8.19 8.19 0 0 1-1.26-4.35c0-4.54 3.69-8.23 8.23-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.81c0 4.54-3.7 8.24-8.25 8.24zm4.51-6.17c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.12-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.45 1.03 2.62.12.17 1.78 2.71 4.3 3.8.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.12-.22-.19-.47-.31z"/>
+            </svg>
           </a>
         </div>
       </div>
 
-      <!-- Help & Legal Links -->
-      <div>
-        <h4 class="font-display text-lg text-[#f6dc94] font-semibold">Explore &amp; Help</h4>
-        <ul class="mt-3 space-y-2 text-sm opacity-90">
-          <li><a href="track.php" class="footer-link transition-colors hover:text-[#f6dc94]">Track Order</a></li>
-          <li><a href="policy.php?page=about" class="footer-link transition-colors hover:text-[#f6dc94]">Our Story &amp; Craft</a></li>
-          <li><a href="policy.php?page=shipping" class="footer-link transition-colors hover:text-[#f6dc94]">Shipping Policy</a></li>
-          <li><a href="policy.php?page=refund" class="footer-link transition-colors hover:text-[#f6dc94]">Refund &amp; Returns</a></li>
-          <li><a href="policy.php?page=privacy" class="footer-link transition-colors hover:text-[#f6dc94]">Privacy Policy</a></li>
-          <li><a href="policy.php?page=terms" class="footer-link transition-colors hover:text-[#f6dc94]">Terms &amp; Conditions</a></li>
+      <!-- 2. Explore & Help Links (Centered in mobile view) -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <h4 class="font-display text-lg font-semibold" style="color: #f6e9de !important;">Explore &amp; Help</h4>
+        <ul class="mt-3 space-y-2 text-sm flex flex-col items-center md:items-start">
+          <li><a href="track.php" class="footer-link transition-colors hover:text-[#f6dc94]" style="color: #f6e9de !important;">Track Order</a></li>
+          <li><a href="policy.php?page=about" class="footer-link transition-colors hover:text-[#f6dc94]" style="color: #f6e9de !important;">Our Story &amp; Craft</a></li>
+          <li><a href="policy.php?page=shipping" class="footer-link transition-colors hover:text-[#f6dc94]" style="color: #f6e9de !important;">Shipping Policy</a></li>
+          <li><a href="policy.php?page=refund" class="footer-link transition-colors hover:text-[#f6dc94]" style="color: #f6e9de !important;">Refund &amp; Returns</a></li>
+          <li><a href="policy.php?page=privacy" class="footer-link transition-colors hover:text-[#f6dc94]" style="color: #f6e9de !important;">Privacy Policy</a></li>
+          <li><a href="policy.php?page=terms" class="footer-link transition-colors hover:text-[#f6dc94]" style="color: #f6e9de !important;">Terms &amp; Conditions</a></li>
+        </ul>
+      </div>
+
+      <!-- 3. Contact & Store Details (Centered in mobile view) -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <h4 class="font-display text-lg font-semibold" style="color: #f6e9de !important;">Get In Touch</h4>
+        <ul class="mt-3 space-y-2.5 text-sm leading-relaxed flex flex-col items-center md:items-start text-center md:text-left">
+          <li class="flex flex-col sm:flex-row items-center md:items-start gap-1 sm:gap-2">
+            <a href="mailto:care@dabhichikki.com" class="hover:underline hover:text-[#f6dc94] transition" style="color: #f6e9de !important;"> Mail : care@dabhichikki.com</a>
+          </li>
+          <li class="flex flex-col sm:flex-row items-center md:items-start gap-1 sm:gap-2">
+            <a href="tel:+919876543210" class="hover:underline hover:text-[#f6dc94] transition" style="color: #f6e9de !important;">Phone : +91 8000 111 735</a>
+          </li>
+          <li class="flex flex-col sm:flex-row items-center md:items-start gap-1 sm:gap-2">
+            <span class="text-[11px] font-semibold uppercase tracking-[0.14em] font-mono" style="color: #f6e9de !important;">Office:</span>
+            <span style="color: #f6e9de !important;">Office No. 212, City Gold Plaza, Rajkot - 360003</span>
+          </li>
         </ul>
       </div>
 
     </div>
 
-    <!-- Footer Bottom Copyright Bar -->
-    <div class="border-t border-white/10">
-      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 text-xs opacity-70 md:px-6 flex-wrap gap-2">
-        <p>© <?= date('Y') ?> Dabhi Chikki. Handcrafted Since 2009. All rights reserved.</p>
-        <p>Made with ❤️ in Gujarat, India</p>
+    <!-- Footer Bottom Copyright Bar (NO separate white line, centered) -->
+    <div class="pb-8 pt-2">
+      <div class="mx-auto flex flex-col items-center justify-center text-center px-4 text-xs gap-1.5" style="color: #f6e9de !important;">
+        <p style="color: #f6e9de !important;">© <?= date('Y') ?> Dabhi Chikki. All rights reserved.</p>
+        <p style="color: #f6e9de !important;">Made with ❤️ in Gujarat, India</p>
       </div>
     </div>
   </footer>
@@ -168,7 +184,12 @@
   </div>
   <?php endif; ?>
 
-  <!-- Sticky Floating Mobile Bottom Bar (Yogurt Alley Ae Component) -->
+  <?php
+  $currentScript = basename($_SERVER['SCRIPT_FILENAME'] ?? ($_SERVER['SCRIPT_NAME'] ?? ''));
+  $showMobileBottomBar = in_array($currentScript, ['index.php', 'product.php'], true);
+  if ($showMobileBottomBar):
+  ?>
+  <!-- Sticky Floating Mobile Bottom Bar (Shown on Home and Product Detail Pages only) -->
   <div id="mobile-bottom-bar" class="fixed inset-x-0 bottom-0 z-30 px-3 pb-3 md:hidden hidden animate-fade-up">
     <button type="button" onclick="openCartDrawer()" class="flex w-full items-center justify-between rounded-2xl bg-primary px-5 py-3.5 text-primary-foreground shadow-glow transition active:scale-[0.99]">
       <span class="flex items-center gap-2 text-sm font-semibold">
@@ -178,6 +199,7 @@
       <span id="mobile-bar-total" class="text-base font-bold tracking-tight font-price">₹0 →</span>
     </button>
   </div>
+  <?php endif; ?>
 
   <!-- Toast Container -->
   <div id="toast-container"></div>
@@ -185,7 +207,18 @@
 </div><!-- closes min-h-dvh bg-background -->
 
 <style>
-.footer-link:hover { color: var(--footer-hover); }
+footer.bg-secondary,
+footer.bg-secondary a,
+footer.bg-secondary p,
+footer.bg-secondary span,
+footer.bg-secondary h4,
+footer.bg-secondary li {
+  color: #f6e9de !important;
+}
+footer.bg-secondary a:hover,
+footer.bg-secondary .footer-link:hover {
+  color: #f6dc94 !important;
+}
 </style>
 
 <!-- Global Scripts -->

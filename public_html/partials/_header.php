@@ -152,7 +152,7 @@ try {
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       padding: 0.375rem 0.875rem;
       border-radius: 9999px;
-      color: rgba(255, 255, 255, 0.92) !important;
+      color: #f6e9de !important;
       display: inline-flex !important;
       align-items: center !important;
       gap: 0.35rem !important;
@@ -160,7 +160,17 @@ try {
     }
     .header-nav-link:hover {
       color: #f6dc94 !important;
-      background-color: rgba(255, 255, 255, 0.12) !important;
+      background-color: rgba(246, 233, 222, 0.12) !important;
+    }
+    #mobile-menu-btn,
+    .site-header-actions a,
+    .site-header-actions button {
+      color: #f6e9de !important;
+    }
+    #mobile-menu-btn svg,
+    .site-header-actions svg {
+      color: #f6e9de !important;
+      stroke: #f6e9de;
     }
     .nav-dropdown-wrap {
       position: relative !important;
@@ -488,95 +498,38 @@ try {
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
-      padding: 14px 18px !important;
-      background-color: #f7f1e6 !important;
-      border-bottom: 2px solid #ecd8bb !important;
+      padding: 16px 20px !important;
+      background-color: #f5eedf !important;
+      border-bottom: 1px solid #ede8e0 !important;
     }
     .mobile-sub-back-btn {
       display: flex !important;
       align-items: center !important;
-      gap: 8px !important;
+      gap: 10px !important;
       background: transparent !important;
       border: none !important;
       cursor: pointer !important;
       font-family: var(--font-display, 'Recoleta Alt', 'Recoleta', Georgia, serif) !important;
-      font-weight: 700 !important;
-      font-size: 1.15rem !important;
+      font-weight: 600 !important;
+      font-size: 1.25rem !important;
       letter-spacing: -0.01em !important;
       text-transform: none !important;
       color: #541f21 !important;
-      padding: 4px 0 !important;
+      padding: 0 !important;
+      transition: color 0.18s ease !important;
     }
     .mobile-sub-back-btn:hover {
       color: #c7613d !important;
     }
     .mobile-sub-view-link {
-      font-size: 0.75rem !important;
+      font-size: 0.82rem !important;
       font-weight: 600 !important;
       color: #c7613d !important;
       text-decoration: underline !important;
+      transition: color 0.18s ease !important;
     }
-
-    /* Submenu Cards */
-    .mobile-submenu-items {
-      padding: 12px 14px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 10px !important;
-    }
-    .mobile-sub-item-card {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      padding: 12px 14px !important;
-      background: #ffffff !important;
-      border: 1px solid #ebd9c5 !important;
-      border-radius: 14px !important;
-      text-decoration: none !important;
-      transition: all 0.2s ease !important;
-      box-shadow: 0 2px 8px rgba(84, 31, 33, 0.04) !important;
-    }
-    .mobile-sub-item-card:hover {
-      background-color: #fdf7ed !important;
-      border-color: #c7613d !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 4px 14px rgba(84, 31, 33, 0.08) !important;
-    }
-    .mobile-sub-item-left {
-      display: flex !important;
-      align-items: center !important;
-      gap: 12px !important;
-    }
-    .mobile-sub-thumb {
-      font-size: 1.5rem !important;
-      width: 40px !important;
-      height: 40px !important;
-      border-radius: 10px !important;
-      background: #faf4e8 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      flex-shrink: 0 !important;
-      border: 1px solid #eedcc8 !important;
-    }
-    .mobile-sub-name {
-      font-family: var(--font-display, 'Recoleta Alt', 'Recoleta', Georgia, serif) !important;
-      font-weight: 600 !important;
-      font-size: 1.05rem !important;
-      letter-spacing: -0.01em !important;
-      color: #3d1412 !important;
-      line-height: 1.25 !important;
-    }
-    .mobile-sub-desc {
-      font-size: 0.72rem !important;
-      color: #8c7365 !important;
-      margin-top: 2px !important;
-    }
-    .mobile-sub-item-right {
-      display: flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      flex-shrink: 0 !important;
+    .mobile-sub-view-link:hover {
+      color: #541f21 !important;
     }
     .mobile-sub-badge {
       display: inline-block !important;
@@ -587,23 +540,6 @@ try {
       font-weight: 700 !important;
       letter-spacing: 0.04em !important;
       text-transform: uppercase !important;
-    }
-    .mobile-sub-arrow {
-      width: 28px !important;
-      height: 28px !important;
-      border-radius: 8px !important;
-      border: 1px solid #ebd9c5 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      color: #541f21 !important;
-      background-color: #ffffff !important;
-      transition: all 0.2s ease !important;
-    }
-    .mobile-sub-item-card:hover .mobile-sub-arrow {
-      background-color: #541f21 !important;
-      color: #ffffff !important;
-      border-color: #541f21 !important;
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -695,14 +631,14 @@ try {
             id="mobile-menu-btn"
             type="button"
             class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10 active:scale-95"
-            style="color:#ffffff !important;"
+            style="color:#f6e9de !important;"
             aria-label="Open navigation menu"
             title="Menu"
           >
-            <svg role="presentation" width="22" height="22" class="h-5 w-5 text-white" viewBox="0 0 30 30" fill="none">
-              <path d="M3.14852 7.45157C4.33548 7.40404 5.0225 7.77332 5.68582 8.13C6.31955 8.46993 6.92069 8.79305 7.98175 8.75093C9.01579 8.71227 9.51933 8.26731 10.0503 7.79874C10.6331 7.28692 11.2373 6.75539 12.4542 6.70849C13.6651 6.66146 14.2809 7.14212 14.876 7.61026C15.421 8.03702 15.9367 8.43896 16.9737 8.40036C18.0077 8.3617 18.5113 7.91674 19.0423 7.44817C19.6251 6.93635 20.2293 6.40482 21.4402 6.35779C22.6511 6.31077 23.2669 6.79143 23.862 7.25956C24.407 7.68632 24.9196 8.08821 25.9537 8.04955C25.9686 8.04986 26.2174 8.03898 26.3791 7.76018L26.8561 8.28629C26.5054 8.86752 26.008 8.88122 25.9541 8.88008C24.7522 8.9273 24.1365 8.4426 23.5413 7.9785C22.9963 7.55174 22.4837 7.14986 21.4496 7.18852C20.4156 7.22718 19.912 7.67214 19.381 8.14071C18.7982 8.65253 18.194 9.18406 16.9831 9.23109C15.7692 9.27805 15.1504 8.79732 14.5554 8.32919C14.0103 7.90243 13.4977 7.50055 12.4637 7.53921C11.4266 7.57781 10.9231 8.02277 10.3891 8.49127C9.80629 9.0031 9.20218 9.5306 7.99118 9.58165C6.80123 9.62912 6.11421 9.25984 5.44789 8.9031C4.81417 8.56316 4.21594 8.24413 3.15795 8.28229L3.1486 7.44754L3.14852 7.45157Z" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M3.14852 14.4748C4.33548 14.4273 5.0225 14.7966 5.68582 15.1533C6.31955 15.4932 6.92069 15.8163 7.98175 15.7742C9.01579 15.7355 9.51933 15.2906 10.0503 14.822C10.6331 14.3102 11.2373 13.7786 12.4542 13.7317C13.6651 13.6847 14.2809 14.1654 14.876 14.6335C15.421 15.0603 15.9367 15.4622 16.9737 15.4236C18.0077 15.385 18.5113 14.94 19.0423 14.4714C19.6251 13.9596 20.2293 13.4281 21.4402 13.381C22.6511 13.334 23.2669 13.8147 23.862 14.2828C24.407 14.7096 24.9196 15.1115 25.9537 15.0728C25.9686 15.0731 26.2174 15.0622 26.3791 14.7834L26.8561 15.3095C26.5054 15.8908 26.008 15.9045 25.9541 15.9033C24.7522 15.9506 24.1365 15.4659 23.5413 15.0018C22.9963 14.575 22.4837 14.1731 21.4496 14.2118C20.4156 14.2504 19.912 14.6954 19.381 15.164C18.7982 15.6758 18.194 16.2073 16.9831 16.2543C15.7692 16.3013 15.1504 15.8206 14.5554 15.3524C14.0103 14.9257 13.4977 14.5238 12.4637 14.5625C11.4266 14.6011 10.9231 15.046 10.3891 15.5145C9.80629 16.0263 9.20218 16.5539 7.99118 16.6049C6.80123 16.6524 6.11421 16.2831 5.44789 15.9263C4.81417 15.5864 4.21594 15.2674 3.15795 15.3055L3.1486 14.4708L3.14852 14.4748Z" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M3.14852 21.4981C4.33548 21.4505 5.0225 21.8198 5.68582 22.1765C6.31955 22.5164 6.92069 22.8396 7.98175 22.7974C9.01579 22.7588 9.51933 22.3138 10.0503 21.8452C10.6331 21.3334 11.2373 20.8019 12.4542 20.755C13.6651 20.708 14.2809 21.1886 14.876 21.6568C15.421 22.0835 15.9367 22.4855 16.9737 22.4469C18.0077 22.4082 18.5113 21.9633 19.0423 21.4947C19.6251 20.9829 20.2293 20.4513 21.4402 20.4043C22.6511 20.3573 23.2669 20.8379 23.862 21.3061C24.407 21.7328 24.9196 22.1347 25.9537 22.0961C25.9686 22.0964 26.2174 22.0855 26.3791 21.8067L26.8561 22.3328C26.5054 22.914 26.008 22.9277 25.9541 22.9266C24.7522 22.9738 24.1365 22.4891 23.5413 22.025C22.9963 21.5983 22.4837 21.1964 21.4496 21.235C20.4156 21.2737 19.912 21.7186 19.381 22.1872C18.7982 22.699 18.194 23.2306 16.9831 23.2776C15.7692 23.3246 15.1504 22.8438 14.5554 22.3757C14.0103 21.9489 13.4977 21.5471 12.4637 21.5857C11.4266 21.6243 10.9231 22.0693 10.3891 22.5378C9.80629 23.0496 9.20218 23.5771 7.99118 23.6282C6.80123 23.6756 6.11421 23.3064 5.44789 22.9496C4.81417 22.6097 4.21594 22.2906 3.15795 22.3288L3.1486 21.494L3.14852 21.4981Z" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
+            <svg role="presentation" width="22" height="22" class="h-5 w-5" style="color:#f6e9de;" viewBox="0 0 30 30" fill="none">
+              <path d="M3.14852 7.45157C4.33548 7.40404 5.0225 7.77332 5.68582 8.13C6.31955 8.46993 6.92069 8.79305 7.98175 8.75093C9.01579 8.71227 9.51933 8.26731 10.0503 7.79874C10.6331 7.28692 11.2373 6.75539 12.4542 6.70849C13.6651 6.66146 14.2809 7.14212 14.876 7.61026C15.421 8.03702 15.9367 8.43896 16.9737 8.40036C18.0077 8.3617 18.5113 7.91674 19.0423 7.44817C19.6251 6.93635 20.2293 6.40482 21.4402 6.35779C22.6511 6.31077 23.2669 6.79143 23.862 7.25956C24.407 7.68632 24.9196 8.08821 25.9537 8.04955C25.9686 8.04986 26.2174 8.03898 26.3791 7.76018L26.8561 8.28629C26.5054 8.86752 26.008 8.88122 25.9541 8.88008C24.7522 8.9273 24.1365 8.4426 23.5413 7.9785C22.9963 7.55174 22.4837 7.14986 21.4496 7.18852C20.4156 7.22718 19.912 7.67214 19.381 8.14071C18.7982 8.65253 18.194 9.18406 16.9831 9.23109C15.7692 9.27805 15.1504 8.79732 14.5554 8.32919C14.0103 7.90243 13.4977 7.50055 12.4637 7.53921C11.4266 7.57781 10.9231 8.02277 10.3891 8.49127C9.80629 9.0031 9.20218 9.5306 7.99118 9.58165C6.80123 9.62912 6.11421 9.25984 5.44789 8.9031C4.81417 8.56316 4.21594 8.24413 3.15795 8.28229L3.1486 7.44754L3.14852 7.45157Z" fill="#f6e9de" stroke="#f6e9de" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M3.14852 14.4748C4.33548 14.4273 5.0225 14.7966 5.68582 15.1533C6.31955 15.4932 6.92069 15.8163 7.98175 15.7742C9.01579 15.7355 9.51933 15.2906 10.0503 14.822C10.6331 14.3102 11.2373 13.7786 12.4542 13.7317C13.6651 13.6847 14.2809 14.1654 14.876 14.6335C15.421 15.0603 15.9367 15.4622 16.9737 15.4236C18.0077 15.385 18.5113 14.94 19.0423 14.4714C19.6251 13.9596 20.2293 13.4281 21.4402 13.381C22.6511 13.334 23.2669 13.8147 23.862 14.2828C24.407 14.7096 24.9196 15.1115 25.9537 15.0728C25.9686 15.0731 26.2174 15.0622 26.3791 14.7834L26.8561 15.3095C26.5054 15.8908 26.008 15.9045 25.9541 15.9033C24.7522 15.9506 24.1365 15.4659 23.5413 15.0018C22.9963 14.575 22.4837 14.1731 21.4496 14.2118C20.4156 14.2504 19.912 14.6954 19.381 15.164C18.7982 15.6758 18.194 16.2073 16.9831 16.2543C15.7692 16.3013 15.1504 15.8206 14.5554 15.3524C14.0103 14.9257 13.4977 14.5238 12.4637 14.5625C11.4266 14.6011 10.9231 15.046 10.3891 15.5145C9.80629 16.0263 9.20218 16.5539 7.99118 16.6049C6.80123 16.6524 6.11421 16.2831 5.44789 15.9263C4.81417 15.5864 4.21594 15.2674 3.15795 15.3055L3.1486 14.4708L3.14852 14.4748Z" fill="#f6e9de" stroke="#f6e9de" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M3.14852 21.4981C4.33548 21.4505 5.0225 21.8198 5.68582 22.1765C6.31955 22.5164 6.92069 22.8396 7.98175 22.7974C9.01579 22.7588 9.51933 22.3138 10.0503 21.8452C10.6331 21.3334 11.2373 20.8019 12.4542 20.755C13.6651 20.708 14.2809 21.1886 14.876 21.6568C15.421 22.0835 15.9367 22.4855 16.9737 22.4469C18.0077 22.4082 18.5113 21.9633 19.0423 21.4947C19.6251 20.9829 20.2293 20.4513 21.4402 20.4043C22.6511 20.3573 23.2669 20.8379 23.862 21.3061C24.407 21.7328 24.9196 22.1347 25.9537 22.0961C25.9686 22.0964 26.2174 22.0855 26.3791 21.8067L26.8561 22.3328C26.5054 22.914 26.008 22.9277 25.9541 22.9266C24.7522 22.9738 24.1365 22.4891 23.5413 22.025C22.9963 21.5983 22.4837 21.1964 21.4496 21.235C20.4156 21.2737 19.912 21.7186 19.381 22.1872C18.7982 22.699 18.194 23.2306 16.9831 23.2776C15.7692 23.3246 15.1504 22.8438 14.5554 22.3757C14.0103 21.9489 13.4977 21.5471 12.4637 21.5857C11.4266 21.6243 10.9231 22.0693 10.3891 22.5378C9.80629 23.0496 9.20218 23.5771 7.99118 23.6282C6.80123 23.6756 6.11421 23.3064 5.44789 22.9496C4.81417 22.6097 4.21594 22.2906 3.15795 22.3288L3.1486 21.494L3.14852 21.4981Z" fill="#f6e9de" stroke="#f6e9de" stroke-width="1.5" stroke-linejoin="round"/>
             </svg>
           </button>
         </div>
@@ -802,14 +738,14 @@ try {
             <div class="profile-dropdown-wrap">
               <?php if ($isAdminUser): ?>
                 <!-- Admin Profile Button -->
-                <a href="admin/index.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10 relative" style="color:#ffffff !important;" aria-label="Admin Dashboard" title="Admin Dashboard (<?= htmlspecialchars($currentUser['full_name'] ?? 'Admin') ?>)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6dc94" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 2a5 5 0 0 0-5 5v2a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2V7a5 5 0 0 0-5-5z"></path><circle cx="12" cy="14" r="2"></circle></svg>
+                <a href="admin/index.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10 relative" style="color:#f6e9de !important;" aria-label="Admin Dashboard" title="Admin Dashboard (<?= htmlspecialchars($currentUser['full_name'] ?? 'Admin') ?>)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6e9de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 2a5 5 0 0 0-5 5v2a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2V7a5 5 0 0 0-5-5z"></path><circle cx="12" cy="14" r="2"></circle></svg>
                   <span class="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#f6dc94] text-[9px] font-black text-[#541f21] shadow-soft">★</span>
                 </a>
               <?php else: ?>
                 <!-- Buyer Profile Button -->
-                <a href="account.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Account" title="My Account">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <a href="account.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#f6e9de !important;" aria-label="Account" title="My Account">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6e9de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 </a>
               <?php endif; ?>
 
@@ -885,14 +821,14 @@ try {
             </div>
           <?php else: ?>
             <!-- Single Unified Login Button (Guest) -->
-            <a href="auth.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Sign in" title="Sign In">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <a href="auth.php" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#f6e9de !important;" aria-label="Sign in" title="Sign In">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6e9de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </a>
           <?php endif; ?>
 
           <!-- Shopping Bag Button -->
-          <button id="cart-toggle-btn" class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#ffffff !important;" aria-label="Cart" title="Cart Bag">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+          <button id="cart-toggle-btn" class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition hover:bg-white/10" style="color:#f6e9de !important;" aria-label="Cart" title="Cart Bag">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f6e9de" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
               <path d="M16 10a4 4 0 0 1-8 0"></path>
               <path d="M3.103 6.034h17.794"></path>
               <path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"></path>
@@ -927,6 +863,18 @@ try {
         <!-- ── MAIN PANEL (Level 0) ── -->
         <div id="mobile-panel-main" class="mobile-panel mobile-panel-active">
           <div class="mobile-menu-list">
+            <?php
+              $mobileBadgeStyle = function(?string $badgeColor): string {
+                $bg = $badgeColor ?: '#c7613d';
+                if ($bg === '#f6dc94') {
+                  return 'background-color:#f6dc94;color:#541f21;';
+                }
+                if (strpos($bg, 'rgba(255,255,255') !== false || $bg === '#ffffff' || $bg === 'white') {
+                  return 'background-color:#ebd9c5;color:#541f21;';
+                }
+                return 'background-color:' . htmlspecialchars($bg) . ';color:#ffffff;';
+              };
+            ?>
             <?php if (!empty($navTree)): ?>
               <?php foreach ($navTree as $item): ?>
                 <?php $hasChildren = !empty($item['children']); ?>
@@ -947,7 +895,7 @@ try {
                     </div>
                     <div class="mobile-menu-item-right">
                       <?php if (!empty($item['badge'])): ?>
-                        <span class="mobile-sub-badge" style="background-color:<?= htmlspecialchars($item['badge_color'] ?: '#c7613d') ?>;color:<?= ($item['badge_color'] ?? '') === '#f6dc94' ? '#541f21' : '#ffffff' ?>;">
+                        <span class="mobile-sub-badge" style="<?= $mobileBadgeStyle($item['badge_color'] ?? '') ?>">
                           <?= htmlspecialchars($item['badge']) ?>
                         </span>
                       <?php endif; ?>
@@ -971,7 +919,7 @@ try {
                     </div>
                     <div class="mobile-menu-item-right">
                       <?php if (!empty($item['badge'])): ?>
-                        <span class="mobile-sub-badge" style="background-color:<?= htmlspecialchars($item['badge_color'] ?: '#c7613d') ?>;color:<?= ($item['badge_color'] ?? '') === '#f6dc94' ? '#541f21' : '#ffffff' ?>;">
+                        <span class="mobile-sub-badge" style="<?= $mobileBadgeStyle($item['badge_color'] ?? '') ?>">
                           <?= htmlspecialchars($item['badge']) ?>
                         </span>
                       <?php endif; ?>
@@ -1034,32 +982,28 @@ try {
                   <?php endif; ?>
                 </div>
 
-                <!-- Submenu Items List -->
-                <div class="mobile-submenu-items">
+                <!-- Submenu Items List (Identical style to Main Menu) -->
+                <div class="mobile-menu-list">
                   <?php foreach ($item['children'] as $child): ?>
-                    <a href="<?= htmlspecialchars($child['url']) ?>" target="<?= htmlspecialchars($child['target'] ?? '_self') ?>" class="mobile-sub-item-card" onclick="closeMobileDrawer()">
-                      <div class="mobile-sub-item-left">
+                    <a href="<?= htmlspecialchars($child['url']) ?>" target="<?= htmlspecialchars($child['target'] ?? '_self') ?>" class="mobile-menu-row" onclick="closeMobileDrawer()">
+                      <div class="mobile-menu-item-left">
                         <?php if (!empty($child['icon'])): ?>
-                          <div class="mobile-sub-thumb">
-                            <?= htmlspecialchars($child['icon']) ?>
+                          <div class="mobile-menu-icon">
+                            <?php if ($child['icon'] === '🔴'): ?>
+                              <span style="display:inline-block;width:8px;height:8px;border-radius:9999px;background-color:#f87171;"></span>
+                            <?php else: ?>
+                              <?= htmlspecialchars($child['icon']) ?>
+                            <?php endif; ?>
                           </div>
                         <?php endif; ?>
-                        <div>
-                          <div class="mobile-sub-name"><?= htmlspecialchars($child['title']) ?></div>
-                          <?php if (!empty($child['subtitle'])): ?>
-                            <div class="mobile-sub-desc"><?= htmlspecialchars($child['subtitle']) ?></div>
-                          <?php endif; ?>
-                        </div>
+                        <span class="mobile-menu-title"><?= htmlspecialchars($child['title']) ?></span>
                       </div>
-                      <div class="mobile-sub-item-right">
+                      <div class="mobile-menu-item-right">
                         <?php if (!empty($child['badge'])): ?>
-                          <span class="mobile-sub-badge" style="background-color:<?= htmlspecialchars($child['badge_color'] ?: '#c7613d') ?>;color:<?= ($child['badge_color'] ?? '') === '#f6dc94' ? '#541f21' : '#ffffff' ?>;">
+                          <span class="mobile-sub-badge" style="<?= $mobileBadgeStyle($child['badge_color'] ?? '') ?>">
                             <?= htmlspecialchars($child['badge']) ?>
                           </span>
                         <?php endif; ?>
-                        <div class="mobile-sub-arrow">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                        </div>
                       </div>
                     </a>
                   <?php endforeach; ?>

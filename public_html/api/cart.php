@@ -39,7 +39,6 @@ switch ($action) {
         }
 
         $result = Cart::addItem($variantId, $quantity, $boxGroup);
-        $result['cart_count'] = Cart::itemCount($cartId);
         if (!empty($result['ok'])) {
             $variant = Database::fetchOne(
                 'SELECT p.name FROM product_variants v JOIN products p ON p.id = v.product_id WHERE v.id = ?',
@@ -48,6 +47,13 @@ switch ($action) {
             $prodName = $variant['name'] ?? 'Chikki';
             $result['product_name'] = $prodName;
             $result['message'] = 'Added ' . $prodName;
+
+            $items   = Cart::getItems($cartId);
+            $summary = Cart::getSummary($items);
+            $result  = array_merge($result, $summary);
+            $result['cart_count'] = $summary['item_count'];
+        } else {
+            $result['cart_count'] = Cart::itemCount($cartId);
         }
         echo json_encode($result);
         break;
@@ -77,7 +83,14 @@ switch ($action) {
         break;
 
     case 'count':
-        echo json_encode(['ok' => true, 'cart_count' => Cart::itemCount($cartId)]);
+        $items   = Cart::getItems($cartId);
+        $summary = Cart::getSummary($items);
+        echo json_encode([
+            'ok'           => true,
+            'cart_count'   => $summary['item_count'],
+            'subtotal'     => $summary['subtotal'],
+            'total_weight' => $summary['total_weight'],
+        ]);
         break;
 
     default:

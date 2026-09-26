@@ -32,40 +32,22 @@ $recentOrders = Database::fetchAll(
      FROM orders o JOIN users u ON u.id=o.user_id
      ORDER BY o.placed_at DESC LIMIT 8"
 );
+$pageTitle   = 'Dashboard';
+$pageHeading = 'Dashboard';
+$activePage  = 'dashboard';
+require_once __DIR__ . '/partials/page-start.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Dashboard | <?= e(APP_NAME) ?> Admin</title>
-  <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
-  <link rel="icon" href="<?= asset('images/logo.png') ?>" type="image/png">
-  <!-- Chart.js for analytics widgets -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
-</head>
-<body>
-<div class="admin-layout">
 
-  <?php require_once __DIR__ . '/partials/sidebar.php'; ?>
+<div class="admin-content">
 
-  <div class="admin-main">
-    <?php require_once __DIR__ . '/partials/topbar.php'; ?>
-
-    <div class="admin-content">
-
-      <!-- Welcome banner -->
-      <div style="background:linear-gradient(135deg,var(--dc-yellow) 0%,var(--dc-yellow-dark) 100%);border-radius:var(--dc-radius-lg);padding:var(--dc-space-lg);margin-bottom:var(--dc-space-lg);display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <h2 style="margin:0;font-size:1.4rem;">👋 Welcome back, <?= e(explode(' ', $user['full_name'])[0]) ?>!</h2>
-          <p style="margin:4px 0 0;color:var(--dc-black-soft);font-size:0.9rem;"><?= date('l, d F Y') ?> &nbsp;·&nbsp; <?= e(ucfirst($role)) ?></p>
-        </div>
-        <a href="<?= url('admin/orders.php') ?>" class="btn btn-primary">View Orders</a>
-      </div>
+  <!-- Welcome banner -->
+  <div class="adm-welcome-banner">
+    <div class="adm-welcome-text">
+      <h2>👋 Welcome back, <?= e(explode(' ', $user['full_name'])[0]) ?>!</h2>
+      <p><?= date('l, d F Y') ?> &nbsp;·&nbsp; <?= e(ucfirst($role)) ?></p>
+    </div>
+    <a href="<?= url('admin/orders.php') ?>" class="btn btn-primary">View Orders</a>
+  </div>
 
       <!-- Stats row -->
       <div class="stats-grid">
@@ -155,29 +137,24 @@ $recentOrders = Database::fetchAll(
       </div>
 
       <!-- Quick actions -->
-      <div class="grid-4" style="margin-top:var(--dc-space-lg);">
-        <a href="<?= url('admin/product-edit.php') ?>" class="card" style="text-align:center;text-decoration:none;display:block;">
+      <div class="adm-quick-actions-grid">
+        <a href="<?= url('admin/product-edit.php') ?>" class="card" style="text-align:center;text-decoration:none;display:block;padding:20px;">
           <div style="font-size:2rem;margin-bottom:8px;">➕</div>
-          <div class="fw-semibold" style="font-size:0.9rem;">Add Product</div>
+          <div class="fw-semibold" style="font-size:0.9rem;color:var(--adm-text-main);">Add Product</div>
         </a>
-        <a href="<?= url('admin/inventory-batch.php?action=receive') ?>" class="card" style="text-align:center;text-decoration:none;display:block;">
+        <a href="<?= url('admin/inventory-batch.php?action=receive') ?>" class="card" style="text-align:center;text-decoration:none;display:block;padding:20px;">
           <div style="font-size:2rem;margin-bottom:8px;">📥</div>
-          <div class="fw-semibold" style="font-size:0.9rem;">Receive Stock</div>
+          <div class="fw-semibold" style="font-size:0.9rem;color:var(--adm-text-main);">Receive Stock</div>
         </a>
-        <a href="<?= url('admin/reports.php') ?>" class="card" style="text-align:center;text-decoration:none;display:block;">
+        <a href="<?= url('admin/reports.php') ?>" class="card" style="text-align:center;text-decoration:none;display:block;padding:20px;">
           <div style="font-size:2rem;margin-bottom:8px;">📋</div>
-          <div class="fw-semibold" style="font-size:0.9rem;">Generate Report</div>
+          <div class="fw-semibold" style="font-size:0.9rem;color:var(--adm-text-main);">Generate Report</div>
         </a>
-        <a href="<?= url('admin/users.php?action=new') ?>" class="card" style="text-align:center;text-decoration:none;display:block;">
+        <a href="<?= url('admin/users.php?action=new') ?>" class="card" style="text-align:center;text-decoration:none;display:block;padding:20px;">
           <div style="font-size:2rem;margin-bottom:8px;">👤</div>
-          <div class="fw-semibold" style="font-size:0.9rem;">Add User</div>
+          <div class="fw-semibold" style="font-size:0.9rem;color:var(--adm-text-main);">Add User</div>
         </a>
       </div>
 
     </div><!-- /admin-content -->
-  </div><!-- /admin-main -->
-</div><!-- /admin-layout -->
-
-<script src="<?= asset('js/main.js') ?>" defer></script>
-</body>
-</html>
+<?php require_once __DIR__ . '/partials/page-end.php'; ?>

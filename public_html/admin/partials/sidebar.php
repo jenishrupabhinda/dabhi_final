@@ -2,42 +2,55 @@
 /**
  * Admin sidebar partial.
  * Expects $adminUser to be set (Auth::user() result) before including.
- * Expects $activePage to be set — e.g. 'dashboard', 'products', 'orders'
+ * Expects $activePage to be set — e.g. 'dashboard', 'products', 'orders', 'payment-settings'
  */
 if (!isset($activePage)) $activePage = '';
 $_user = Auth::user();
 $_role = Auth::role();
 
-// Helper: active class
+// Helper: robust active class with auto-detection fallback
 function sidebarActive(string $page): string {
     global $activePage;
-    return $activePage === $page ? 'active' : '';
+    if (!empty($activePage)) {
+        if ($activePage === $page) return 'active';
+    }
+    // Auto-detect based on current PHP filename
+    $script = basename($_SERVER['PHP_SELF'] ?? '', '.php');
+    if ($script === $page) return 'active';
+    if ($page === 'dashboard' && ($script === 'index' || $script === '')) return 'active';
+    if ($page === 'products' && $script === 'product-edit') return 'active';
+    if ($page === 'users' && ($script === 'user-edit' || $script === 'permissions')) return 'active';
+    if ($page === 'orders' && $script === 'order-detail') return 'active';
+    return '';
 }
+
 // Helper: can current user see this link?
 function sidebarCan(string $perm): bool {
     return Auth::role() === 'superadmin' || RBAC::can(Auth::id(), $perm);
 }
 ?>
-<aside class="admin-sidebar" id="adminSidebar" role="navigation" aria-label="Admin navigation">
+<aside class="admin-sidebar" id="adminSidebar" role="navigation" aria-label="Admin Navigation">
 
-  <!-- Brand -->
+  <!-- Brand Section -->
   <div class="sidebar-brand">
-    <a href="<?= url('admin/index.php') ?>" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+    <a href="<?= url('admin/index.php') ?>" title="Dabhi Chikki Admin Dashboard">
       <img src="<?= asset('images/logo.png') ?>" alt="Dabhi Chikki">
-      <div>
+      <div style="min-width:0;">
         <div class="sidebar-brand-name">Dabhi Chikki</div>
         <div class="sidebar-brand-sub">Admin Panel</div>
       </div>
     </a>
+    <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close navigation sidebar">✕</button>
   </div>
 
-  <!-- Nav -->
+  <!-- Navigation Items -->
   <nav class="sidebar-nav">
 
-    <!-- Overview -->
+    <!-- Dashboard -->
     <div class="sidebar-section">
-      <a href="<?= url('admin/index.php') ?>" class="sidebar-link <?= sidebarActive('dashboard') ?>">
-        <span class="icon">🏠</span> Dashboard
+      <a href="<?= url('admin/index.php') ?>" class="sidebar-link <?= sidebarActive('dashboard') ?>" data-tooltip="Dashboard">
+        <span class="icon">🏠</span>
+        <span class="link-label">Dashboard</span>
       </a>
     </div>
 
@@ -45,18 +58,30 @@ function sidebarCan(string $perm): bool {
     <div class="sidebar-section">
       <span class="sidebar-section-label">Catalog</span>
       <?php if (sidebarCan('manage_products') || $_role === 'superadmin' || $_role === 'admin'): ?>
-      <a href="<?= url('admin/products.php') ?>" class="sidebar-link <?= sidebarActive('products') ?>">
-        <span class="icon">🛍️</span> Products
+      <a href="<?= url('admin/products.php') ?>" class="sidebar-link <?= sidebarActive('products') ?>" data-tooltip="Products">
+        <span class="icon">🛍️</span>
+        <span class="link-label">Products</span>
       </a>
       <?php endif; ?>
+
       <?php if (sidebarCan('manage_categories') || $_role === 'superadmin' || $_role === 'admin'): ?>
-      <a href="<?= url('admin/categories.php') ?>" class="sidebar-link <?= sidebarActive('categories') ?>">
-        <span class="icon">🗂️</span> Categories
+      <a href="<?= url('admin/categories.php') ?>" class="sidebar-link <?= sidebarActive('categories') ?>" data-tooltip="Categories">
+        <span class="icon">🗂️</span>
+        <span class="link-label">Categories</span>
       </a>
       <?php endif; ?>
+
       <?php if (sidebarCan('manage_reviews')): ?>
-      <a href="<?= url('admin/reviews.php') ?>" class="sidebar-link <?= sidebarActive('reviews') ?>">
-        <span class="icon">⭐</span> Reviews
+      <a href="<?= url('admin/reviews.php') ?>" class="sidebar-link <?= sidebarActive('reviews') ?>" data-tooltip="Reviews">
+        <span class="icon">⭐</span>
+        <span class="link-label">Reviews</span>
+      </a>
+      <?php endif; ?>
+
+      <?php if ($_role === 'superadmin' || $_role === 'admin' || sidebarCan('manage_settings')): ?>
+      <a href="<?= url('admin/coupons.php') ?>" class="sidebar-link <?= sidebarActive('coupons') ?>" data-tooltip="Coupons & Discounts">
+        <span class="icon">🏷️</span>
+        <span class="link-label">Coupons</span>
       </a>
       <?php endif; ?>
     </div>
@@ -65,14 +90,17 @@ function sidebarCan(string $perm): bool {
     <?php if ($_role === 'superadmin' || $_role === 'admin'): ?>
     <div class="sidebar-section">
       <span class="sidebar-section-label">Storefront CMS</span>
-      <a href="<?= url('admin/modules.php') ?>" class="sidebar-link <?= sidebarActive('modules') ?>">
-        <span class="icon">🎛️</span> Modules &amp; Content
+      <a href="<?= url('admin/modules.php') ?>" class="sidebar-link <?= sidebarActive('modules') ?>" data-tooltip="Modules & Content">
+        <span class="icon">🎛️</span>
+        <span class="link-label">Modules &amp; Content</span>
       </a>
-      <a href="<?= url('admin/menus.php') ?>" class="sidebar-link <?= sidebarActive('menus') ?>">
-        <span class="icon">🧭</span> Navigation Menu
+      <a href="<?= url('admin/menus.php') ?>" class="sidebar-link <?= sidebarActive('menus') ?>" data-tooltip="Navigation Menu">
+        <span class="icon">🧭</span>
+        <span class="link-label">Navigation Menu</span>
       </a>
-      <a href="<?= url('admin/instagram-reels.php') ?>" class="sidebar-link <?= sidebarActive('instagram-reels') ?>">
-        <span class="icon">📸</span> Instagram Reels
+      <a href="<?= url('admin/instagram-reels.php') ?>" class="sidebar-link <?= sidebarActive('instagram-reels') ?>" data-tooltip="Instagram Reels">
+        <span class="icon">📸</span>
+        <span class="link-label">Instagram Reels</span>
       </a>
     </div>
     <?php endif; ?>
@@ -81,8 +109,9 @@ function sidebarCan(string $perm): bool {
     <div class="sidebar-section">
       <span class="sidebar-section-label">Orders</span>
       <?php if (sidebarCan('manage_orders') || $_role === 'superadmin' || $_role === 'admin'): ?>
-      <a href="<?= url('admin/orders.php') ?>" class="sidebar-link <?= sidebarActive('orders') ?>">
-        <span class="icon">📦</span> Orders
+      <a href="<?= url('admin/orders.php') ?>" class="sidebar-link <?= sidebarActive('orders') ?>" data-tooltip="Orders">
+        <span class="icon">📦</span>
+        <span class="link-label">Orders</span>
       </a>
       <?php endif; ?>
     </div>
@@ -91,11 +120,13 @@ function sidebarCan(string $perm): bool {
     <div class="sidebar-section">
       <span class="sidebar-section-label">Inventory</span>
       <?php if (sidebarCan('manage_inventory') || $_role === 'superadmin' || $_role === 'admin'): ?>
-      <a href="<?= url('admin/inventory.php') ?>" class="sidebar-link <?= sidebarActive('inventory') ?>">
-        <span class="icon">📊</span> Stock Overview
+      <a href="<?= url('admin/inventory.php') ?>" class="sidebar-link <?= sidebarActive('inventory') ?>" data-tooltip="Stock Overview">
+        <span class="icon">📊</span>
+        <span class="link-label">Stock Overview</span>
       </a>
-      <a href="<?= url('admin/inventory-batch.php') ?>" class="sidebar-link <?= sidebarActive('inventory-batch') ?>">
-        <span class="icon">🗃️</span> Batch Manager
+      <a href="<?= url('admin/inventory-batch.php') ?>" class="sidebar-link <?= sidebarActive('inventory-batch') ?>" data-tooltip="Batch Manager">
+        <span class="icon">🗃️</span>
+        <span class="link-label">Batch Manager</span>
       </a>
       <?php endif; ?>
     </div>
@@ -105,13 +136,15 @@ function sidebarCan(string $perm): bool {
     <div class="sidebar-section">
       <span class="sidebar-section-label">Analytics</span>
       <?php if (sidebarCan('view_product_analytics') || $_role === 'superadmin'): ?>
-      <a href="<?= url('admin/analytics.php') ?>" class="sidebar-link <?= sidebarActive('analytics') ?>">
-        <span class="icon">📈</span> Analytics
+      <a href="<?= url('admin/analytics.php') ?>" class="sidebar-link <?= sidebarActive('analytics') ?>" data-tooltip="Analytics">
+        <span class="icon">📈</span>
+        <span class="link-label">Analytics</span>
       </a>
       <?php endif; ?>
       <?php if (sidebarCan('generate_reports') || $_role === 'superadmin'): ?>
-      <a href="<?= url('admin/reports.php') ?>" class="sidebar-link <?= sidebarActive('reports') ?>">
-        <span class="icon">📋</span> Reports
+      <a href="<?= url('admin/reports.php') ?>" class="sidebar-link <?= sidebarActive('reports') ?>" data-tooltip="Reports">
+        <span class="icon">📋</span>
+        <span class="link-label">Reports</span>
       </a>
       <?php endif; ?>
     </div>
@@ -122,27 +155,38 @@ function sidebarCan(string $perm): bool {
     <div class="sidebar-section">
       <span class="sidebar-section-label">Settings</span>
 
+      <?php if (sidebarCan('manage_settings') || $_role === 'superadmin'): ?>
+      <a href="<?= url('admin/settings.php') ?>" class="sidebar-link <?= sidebarActive('settings') ?>" data-tooltip="General Settings">
+        <span class="icon">⚙️</span>
+        <span class="link-label">General Settings</span>
+      </a>
+      <?php endif; ?>
+
       <?php if (sidebarCan('manage_shipping_rules') || $_role === 'superadmin'): ?>
-      <a href="<?= url('admin/shipping-settings.php') ?>" class="sidebar-link <?= sidebarActive('shipping-settings') ?>">
-        <span class="icon">🚚</span> Shipping &amp; Zones
+      <a href="<?= url('admin/shipping-settings.php') ?>" class="sidebar-link <?= sidebarActive('shipping-settings') ?>" data-tooltip="Shipping & Zones">
+        <span class="icon">🚚</span>
+        <span class="link-label">Shipping &amp; Zones</span>
       </a>
       <?php endif; ?>
 
       <?php if (sidebarCan('manage_payment_settings') || $_role === 'superadmin'): ?>
-      <a href="<?= url('admin/payment-settings.php') ?>" class="sidebar-link <?= sidebarActive('payment-settings') ?>">
-        <span class="icon">💳</span> Payment
+      <a href="<?= url('admin/payment-settings.php') ?>" class="sidebar-link <?= sidebarActive('payment-settings') ?>" data-tooltip="Payment Settings">
+        <span class="icon">💳</span>
+        <span class="link-label">Payment Settings</span>
       </a>
       <?php endif; ?>
 
       <?php if (sidebarCan('manage_gst') || $_role === 'superadmin'): ?>
-      <a href="<?= url('admin/gst-settings.php') ?>" class="sidebar-link <?= sidebarActive('gst-settings') ?>">
-        <span class="icon">🧾</span> GST
+      <a href="<?= url('admin/gst-settings.php') ?>" class="sidebar-link <?= sidebarActive('gst-settings') ?>" data-tooltip="GST Settings">
+        <span class="icon">🧾</span>
+        <span class="link-label">GST</span>
       </a>
       <?php endif; ?>
 
       <?php if (sidebarCan('manage_notifications') || $_role === 'superadmin'): ?>
-      <a href="<?= url('admin/notification-settings.php') ?>" class="sidebar-link <?= sidebarActive('notification-settings') ?>">
-        <span class="icon">🔔</span> Notifications
+      <a href="<?= url('admin/notification-settings.php') ?>" class="sidebar-link <?= sidebarActive('notification-settings') ?>" data-tooltip="Notifications">
+        <span class="icon">🔔</span>
+        <span class="link-label">Notifications</span>
       </a>
       <?php endif; ?>
     </div>
@@ -152,12 +196,14 @@ function sidebarCan(string $perm): bool {
     <?php if ($_role === 'superadmin' || sidebarCan('manage_employees') || sidebarCan('manage_admins')): ?>
     <div class="sidebar-section">
       <span class="sidebar-section-label">Users</span>
-      <a href="<?= url('admin/users.php') ?>" class="sidebar-link <?= sidebarActive('users') ?>">
-        <span class="icon">👥</span> User Management
+      <a href="<?= url('admin/users.php') ?>" class="sidebar-link <?= sidebarActive('users') ?>" data-tooltip="User Management">
+        <span class="icon">👥</span>
+        <span class="link-label">User Management</span>
       </a>
       <?php if ($_role === 'superadmin' || sidebarCan('view_audit_log')): ?>
-      <a href="<?= url('admin/audit-log.php') ?>" class="sidebar-link <?= sidebarActive('audit-log') ?>">
-        <span class="icon">🔍</span> Audit Log
+      <a href="<?= url('admin/audit-log.php') ?>" class="sidebar-link <?= sidebarActive('audit-log') ?>" data-tooltip="Audit Log">
+        <span class="icon">🔍</span>
+        <span class="link-label">Audit Log</span>
       </a>
       <?php endif; ?>
     </div>
@@ -173,10 +219,13 @@ function sidebarCan(string $perm): bool {
         <div class="sidebar-user-name"><?= e($_user['full_name'] ?? '') ?></div>
         <div class="sidebar-user-role"><?= e(ucfirst($_role ?? '')) ?></div>
       </div>
-      <a href="<?= url('logout.php') ?>" title="Logout" style="color:rgba(255,255,255,0.4);padding:4px;border-radius:4px;text-decoration:none;font-size:0.85rem;" aria-label="Logout">
+      <a href="<?= url('logout.php') ?>" class="sidebar-logout-btn" title="Sign out" aria-label="Sign out">
         ⎋
       </a>
     </div>
   </div>
 
 </aside><!-- /admin-sidebar -->
+
+<!-- Off-Canvas Backdrop for Mobile Devices -->
+<div class="admin-sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>

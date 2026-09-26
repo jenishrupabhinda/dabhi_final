@@ -89,7 +89,7 @@ require_once __DIR__ . '/partials/page-start.php';
         <p class="form-hint" style="margin-top:4px;">When enabled, customers within your business state are charged CGST + SGST (split equally), and other states are charged IGST.</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;">
+      <div class="adm-form-grid-3">
         <div class="form-group">
           <label class="form-label">Legal Business Name <span style="color:var(--dc-danger);">*</span></label>
           <input type="text" name="business_name" class="form-control" value="<?= e($gstConfig['business_name'] ?? 'Dabhi Chikki') ?>" required>

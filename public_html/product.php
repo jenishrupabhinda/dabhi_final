@@ -627,8 +627,11 @@ require_once __DIR__ . '/partials/_header.php';
 </div>
 
 <style>
-/* Hide generic mobile cart bar on product detail page */
-#mobile-bottom-bar { display: none !important; }
+/* On product detail page, float mobile bottom bar above the sticky Add to Bag bar */
+#mobile-bottom-bar {
+  bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 45 !important;
+}
 </style>
 
 <script>

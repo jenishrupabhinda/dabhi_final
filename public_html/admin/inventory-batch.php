@@ -134,7 +134,7 @@ require_once __DIR__ . '/partials/page-start.php';
       <?= csrfField() ?>
       <input type="hidden" name="action" value="receive_batch">
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;">
+      <div class="adm-form-grid-3">
         <div class="form-group">
           <label class="form-label">Product Variant <span style="color:var(--dc-danger);">*</span></label>
           <select name="variant_id" class="form-control" required>
@@ -183,7 +183,7 @@ require_once __DIR__ . '/partials/page-start.php';
         </div>
       </div>
 
-      <div style="margin-top:16px;display:flex;gap:10px;">
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
         <button type="submit" class="btn btn-primary">Save & Receive Stock</button>
         <button type="button" class="btn btn-ghost" onclick="document.getElementById('receiveBatchModal').style.display='none';">Cancel</button>
       </div>

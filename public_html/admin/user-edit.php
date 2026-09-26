@@ -92,57 +92,59 @@ require_once __DIR__ . '/partials/page-start.php';
   </div>
 
   <div class="card" style="max-width:680px;">
-    <form method="POST">
-      <?= csrfField() ?>
+    <div class="card-body" style="padding:24px;">
+      <form method="POST">
+        <?= csrfField() ?>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div class="form-group">
-          <label class="form-label">Full Name <span style="color:var(--dc-danger);">*</span></label>
-          <input type="text" name="full_name" class="form-control" value="<?= e($user['full_name'] ?? '') ?>" required>
+        <div class="adm-form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Full Name <span style="color:var(--adm-terracotta);">*</span></label>
+            <input type="text" name="full_name" class="form-control" value="<?= e($user['full_name'] ?? '') ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email Address <span style="color:var(--adm-terracotta);">*</span></label>
+            <input type="email" name="email" class="form-control" value="<?= e($user['email'] ?? '') ?>" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="text" name="phone" class="form-control" value="<?= e($user['phone'] ?? '') ?>" placeholder="10-digit mobile">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-control" required>
+              <option value="employee" <?= ($user['role'] ?? '') === 'employee' ? 'selected' : '' ?>>Employee (Operational)</option>
+              <?php if (Auth::role() === 'superadmin'): ?>
+                <option value="admin" <?= ($user['role'] ?? '') === 'admin' ? 'selected' : '' ?>>Admin (Full Management)</option>
+              <?php endif; ?>
+            </select>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;">
+            <label class="form-label"><?= $userId ? 'Change Password (leave blank to keep current)' : 'Initial Password (leave blank to auto-generate)' ?></label>
+            <input type="text" name="new_password" class="form-control" placeholder="<?= $userId ? 'Enter new password...' : 'Auto-generated if left empty' ?>">
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1;display:flex;flex-direction:column;gap:12px;margin-bottom:8px;">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;">
+              <input type="checkbox" name="is_active" value="1" <?= ($user['is_active'] ?? 1) ? 'checked' : '' ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+              <span>Active Account (can log into dashboard)</span>
+            </label>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:600;">
+              <input type="checkbox" name="must_reset_password" value="1" <?= ($user['must_reset_password'] ?? 0) ? 'checked' : '' ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;">
+              <span>Force password change on next login</span>
+            </label>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Email Address <span style="color:var(--dc-danger);">*</span></label>
-          <input type="email" name="email" class="form-control" value="<?= e($user['email'] ?? '') ?>" required>
+        <div style="margin-top:20px;display:flex;gap:10px;">
+          <button type="submit" class="btn btn-primary btn-lg"><?= $userId ? 'Update User' : 'Create Staff Account' ?></button>
+          <a href="<?= url('admin/users.php?tab=staff') ?>" class="btn btn-secondary btn-lg">Cancel</a>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Phone Number</label>
-          <input type="text" name="phone" class="form-control" value="<?= e($user['phone'] ?? '') ?>" placeholder="10-digit mobile">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Role</label>
-          <select name="role" class="form-control" required>
-            <option value="employee" <?= ($user['role'] ?? '') === 'employee' ? 'selected' : '' ?>>Employee (Operational)</option>
-            <?php if (Auth::role() === 'superadmin'): ?>
-              <option value="admin" <?= ($user['role'] ?? '') === 'admin' ? 'selected' : '' ?>>Admin (Full Management)</option>
-            <?php endif; ?>
-          </select>
-        </div>
-
-        <div class="form-group" style="grid-column:1/-1;">
-          <label class="form-label"><?= $userId ? 'Change Password (leave blank to keep current)' : 'Initial Password (leave blank to auto-generate)' ?></label>
-          <input type="text" name="new_password" class="form-control" placeholder="<?= $userId ? 'Enter new password...' : 'Auto-generated if left empty' ?>">
-        </div>
-
-        <div class="form-group" style="grid-column:1/-1;display:flex;flex-direction:column;gap:10px;">
-          <label style="cursor:pointer;display:flex;align-items:center;gap:8px;">
-            <input type="checkbox" name="is_active" value="1" <?= ($user['is_active'] ?? 1) ? 'checked' : '' ?> style="width:18px;height:18px;">
-            Active Account (can log into dashboard)
-          </label>
-          <label style="cursor:pointer;display:flex;align-items:center;gap:8px;">
-            <input type="checkbox" name="must_reset_password" value="1" <?= ($user['must_reset_password'] ?? 0) ? 'checked' : '' ?> style="width:18px;height:18px;">
-            Force password change on next login
-          </label>
-        </div>
-      </div>
-
-      <div style="margin-top:20px;display:flex;gap:10px;">
-        <button type="submit" class="btn btn-primary btn-lg"><?= $userId ? 'Update User' : 'Create Staff Account' ?></button>
-        <a href="<?= url('admin/users.php?tab=staff') ?>" class="btn btn-ghost btn-lg">Cancel</a>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 
 </div>

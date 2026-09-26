@@ -131,8 +131,7 @@ require_once __DIR__ . '/partials/page-start.php';
 
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
     <div>
-      <h2 style="margin:0;"><?= e($pageHeading) ?></h2>
-      <p style="margin:4px 0 0;color:var(--dc-muted);font-size:0.88rem;">Generate consolidated financial, sales, tax, and inventory valuation statements.</p>
+      <p style="margin:0;color:var(--adm-text-muted);font-size:0.9rem;">Generate consolidated financial, sales, tax, and inventory valuation statements.</p>
     </div>
     <div>
       <a href="?<?= http_build_query(['type' => $reportType, 'from' => $dateFrom, 'to' => $dateTo, 'export' => 'csv']) ?>" class="btn btn-secondary">
@@ -143,34 +142,38 @@ require_once __DIR__ . '/partials/page-start.php';
 
   <!-- Filter Card -->
   <div class="card" style="margin-bottom:20px;">
-    <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-      <div class="form-group" style="margin:0;min-width:180px;">
-        <label class="form-label">Report Type</label>
-        <select name="type" class="form-control form-control-sm">
-          <option value="sales" <?= $reportType === 'sales' ? 'selected' : '' ?>>Sales Summary</option>
-          <option value="gst" <?= $reportType === 'gst' ? 'selected' : '' ?>>GST / Tax Filing</option>
-          <option value="inventory" <?= $reportType === 'inventory' ? 'selected' : '' ?>>Stock Valuation</option>
-        </select>
-      </div>
+    <div class="card-body" style="padding:16px 20px;">
+      <form method="GET" class="adm-filter-bar">
+        <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+          <label class="form-label">Report Type</label>
+          <select name="type" class="form-control">
+            <option value="sales" <?= $reportType === 'sales' ? 'selected' : '' ?>>Sales Summary</option>
+            <option value="gst" <?= $reportType === 'gst' ? 'selected' : '' ?>>GST / Tax Filing</option>
+            <option value="inventory" <?= $reportType === 'inventory' ? 'selected' : '' ?>>Stock Valuation</option>
+          </select>
+        </div>
 
-      <?php if ($reportType !== 'inventory'): ?>
-      <div class="form-group" style="margin:0;">
-        <label class="form-label">From Date</label>
-        <input type="date" name="from" class="form-control form-control-sm" value="<?= e($dateFrom) ?>">
-      </div>
-      <div class="form-group" style="margin:0;">
-        <label class="form-label">To Date</label>
-        <input type="date" name="to" class="form-control form-control-sm" value="<?= e($dateTo) ?>">
-      </div>
-      <?php endif; ?>
+        <?php if ($reportType !== 'inventory'): ?>
+        <div class="form-group" style="margin:0;flex:1;min-width:140px;">
+          <label class="form-label">From Date</label>
+          <input type="date" name="from" class="form-control" value="<?= e($dateFrom) ?>">
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:140px;">
+          <label class="form-label">To Date</label>
+          <input type="date" name="to" class="form-control" value="<?= e($dateTo) ?>">
+        </div>
+        <?php endif; ?>
 
-      <button type="submit" class="btn btn-primary btn-sm">Generate Report</button>
-      <a href="<?= url('admin/reports.php') ?>" class="btn btn-ghost btn-sm">Reset</a>
-    </form>
+        <div class="adm-filter-actions">
+          <button type="submit" class="btn btn-primary" style="height:42px;">Generate Report</button>
+          <a href="<?= url('admin/reports.php') ?>" class="btn btn-secondary" style="height:42px;">Reset</a>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Summary Cards -->
-  <div class="stats-grid" style="grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));margin-bottom:20px;">
+  <div class="stats-grid">
     <?php if ($reportType === 'inventory'): ?>
       <div class="stat-card">
         <div class="stat-label">Total Units in Stock</div>

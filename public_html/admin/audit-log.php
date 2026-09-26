@@ -49,31 +49,34 @@ require_once __DIR__ . '/partials/page-start.php';
   <?php flashRender(); ?>
 
   <div style="margin-bottom:20px;">
-    <h2 style="margin:0;"><?= e($pageHeading) ?></h2>
-    <p style="margin:4px 0 0;color:var(--dc-muted);font-size:0.88rem;">Complete traceability log of staff operations, status changes, and data modifications.</p>
+    <p style="margin:0;color:var(--adm-text-muted);font-size:0.9rem;">Complete traceability log of staff operations, status changes, and data modifications.</p>
   </div>
 
   <!-- Filter -->
   <div class="card" style="margin-bottom:20px;">
-    <form method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-      <div class="form-group" style="margin:0;min-width:180px;">
-        <label class="form-label">Search Action</label>
-        <input type="text" name="action_name" class="form-control form-control-sm" placeholder="e.g. update, create, delete" value="<?= e($filterAction) ?>">
-      </div>
-      <div class="form-group" style="margin:0;min-width:180px;">
-        <label class="form-label">Entity Type</label>
-        <select name="entity_type" class="form-control form-control-sm">
-          <option value="">All Entities</option>
-          <?php foreach ($entityTypes as $et): ?>
-            <option value="<?= e($et['entity_type']) ?>" <?= $filterEntity === $et['entity_type'] ? 'selected' : '' ?>>
-              <?= ucfirst(e($et['entity_type'])) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-      <a href="<?= url('admin/audit-log.php') ?>" class="btn btn-ghost btn-sm">Reset</a>
-    </form>
+    <div class="card-body" style="padding:16px 20px;">
+      <form method="GET" class="adm-filter-bar">
+        <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+          <label class="form-label">Search Action</label>
+          <input type="text" name="action_name" class="form-control" placeholder="e.g. update, create, delete" value="<?= e($filterAction) ?>">
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+          <label class="form-label">Entity Type</label>
+          <select name="entity_type" class="form-control">
+            <option value="">All Entities</option>
+            <?php foreach ($entityTypes as $et): ?>
+              <option value="<?= e($et['entity_type']) ?>" <?= $filterEntity === $et['entity_type'] ? 'selected' : '' ?>>
+                <?= ucfirst(e($et['entity_type'])) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="adm-filter-actions">
+          <button type="submit" class="btn btn-primary" style="height:42px;">Filter</button>
+          <a href="<?= url('admin/audit-log.php') ?>" class="btn btn-secondary" style="height:42px;">Reset</a>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Table -->

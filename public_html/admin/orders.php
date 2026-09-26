@@ -28,51 +28,65 @@ require_once __DIR__ . '/partials/page-start.php';
 
   <!-- Stats row -->
   <?php $stats = Order::dashboardStats(); ?>
-  <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
-    <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value"><?= number_format($stats['total_orders']) ?></div></div>
-    <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value"><?= number_format($stats['pending_orders']) ?></div></div>
-    <div class="stat-card"><div class="stat-label">Today's Orders</div><div class="stat-value"><?= number_format($stats['today_orders']) ?></div></div>
-    <div class="stat-card"><div class="stat-label">Monthly Revenue</div><div class="stat-value">₹<?= number_format($stats['monthly_revenue']) ?></div></div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Orders</div>
+      <div class="stat-value"><?= number_format($stats['total_orders']) ?></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value" style="color:var(--adm-terracotta);"><?= number_format($stats['pending_orders']) ?></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Today's Orders</div>
+      <div class="stat-value"><?= number_format($stats['today_orders']) ?></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Monthly Revenue</div>
+      <div class="stat-value">₹<?= number_format($stats['monthly_revenue']) ?></div>
+    </div>
   </div>
 
   <!-- Filters -->
-  <div class="card" style="margin-bottom:16px;">
-    <form method="GET" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-      <div class="form-group" style="flex:1;min-width:180px;">
-        <label class="form-label">Search</label>
-        <input type="text" name="search" class="form-control" placeholder="Order # / Name / Email" value="<?= e($filters['search']) ?>">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Status</label>
-        <select name="status" class="form-control">
-          <option value="">All</option>
-          <?php foreach ($statuses as $s): ?>
-          <option value="<?= $s ?>" <?= $filters['status'] === $s ? 'selected' : '' ?>><?= ucwords(str_replace('_',' ',$s)) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Payment</label>
-        <select name="payment_status" class="form-control">
-          <option value="">All</option>
-          <?php foreach (['pending','paid','failed','refunded'] as $ps): ?>
-          <option value="<?= $ps ?>" <?= $filters['payment_status'] === $ps ? 'selected' : '' ?>><?= ucfirst($ps) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">From</label>
-        <input type="date" name="date_from" class="form-control" value="<?= e($filters['date_from']) ?>">
-      </div>
-      <div class="form-group">
-        <label class="form-label">To</label>
-        <input type="date" name="date_to" class="form-control" value="<?= e($filters['date_to']) ?>">
-      </div>
-      <div class="form-group">
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <a href="/admin/orders.php" class="btn btn-ghost">Reset</a>
-      </div>
-    </form>
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-body" style="padding:16px 20px;">
+      <form method="GET" class="adm-filter-bar">
+        <div class="form-group" style="flex:2;min-width:180px;margin-bottom:0;">
+          <label class="form-label">Search</label>
+          <input type="text" name="search" class="form-control" placeholder="Order # / Name / Email" value="<?= e($filters['search']) ?>">
+        </div>
+        <div class="form-group" style="flex:1;min-width:140px;margin-bottom:0;">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-control">
+            <option value="">All Statuses</option>
+            <?php foreach ($statuses as $s): ?>
+            <option value="<?= $s ?>" <?= $filters['status'] === $s ? 'selected' : '' ?>><?= ucwords(str_replace('_',' ',$s)) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;min-width:140px;margin-bottom:0;">
+          <label class="form-label">Payment</label>
+          <select name="payment_status" class="form-control">
+            <option value="">All Payments</option>
+            <?php foreach (['pending','paid','failed','refunded'] as $ps): ?>
+            <option value="<?= $ps ?>" <?= $filters['payment_status'] === $ps ? 'selected' : '' ?>><?= ucfirst($ps) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;min-width:130px;margin-bottom:0;">
+          <label class="form-label">From</label>
+          <input type="date" name="date_from" class="form-control" value="<?= e($filters['date_from']) ?>">
+        </div>
+        <div class="form-group" style="flex:1;min-width:130px;margin-bottom:0;">
+          <label class="form-label">To</label>
+          <input type="date" name="date_to" class="form-control" value="<?= e($filters['date_to']) ?>">
+        </div>
+        <div class="adm-filter-actions">
+          <button type="submit" class="btn btn-primary" style="height:42px;">Filter</button>
+          <a href="<?= url('admin/orders.php') ?>" class="btn btn-secondary" style="height:42px;">Reset</a>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Table -->

@@ -149,33 +149,23 @@ $variants   = $product ? $product['variants'] : [
     ['id'=>'','sku'=>'','weight_grams'=>250,'mrp'=>'','selling_price'=>'','reorder_level'=>10,'is_active'=>1]
 ];
 $images = $product ? $product['images'] : [];
+
+$activePage  = 'products';
+$pageTitle   = $pageHeading;
+require_once __DIR__ . '/partials/page-start.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title><?= e($pageHeading) ?> | <?= e(APP_NAME) ?> Admin</title>
-  <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
-  <link rel="icon" href="<?= asset('images/logo.png') ?>">
-</head>
-<body>
-<div class="admin-layout">
-  <?php require_once __DIR__ . '/partials/sidebar.php'; ?>
-  <div class="admin-main">
-    <?php require_once __DIR__ . '/partials/topbar.php'; ?>
-    <div class="admin-content">
 
-      <?php foreach ($errors as $err): ?>
-        <div class="alert alert-error"><?= e($err) ?></div>
-      <?php endforeach; ?>
+<div class="admin-content">
 
-      <form method="POST" action="<?= url('admin/product-edit.php' . ($editId ? '?id=' . (int)$editId : '')) ?>" enctype="multipart/form-data" id="productForm">
-        <?= csrfField() ?>
+  <?php flashRender(); ?>
+  <?php foreach ($errors as $err): ?>
+    <div class="alert alert-error"><?= e($err) ?></div>
+  <?php endforeach; ?>
 
-        <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;">
+  <form method="POST" action="<?= url('admin/product-edit.php' . ($editId ? '?id=' . (int)$editId : '')) ?>" enctype="multipart/form-data" id="productForm">
+    <?= csrfField() ?>
+
+    <div class="adm-product-edit-grid">
 
           <!-- ── Left: Main fields ── -->
           <div>
@@ -408,12 +398,10 @@ $images = $product ? $product['images'] : [];
 
           </div><!-- /right -->
 
-        </div><!-- /grid -->
+        </div><!-- /adm-product-edit-grid -->
       </form>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /admin-content -->
 
 <script>
 // Auto slug
@@ -473,6 +461,4 @@ document.querySelectorAll('.remove-variant-btn').forEach(function(btn){
   btn.addEventListener('click', function(){ this.closest('tr').remove(); });
 });
 </script>
-<script src="<?= asset('js/main.js') ?>" defer></script>
-</body>
-</html>
+<?php require_once __DIR__ . '/partials/page-end.php'; ?>

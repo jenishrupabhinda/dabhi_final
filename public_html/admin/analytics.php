@@ -62,16 +62,27 @@ require_once __DIR__ . '/partials/page-start.php';
 <div class="admin-content">
 
   <!-- Date filter -->
-  <form method="GET" style="display:flex;gap:10px;margin-bottom:20px;align-items:flex-end;flex-wrap:wrap;">
-    <div class="form-group"><label class="form-label">From</label>
-      <input type="date" name="date_from" class="form-control" value="<?= e($dateFrom) ?>"></div>
-    <div class="form-group"><label class="form-label">To</label>
-      <input type="date" name="date_to" class="form-control" value="<?= e($dateTo) ?>"></div>
-    <div class="form-group"><button type="submit" class="btn btn-primary">Apply</button></div>
-  </form>
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-body" style="padding:16px 20px;">
+      <form method="GET" class="adm-filter-bar">
+        <div class="form-group" style="margin:0;flex:1;min-width:140px;">
+          <label class="form-label">From Date</label>
+          <input type="date" name="date_from" class="form-control" value="<?= e($dateFrom) ?>">
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:140px;">
+          <label class="form-label">To Date</label>
+          <input type="date" name="date_to" class="form-control" value="<?= e($dateTo) ?>">
+        </div>
+        <div class="adm-filter-actions">
+          <button type="submit" class="btn btn-primary" style="height:42px;">Apply Filter</button>
+          <a href="<?= url('admin/analytics.php') ?>" class="btn btn-secondary" style="height:42px;">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Summary cards -->
-  <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px;">
+  <div class="stats-grid">
     <div class="stat-card"><div class="stat-label">Paid Orders</div><div class="stat-value"><?= number_format($totals['total_orders']) ?></div></div>
     <div class="stat-card"><div class="stat-label">Revenue</div><div class="stat-value">₹<?= number_format($totals['total_revenue']) ?></div></div>
     <div class="stat-card"><div class="stat-label">Discounts Given</div><div class="stat-value">₹<?= number_format($totals['total_discounts']) ?></div></div>
@@ -79,21 +90,21 @@ require_once __DIR__ . '/partials/page-start.php';
     <div class="stat-card"><div class="stat-label">Total GST</div><div class="stat-value">₹<?= number_format($totals['total_gst']) ?></div></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;">
+  <div class="analytics-main-grid">
 
     <!-- Revenue by day -->
     <div class="card">
       <div class="card-header"><h3 class="card-title">Daily Revenue</h3></div>
       <?php if (empty($revenueByDay)): ?>
-        <p class="text-muted text-center" style="padding:24px;">No paid orders in this period.</p>
+        <p class="text-muted text-center" style="padding:28px;">No paid orders in this period.</p>
       <?php else: ?>
-      <div style="overflow-x:auto;">
+      <div class="table-wrap">
         <table class="admin-table">
           <thead><tr><th>Date</th><th>Orders</th><th>Revenue</th></tr></thead>
           <tbody>
           <?php foreach ($revenueByDay as $r): ?>
           <tr>
-            <td><?= date('d M Y', strtotime($r['day'])) ?></td>
+            <td><strong><?= date('d M Y', strtotime($r['day'])) ?></strong></td>
             <td><?= $r['orders'] ?></td>
             <td><strong><?= formatINR((float)$r['revenue']) ?></strong></td>
           </tr>
@@ -106,24 +117,28 @@ require_once __DIR__ . '/partials/page-start.php';
 
     <!-- Status breakdown + Payment split -->
     <div>
-      <div class="card" style="margin-bottom:16px;">
+      <div class="card" style="margin-bottom:20px;">
         <div class="card-header"><h3 class="card-title">Order Status</h3></div>
-        <?php foreach ($statusBreakdown as $s): ?>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.88rem;border-bottom:1px solid var(--dc-border);">
-          <span><?= ucwords(str_replace('_',' ',e($s['status']))) ?></span>
-          <strong><?= $s['n'] ?></strong>
+        <div class="card-body">
+          <?php foreach ($statusBreakdown as $s): ?>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:0.88rem;border-bottom:1px solid var(--adm-border-subtle);">
+            <span><?= ucwords(str_replace('_',' ',e($s['status']))) ?></span>
+            <strong><?= $s['n'] ?></strong>
+          </div>
+          <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
       </div>
 
       <div class="card">
         <div class="card-header"><h3 class="card-title">Payment Method</h3></div>
-        <?php foreach ($paymentSplit as $p): ?>
-        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.88rem;border-bottom:1px solid var(--dc-border);">
-          <span><?= strtoupper(e($p['payment_method'])) ?> (<?= $p['n'] ?>)</span>
-          <strong><?= formatINR((float)$p['revenue']) ?></strong>
+        <div class="card-body">
+          <?php foreach ($paymentSplit as $p): ?>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:0.88rem;border-bottom:1px solid var(--adm-border-subtle);">
+            <span><?= strtoupper(e($p['payment_method'])) ?> (<?= $p['n'] ?>)</span>
+            <strong><?= formatINR((float)$p['revenue']) ?></strong>
+          </div>
+          <?php endforeach; ?>
         </div>
-        <?php endforeach; ?>
       </div>
     </div>
   </div>
@@ -132,20 +147,22 @@ require_once __DIR__ . '/partials/page-start.php';
   <div class="card">
     <div class="card-header"><h3 class="card-title">Top Products by Revenue</h3></div>
     <?php if (empty($topProducts)): ?>
-      <p class="text-muted text-center" style="padding:24px;">No data.</p>
+      <p class="text-muted text-center" style="padding:28px;">No data recorded.</p>
     <?php else: ?>
-    <table class="admin-table">
-      <thead><tr><th>Product</th><th>Units Sold</th><th>Revenue</th></tr></thead>
-      <tbody>
-      <?php foreach ($topProducts as $t): ?>
-      <tr>
-        <td><?= e($t['name']) ?></td>
-        <td><?= number_format($t['units_sold']) ?></td>
-        <td><strong><?= formatINR((float)$t['revenue']) ?></strong></td>
-      </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Product</th><th>Units Sold</th><th>Revenue</th></tr></thead>
+        <tbody>
+        <?php foreach ($topProducts as $t): ?>
+        <tr>
+          <td><strong><?= e($t['name']) ?></strong></td>
+          <td><?= number_format($t['units_sold']) ?></td>
+          <td><strong><?= formatINR((float)$t['revenue']) ?></strong></td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
     <?php endif; ?>
   </div>
 </div>

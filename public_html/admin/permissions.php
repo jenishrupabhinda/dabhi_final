@@ -74,8 +74,8 @@ require_once __DIR__ . '/partials/page-start.php';
 
   <!-- User Selector -->
   <div class="card" style="margin-bottom:20px;">
-    <form method="GET" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-      <div class="form-group" style="margin:0;min-width:240px;">
+    <form method="GET" class="adm-filter-bar">
+      <div class="form-group" style="margin:0;flex:1;min-width:200px;">
         <label class="form-label">Select Staff Member</label>
         <select name="user" class="form-control" onchange="this.form.submit();">
           <?php foreach ($staffList as $s): ?>
@@ -85,7 +85,9 @@ require_once __DIR__ . '/partials/page-start.php';
           <?php endforeach; ?>
         </select>
       </div>
-      <button type="submit" class="btn btn-primary btn-sm">Load Permissions</button>
+      <div class="adm-filter-actions">
+        <button type="submit" class="btn btn-primary" style="height:42px;">Load Permissions</button>
+      </div>
     </form>
   </div>
 
@@ -94,30 +96,32 @@ require_once __DIR__ . '/partials/page-start.php';
     <?= csrfField() ?>
     <input type="hidden" name="user_id" value="<?= $targetUser['id'] ?>">
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:20px;margin-bottom:24px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr));gap:20px;margin-bottom:24px;">
       <?php foreach ($groupedPerms as $categoryName => $perms): ?>
       <div class="card">
         <div class="card-header">
           <h3 class="card-title" style="text-transform:capitalize;">📁 <?= e($categoryName) ?> Access</h3>
         </div>
-        <div style="display:flex;flex-direction:column;gap:14px;margin-top:10px;">
-          <?php foreach ($perms as $p): ?>
-          <label style="cursor:pointer;display:flex;align-items:flex-start;gap:10px;">
-            <input type="checkbox" name="perms[<?= e($p['permission_key']) ?>]" value="1" <?= $p['is_enabled'] ? 'checked' : '' ?> style="width:18px;height:18px;margin-top:2px;">
-            <div>
-              <div style="font-weight:600;font-size:0.92rem;"><?= e($p['label']) ?></div>
-              <?php if ($p['description']): ?>
-                <div style="font-size:0.75rem;color:var(--dc-muted);margin-top:2px;"><?= e($p['description']) ?></div>
-              <?php endif; ?>
-            </div>
-          </label>
-          <?php endforeach; ?>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <?php foreach ($perms as $p): ?>
+            <label style="cursor:pointer;display:flex;align-items:flex-start;gap:10px;">
+              <input type="checkbox" name="perms[<?= e($p['permission_key']) ?>]" value="1" <?= $p['is_enabled'] ? 'checked' : '' ?> style="accent-color:var(--adm-terracotta);width:18px;height:18px;margin-top:2px;flex-shrink:0;">
+              <div>
+                <div style="font-weight:600;font-size:0.92rem;color:var(--adm-text-main);"><?= e($p['label']) ?></div>
+                <?php if ($p['description']): ?>
+                  <div style="font-size:0.75rem;color:var(--adm-text-muted);margin-top:2px;"><?= e($p['description']) ?></div>
+                <?php endif; ?>
+              </div>
+            </label>
+            <?php endforeach; ?>
+          </div>
         </div>
       </div>
       <?php endforeach; ?>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-lg">Save Permissions for <?= e($targetUser['full_name']) ?></button>
+    <button type="submit" class="btn btn-primary btn-lg" style="max-width:100%;white-space:normal;text-align:center;">Save Permissions for <?= e($targetUser['full_name']) ?></button>
   </form>
   <?php else: ?>
     <div class="card">

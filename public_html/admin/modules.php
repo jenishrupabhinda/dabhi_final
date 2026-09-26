@@ -198,10 +198,10 @@ require_once __DIR__ . '/partials/page-start.php';
   <?php flashRender(); ?>
 
   <!-- Top Hero Bar -->
-  <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, #2b1311 0%, #3e1b18 100%); color: #ffffff; border-color: rgba(255,255,255,0.08);">
-    <div class="card-body" style="padding: 24px 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
-      <div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+  <div class="card mod-hero" style="margin-bottom: 24px; background: linear-gradient(135deg, #2b1311 0%, #3e1b18 100%); color: #ffffff; border-color: rgba(255,255,255,0.08);">
+    <div class="card-body mod-hero-body">
+      <div class="mod-hero-info">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
           <span class="badge" style="background: rgba(199, 97, 61, 0.35); color: #f6dc94; border: 1px solid rgba(246, 220, 148, 0.3);">
             🎛️ Storefront CMS
           </span>
@@ -216,7 +216,7 @@ require_once __DIR__ . '/partials/page-start.php';
           Easily toggle sections and customer modules ON or OFF sitewide, and personalize all customer-facing headlines, promo codes, badges, and marketing copy.
         </p>
       </div>
-      <div style="display: flex; gap: 10px;">
+      <div class="mod-hero-actions">
         <button type="button" onclick="document.getElementById('modulesMasterForm').submit();" class="btn btn-primary" style="box-shadow: 0 4px 14px rgba(199, 97, 61, 0.4);">
           💾 Save All Changes
         </button>
@@ -231,29 +231,30 @@ require_once __DIR__ . '/partials/page-start.php';
     <?= csrfField() ?>
     <input type="hidden" name="action" value="save_all_modules">
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-bottom: 32px;">
+    <div class="modules-grid">
 
       <!-- ══ MODULE 1: CUSTOMER REVIEWS & RATINGS ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_reviews_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(199, 97, 61, 0.12); color: var(--dc-terracotta);">⭐</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Customer Reviews &amp; Testimonials</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Homepage reviews showcase &amp; product reviews</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Customer Reviews &amp; Testimonials</h3>
+              <span class="mod-desc">Homepage reviews showcase &amp; product reviews</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Reviews Module ON/OFF">
-            <input type="checkbox" name="module_reviews" value="1" <?= $mReviews ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Reviews Module ON/OFF">
+              <input type="checkbox" name="module_reviews" value="1" <?= $mReviews ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
-          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--dc-cream); padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; border: 1px solid var(--dc-border);">
-            <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="mod-sub-bar">
+            <div class="mod-sub-bar-badges">
               <span class="badge badge-success"><?= $totalReviewsCount ?> Approved Reviews</span>
               <?php if ($pendingReviewsCount > 0): ?>
                 <span class="badge badge-warning">⏳ <?= $pendingReviewsCount ?> Pending Moderation</span>
@@ -274,7 +275,7 @@ require_once __DIR__ . '/partials/page-start.php';
             <textarea id="reviews_subheading" name="reviews_subheading" class="form-control" rows="2"><?= e($reviewsSubhead) ?></textarea>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="mod-inner-grid-2">
             <div class="form-group" style="margin: 0;">
               <label class="form-label" for="reviews_badge_text">Rating Badge Pill Text</label>
               <input type="text" id="reviews_badge_text" name="reviews_badge_text" class="form-control" value="<?= e($reviewsBadge) ?>">
@@ -293,24 +294,25 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 2: INSTAGRAM & SOCIAL REELS SHOWCASE ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_instagram_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(199, 97, 61, 0.12); color: var(--dc-terracotta);">📸</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Instagram &amp; Video Reels Showcase</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Homepage snap-scroll video cards &amp; follow CTA</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Instagram &amp; Video Reels Showcase</h3>
+              <span class="mod-desc">Homepage snap-scroll video cards &amp; follow CTA</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Instagram Module ON/OFF">
-            <input type="checkbox" name="module_instagram" value="1" <?= $mInstagram ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Instagram Module ON/OFF">
+              <input type="checkbox" name="module_instagram" value="1" <?= $mInstagram ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
-          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--dc-cream); padding: 10px 14px; border-radius: 10px; margin-bottom: 16px; border: 1px solid var(--dc-border);">
-            <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="mod-sub-bar">
+            <div class="mod-sub-bar-badges">
               <span class="badge badge-success"><?= $totalReelsCount ?> Videos Configured</span>
             </div>
             <a href="<?= url('admin/instagram-reels.php') ?>" class="btn btn-sm btn-outline">
@@ -318,7 +320,7 @@ require_once __DIR__ . '/partials/page-start.php';
             </a>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="mod-inner-grid-2">
             <div class="form-group">
               <label class="form-label" for="instagram_handle">Account Handle</label>
               <input type="text" id="instagram_handle" name="instagram_handle" class="form-control" value="<?= e($igHandle) ?>">
@@ -330,7 +332,7 @@ require_once __DIR__ . '/partials/page-start.php';
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px;">
+          <div class="mod-inner-grid-2-1">
             <div class="form-group" style="margin: 0;">
               <label class="form-label" for="instagram_profile_url">Profile URL Link</label>
               <input type="url" id="instagram_profile_url" name="instagram_profile_url" class="form-control" value="<?= e($igProfile) ?>">
@@ -347,19 +349,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 3: ANNOUNCEMENT BAR ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_announcement_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(246, 220, 148, 0.35); color: #8a481c;">📢</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Announcement Top Banner</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Sticky top bar for offers &amp; free shipping alerts</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Announcement Top Banner</h3>
+              <span class="mod-desc">Sticky top bar for offers &amp; free shipping alerts</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Announcement Bar ON/OFF">
-            <input type="checkbox" name="module_announcement" value="1" <?= $mAnnouncement ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Announcement Bar ON/OFF">
+              <input type="checkbox" name="module_announcement" value="1" <?= $mAnnouncement ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -368,7 +371,7 @@ require_once __DIR__ . '/partials/page-start.php';
             <input type="text" id="announcement_text" name="announcement_text" class="form-control" value="<?= e($annText) ?>" placeholder="e.g. 🎉 Free Shipping on orders above ₹499" required>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="mod-inner-grid-2">
             <div class="form-group" style="margin: 0;">
               <label class="form-label" for="announcement_badge">Badge Tag Text</label>
               <input type="text" id="announcement_badge" name="announcement_badge" class="form-control" value="<?= e($annBadge) ?>" placeholder="e.g. Special Offer">
@@ -385,19 +388,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 4: WELCOME / PROMOTIONAL POPUP ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_popup_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(27, 138, 90, 0.12); color: #1b8a5a;">🎁</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Welcome / Discount Popup Modal</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">First-visit discount modal with instant promo code</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Welcome / Discount Popup Modal</h3>
+              <span class="mod-desc">First-visit discount modal with instant promo code</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Welcome Popup ON/OFF">
-            <input type="checkbox" name="module_welcome_popup" value="1" <?= $mPopup ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Welcome Popup ON/OFF">
+              <input type="checkbox" name="module_welcome_popup" value="1" <?= $mPopup ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -421,19 +425,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 5: BRAND STORY & HERITAGE ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_story_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(199, 97, 61, 0.12); color: var(--dc-terracotta);">📖</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Brand Story &amp; Craftsmanship</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Homepage yellow feature box with 3 pillar cards</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Brand Story &amp; Craftsmanship</h3>
+              <span class="mod-desc">Homepage yellow feature box with 3 pillar cards</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Brand Story Section ON/OFF">
-            <input type="checkbox" name="module_story" value="1" <?= $mStory ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Brand Story Section ON/OFF">
+              <input type="checkbox" name="module_story" value="1" <?= $mStory ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -452,19 +457,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 6: FEATURED PRODUCTS CAROUSEL ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_featured_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(199, 97, 61, 0.12); color: var(--dc-terracotta);">🥜</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Featured Products Carousel</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Homepage spotlight for signature chikki bars</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Featured Products Carousel</h3>
+              <span class="mod-desc">Homepage spotlight for signature chikki bars</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Featured Products Section ON/OFF">
-            <input type="checkbox" name="module_featured" value="1" <?= $mFeatured ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Featured Products Section ON/OFF">
+              <input type="checkbox" name="module_featured" value="1" <?= $mFeatured ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -483,19 +489,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 7: PINCODE DELIVERY CHECKER ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_pincode_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(43, 112, 168, 0.12); color: #2b70a8;">📍</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Pincode Delivery Estimator</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Product page pincode validation &amp; ETA widget</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Pincode Delivery Estimator</h3>
+              <span class="mod-desc">Product page pincode validation &amp; ETA widget</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Pincode Estimator ON/OFF">
-            <input type="checkbox" name="module_pincode_checker" value="1" <?= $mPincode ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Pincode Estimator ON/OFF">
+              <input type="checkbox" name="module_pincode_checker" value="1" <?= $mPincode ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -509,19 +516,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 8: CASH ON DELIVERY (COD) & CHECKOUT ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_cod_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(27, 138, 90, 0.12); color: #1b8a5a;">💵</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Cash on Delivery (COD)</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Accept cash / UPI upon parcel arrival</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Cash on Delivery (COD)</h3>
+              <span class="mod-desc">Accept cash / UPI upon parcel arrival</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle COD ON/OFF">
-            <input type="checkbox" name="cod_enabled" value="1" <?= $mCod ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle COD ON/OFF">
+              <input type="checkbox" name="cod_enabled" value="1" <?= $mCod ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -534,19 +542,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 9: GST BREAKDOWN DISPLAY ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_gst_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(43, 112, 168, 0.12); color: #2b70a8;">🧾</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">GST / Tax Breakdown Display</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Show itemized CGST + SGST or IGST tax tags</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">GST / Tax Breakdown Display</h3>
+              <span class="mod-desc">Show itemized CGST + SGST or IGST tax tags</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Tax Breakdown ON/OFF">
-            <input type="checkbox" name="module_gst_breakdown" value="1" <?= $mGstBreakdown ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Tax Breakdown ON/OFF">
+              <input type="checkbox" name="module_gst_breakdown" value="1" <?= $mGstBreakdown ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -564,19 +573,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 10: PRODUCT DETAIL BADGES & TRUST CAPSULES ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_product_badges_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(199, 97, 61, 0.12); color: var(--dc-terracotta);">🏷️</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Product Detail Badges &amp; Capsules</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Feature capsules, category supertitle &amp; review stars on product page</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Product Detail Badges &amp; Capsules</h3>
+              <span class="mod-desc">Feature capsules, category supertitle &amp; review stars on product page</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Product Page Badges ON/OFF">
-            <input type="checkbox" name="module_product_badges" value="1" <?= $mProdBadges ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Product Page Badges ON/OFF">
+              <input type="checkbox" name="module_product_badges" value="1" <?= $mProdBadges ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -589,7 +599,7 @@ require_once __DIR__ . '/partials/page-start.php';
             <p class="form-hint">Displayed as uppercase pills below price on the product page (e.g. <code>100% PURE JAGGERY</code>, <code>ROASTED NUTS</code>, etc.).</p>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="mod-inner-grid-2">
             <div class="form-group" style="margin: 0;">
               <label class="form-label" for="product_supertitle_text">Category Eyebrow / Supertitle</label>
               <input type="text" id="product_supertitle_text" name="product_supertitle_text" class="form-control" value="<?= e($prodSuperText) ?>" placeholder="CHIKKI">
@@ -615,19 +625,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 11: HOMEPAGE PRODUCT CARDS (RATINGS & BADGES) ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_card_badges_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(246, 220, 148, 0.35); color: #8a481c;">🌟</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Homepage Product Card Badges &amp; Ratings</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Customizable mini badges (Pure Jaggery) &amp; star ratings</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Homepage Product Card Badges &amp; Ratings</h3>
+              <span class="mod-desc">Customizable mini badges (Pure Jaggery) &amp; star ratings</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Card Badges ON/OFF">
-            <input type="checkbox" name="module_card_badges" value="1" <?= $mCardBadges ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Card Badges ON/OFF">
+              <input type="checkbox" name="module_card_badges" value="1" <?= $mCardBadges ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -652,7 +663,7 @@ require_once __DIR__ . '/partials/page-start.php';
               <input type="checkbox" name="card_rating_fallback_enabled" value="1" <?= $mCardRatingFall ? 'checked' : '' ?>>
               <span style="font-weight: 600; font-size: 0.85rem;">Display Default Rating (e.g. 4.7 ★) when no reviews exist yet</span>
             </label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="mod-inner-grid-2">
               <div class="form-group" style="margin: 0;">
                 <label class="form-label" for="card_default_rating">Default Rating (e.g. 4.7)</label>
                 <input type="text" id="card_default_rating" name="card_default_rating" class="form-control" value="<?= e($cardDefRating) ?>" placeholder="4.7">
@@ -669,19 +680,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 12: TAX & HSN PRICING NOTICE ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_tax_note_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(27, 138, 90, 0.12); color: #1b8a5a;">💰</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Tax &amp; HSN Pricing Notice</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">"Inclusive of all taxes (GST 5% included) · HSN: 1704" note</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Tax &amp; HSN Pricing Notice</h3>
+              <span class="mod-desc">"Inclusive of all taxes (GST 5% included) · HSN: 1704" note</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Tax Note ON/OFF">
-            <input type="checkbox" name="module_tax_note" value="1" <?= $mTaxNote ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Tax Note ON/OFF">
+              <input type="checkbox" name="module_tax_note" value="1" <?= $mTaxNote ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -703,19 +715,20 @@ require_once __DIR__ . '/partials/page-start.php';
       <!-- ══ MODULE 13: LIVE INVENTORY & STOCK BADGES ══ -->
       <div class="card module-box">
         <input type="hidden" name="has_stock_badge_module" value="1">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
+        <div class="card-header mod-card-header">
+          <div class="mod-header-left">
             <div class="module-icon" style="background: rgba(43, 112, 168, 0.12); color: #2b70a8;">📦</div>
-            <div>
-              <h3 class="card-title" style="margin: 0;">Live Inventory &amp; Stock Badges</h3>
-              <span style="font-size: 0.8rem; color: var(--dc-muted);">Fresh batch stock status indicator on product pages</span>
+            <div class="mod-header-text">
+              <h3 class="card-title">Live Inventory &amp; Stock Badges</h3>
+              <span class="mod-desc">Fresh batch stock status indicator on product pages</span>
             </div>
           </div>
-          <!-- Toggle -->
-          <label class="dc-switch-label" title="Toggle Stock Indicator ON/OFF">
-            <input type="checkbox" name="module_stock_badge" value="1" <?= $mStockBadge ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
-            <span class="dc-switch-slider"></span>
-          </label>
+          <div class="mod-header-switch">
+            <label class="dc-switch-label" title="Toggle Stock Indicator ON/OFF">
+              <input type="checkbox" name="module_stock_badge" value="1" <?= $mStockBadge ? 'checked' : '' ?> class="dc-switch-input" onchange="updateCardStatus(this)">
+              <span class="dc-switch-slider"></span>
+            </label>
+          </div>
         </div>
 
         <div class="card-body">
@@ -741,12 +754,12 @@ require_once __DIR__ . '/partials/page-start.php';
     </div>
 
     <!-- Sticky Bottom Save Bar -->
-    <div style="position: sticky; bottom: 16px; background: #ffffff; padding: 14px 24px; border-radius: 16px; border: 1px solid var(--dc-border); box-shadow: 0 10px 30px rgba(43, 19, 17, 0.12); display: flex; justify-content: space-between; align-items: center; z-index: 40;">
-      <div style="font-size: 0.88rem; color: var(--dc-muted);">
+    <div class="mod-sticky-bar">
+      <div class="mod-sticky-bar-text">
         💡 Toggle any switch and edit copy above, then click <strong>Save All Changes</strong>.
       </div>
-      <div style="display: flex; gap: 12px;">
-        <button type="submit" class="btn btn-primary" style="padding: 10px 28px;">
+      <div class="mod-sticky-bar-actions">
+        <button type="submit" class="btn btn-primary">
           💾 Save All Changes
         </button>
       </div>
@@ -757,15 +770,94 @@ require_once __DIR__ . '/partials/page-start.php';
 </div>
 
 <style>
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .module-box {
   transition: all 0.25s ease;
   border-radius: 16px;
   overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 .module-box:hover {
   box-shadow: 0 8px 28px rgba(43, 19, 17, 0.08);
   border-color: #dcd1c2;
 }
+
+.mod-hero-body {
+  padding: 24px 28px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.mod-hero-info {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+.mod-hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mod-card-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 16px 20px !important;
+  border-bottom: 1px solid var(--adm-border-subtle, #f0e9df) !important;
+  background: #ffffff !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+.mod-header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+.mod-header-text {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+}
+.mod-header-text .card-title {
+  margin: 0 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.3 !important;
+  word-break: break-word !important;
+}
+.mod-header-text .mod-desc {
+  font-size: 0.78rem !important;
+  color: var(--dc-muted, #73625a) !important;
+  display: block !important;
+  margin-top: 2px !important;
+  line-height: 1.35 !important;
+  word-break: break-word !important;
+}
+.mod-header-switch {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-left: auto !important;
+}
+
 .module-icon {
   width: 44px;
   height: 44px;
@@ -777,11 +869,70 @@ require_once __DIR__ . '/partials/page-start.php';
   flex-shrink: 0;
 }
 
+.mod-inner-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.mod-inner-grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.mod-sub-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: var(--dc-cream, #fbf8f3);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border: 1px solid var(--dc-border, #ded3c3);
+  box-sizing: border-box;
+  width: 100%;
+}
+.mod-sub-bar-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mod-sticky-bar {
+  position: sticky;
+  bottom: 16px;
+  background: #ffffff;
+  padding: 14px 24px;
+  border-radius: 16px;
+  border: 1px solid var(--dc-border, #ded3c3);
+  box-shadow: 0 10px 30px rgba(43, 19, 17, 0.16);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  z-index: 95;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+.mod-sticky-bar-text {
+  font-size: 0.88rem;
+  color: var(--dc-muted, #73625a);
+}
+
 /* Switches */
 .dc-switch-label {
   user-select: none;
   cursor: pointer;
   display: inline-flex;
+  touch-action: manipulation;
 }
 .dc-switch-input {
   display: none;
@@ -809,10 +960,94 @@ require_once __DIR__ . '/partials/page-start.php';
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .dc-switch-input:checked + .dc-switch-slider {
-  background-color: var(--dc-terracotta);
+  background-color: var(--dc-terracotta, #c7613d);
 }
 .dc-switch-input:checked + .dc-switch-slider::before {
   transform: translateX(20px);
+}
+
+/* Media Queries for Tablet and Mobile */
+@media (max-width: 768px) {
+  .modules-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .mod-hero-body {
+    padding: 18px 16px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mod-hero-info h2 {
+    font-size: 1.25rem !important;
+  }
+  .mod-hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .mod-hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .mod-sticky-bar {
+    bottom: 8px;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 12px;
+    gap: 10px;
+  }
+  .mod-sticky-bar-text {
+    text-align: center;
+    font-size: 0.82rem;
+  }
+  .mod-sticky-bar-actions .btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    min-height: 46px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .mod-inner-grid-2,
+  .mod-inner-grid-2-1 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .mod-inner-grid-2 > .form-group,
+  .mod-inner-grid-2-1 > .form-group {
+    padding-top: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .mod-card-header {
+    padding: 14px 16px !important;
+    gap: 10px !important;
+  }
+  .module-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.15rem;
+    border-radius: 10px;
+  }
+  .mod-header-text .card-title {
+    font-size: 0.92rem !important;
+  }
+  .mod-sub-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+  }
+  .mod-sub-bar .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+  }
 }
 </style>
 

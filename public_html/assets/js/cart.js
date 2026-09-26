@@ -58,6 +58,13 @@
     if (e.key === 'Escape' && isOpen) closeDrawer();
   });
 
+  /* ── Page check for Mobile Bottom Bar ────────────── */
+  function isAllowedPageForMobileBar() {
+    const rawPath = window.location.pathname.split('/').pop().toLowerCase();
+    const page = rawPath.split('?')[0].split('#')[0];
+    return page === '' || page === 'index.php' || page === 'product.php';
+  }
+
   /* ── Badge & Mobile Bar Update ──────────────────── */
   function updateBadgeAndBar(count, total = 0) {
     if (badgeEl) {
@@ -71,7 +78,7 @@
     }
 
     if (mobileBar) {
-      if (count > 0) {
+      if (count > 0 && isAllowedPageForMobileBar()) {
         mobileBar.classList.remove('hidden');
         if (mobileBarCount) mobileBarCount.textContent = count;
         if (mobileBarTotal) mobileBarTotal.textContent = '₹' + Math.round(total) + ' →';
@@ -127,7 +134,7 @@
     const total = subtotal + shippingFee;
     const remainingForFree = Math.max(0, freeShippingThreshold - subtotal);
 
-    updateBadgeAndBar(count, total);
+    updateBadgeAndBar(count, subtotal);
 
     if (items.length === 0) {
       bodyEl.innerHTML = `

@@ -152,11 +152,11 @@ require_once __DIR__ . '/partials/page-start.php';
     </div>
 
     <!-- Add Slab Form -->
-    <div id="addSlabForm" style="display:none;background:var(--dc-bg-soft);padding:16px;border-radius:var(--dc-radius-md);margin:16px 0;">
+    <div id="addSlabForm" style="display:none;background:var(--dc-bg-soft);padding:16px;border-radius:var(--dc-radius-md);margin:16px 0;box-sizing:border-box;">
       <form method="POST">
         <?= csrfField() ?>
         <input type="hidden" name="action" value="add_rate_slab">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:12px;align-items:flex-end;">
+        <div class="adm-form-grid-3">
           <div class="form-group" style="margin:0;">
             <label class="form-label">Zone</label>
             <select name="zone_id" class="form-control" required>
@@ -181,9 +181,9 @@ require_once __DIR__ . '/partials/page-start.php';
             <label class="form-label">COD Extra (₹)</label>
             <input type="number" step="0.5" name="cod_extra_charge" class="form-control" value="20">
           </div>
-          <div style="display:flex;gap:6px;">
-            <button type="submit" class="btn btn-primary btn-sm">Add Slab</button>
-            <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('addSlabForm').style.display='none';">Cancel</button>
+          <div class="form-group" style="margin:0;display:flex;gap:8px;align-items:flex-end;">
+            <button type="submit" class="btn btn-primary" style="flex:1;">Add Slab</button>
+            <button type="button" class="btn btn-ghost" onclick="document.getElementById('addSlabForm').style.display='none';" style="flex:1;">Cancel</button>
           </div>
         </div>
       </form>
@@ -231,30 +231,30 @@ require_once __DIR__ . '/partials/page-start.php';
     <form method="POST" style="background:var(--dc-bg-soft);padding:14px;border-radius:var(--dc-radius-md);margin-bottom:16px;">
       <?= csrfField() ?>
       <input type="hidden" name="action" value="add_pincode">
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-        <div class="form-group" style="margin:0;min-width:140px;">
+      <div class="adm-filter-bar">
+        <div class="form-group" style="margin:0;flex:1;min-width:140px;">
           <label class="form-label">Add / Edit Pincode</label>
-          <input type="text" name="pincode" maxlength="6" class="form-control form-control-sm" placeholder="e.g. 360001" required>
+          <input type="text" name="pincode" maxlength="6" class="form-control" placeholder="e.g. 360001" required>
         </div>
-        <div class="form-group" style="margin:0;min-width:160px;">
+        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
           <label class="form-label">Assigned Zone</label>
-          <select name="zone_id" class="form-control form-control-sm" required>
+          <select name="zone_id" class="form-control form-select" required>
             <?php foreach ($zones as $z): ?>
               <option value="<?= $z['id'] ?>"><?= e($z['name']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>
-        <div class="form-group" style="margin:0;display:flex;align-items:center;gap:6px;height:34px;">
-          <label style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:0.88rem;">
-            <input type="checkbox" name="is_serviceable" value="1" checked> Serviceable
+        <div class="form-group" style="margin:0;display:flex;align-items:center;gap:12px;min-height:42px;flex-wrap:wrap;">
+          <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-size:0.88rem;font-weight:600;">
+            <input type="checkbox" name="is_serviceable" value="1" checked style="width:18px;height:18px;"> Serviceable
+          </label>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-size:0.88rem;font-weight:600;">
+            <input type="checkbox" name="cod_available" value="1" checked style="width:18px;height:18px;"> COD Available
           </label>
         </div>
-        <div class="form-group" style="margin:0;display:flex;align-items:center;gap:6px;height:34px;">
-          <label style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:0.88rem;">
-            <input type="checkbox" name="cod_available" value="1" checked> COD Available
-          </label>
+        <div class="adm-filter-actions">
+          <button type="submit" class="btn btn-primary">Save Pincode</button>
         </div>
-        <button type="submit" class="btn btn-primary btn-sm">Save Pincode</button>
       </div>
     </form>
 

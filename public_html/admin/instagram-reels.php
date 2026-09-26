@@ -272,7 +272,7 @@ require_once __DIR__ . '/partials/page-start.php';
   </div>
 
   <!-- Reels Cards Grid -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
     <h3 style="margin: 0; font-family: var(--dc-font-heading); font-size: 1.15rem; color: var(--dc-black);">
       Reel Items &amp; Video Links (<?= count($reels) ?>)
     </h3>
@@ -654,6 +654,30 @@ require_once __DIR__ . '/partials/page-start.php';
 }
 .dc-switch-input:checked + .dc-switch-slider::before {
   transform: translateX(20px);
+}
+
+@media (max-width: 640px) {
+  .dc-modal {
+    padding: 10px !important;
+  }
+  .dc-modal-content {
+    max-height: 90vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .dc-modal-body {
+    padding: 16px !important;
+  }
+  .dc-modal-body [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .dc-modal-header {
+    padding: 14px 16px !important;
+  }
+  .dc-modal-footer {
+    padding: 12px 16px !important;
+  }
 }
 </style>
 

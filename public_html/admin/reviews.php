@@ -46,27 +46,29 @@ require_once __DIR__ . '/partials/page-start.php';
   <?php if ($pending): ?>
   <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h3 class="card-title">⏳ Pending Approval (<?= count($pending) ?>)</h3></div>
-    <?php foreach ($pending as $r): ?>
-    <div style="border-bottom:1px solid var(--dc-border);padding:14px 0;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
-        <div>
-          <strong><?= e($r['product_name']) ?></strong> · ⭐ <?= $r['rating'] ?>/5<br>
-          <span style="font-size:0.8rem;color:var(--dc-muted);"><?= e($r['full_name']) ?> · <?= date('d M Y', strtotime($r['created_at'])) ?></span>
-          <?php if ($r['comment']): ?><blockquote style="margin:6px 0 0;font-style:italic;"><?= e($r['comment']) ?></blockquote><?php endif; ?>
-        </div>
-        <div style="display:flex;gap:6px;">
-          <form method="POST" style="display:inline;">
-            <?= csrfField() ?><input type="hidden" name="action" value="approve"><input type="hidden" name="review_id" value="<?= $r['id'] ?>">
-            <button type="submit" class="btn btn-primary btn-sm">✅ Approve</button>
-          </form>
-          <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this review?')">
-            <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="review_id" value="<?= $r['id'] ?>">
-            <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--dc-danger);">🗑 Delete</button>
-          </form>
+    <div class="card-body" style="padding:0 20px;">
+      <?php foreach ($pending as $r): ?>
+      <div style="border-bottom:1px solid var(--adm-border-subtle);padding:16px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+          <div>
+            <strong><?= e($r['product_name']) ?></strong> · ⭐ <?= $r['rating'] ?>/5<br>
+            <span style="font-size:0.8rem;color:var(--adm-text-muted);"><?= e($r['full_name']) ?> · <?= date('d M Y', strtotime($r['created_at'])) ?></span>
+            <?php if ($r['comment']): ?><blockquote style="margin:8px 0 0;font-style:italic;color:var(--adm-text-main);font-size:0.9rem;"><?= e($r['comment']) ?></blockquote><?php endif; ?>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <form method="POST" style="display:inline;">
+              <?= csrfField() ?><input type="hidden" name="action" value="approve"><input type="hidden" name="review_id" value="<?= $r['id'] ?>">
+              <button type="submit" class="btn btn-primary btn-sm">✅ Approve</button>
+            </form>
+            <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this review?')">
+              <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="review_id" value="<?= $r['id'] ?>">
+              <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+            </form>
+          </div>
         </div>
       </div>
+      <?php endforeach; ?>
     </div>
-    <?php endforeach; ?>
   </div>
   <?php endif; ?>
 
@@ -75,19 +77,21 @@ require_once __DIR__ . '/partials/page-start.php';
     <?php if (empty($approved)): ?>
       <p class="text-muted text-center" style="padding:32px;">No approved reviews yet.</p>
     <?php else: ?>
-    <?php foreach ($approved as $r): ?>
-    <div style="border-bottom:1px solid var(--dc-border);padding:12px 0;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
-      <div>
-        <strong><?= e($r['product_name']) ?></strong> · ⭐ <?= $r['rating'] ?>/5<br>
-        <span style="font-size:0.78rem;color:var(--dc-muted);"><?= e($r['full_name']) ?> · <?= date('d M Y', strtotime($r['created_at'])) ?></span>
-        <?php if ($r['comment']): ?><div style="font-size:0.85rem;margin-top:4px;"><?= e($r['comment']) ?></div><?php endif; ?>
+    <div class="card-body" style="padding:0 20px;">
+      <?php foreach ($approved as $r): ?>
+      <div style="border-bottom:1px solid var(--adm-border-subtle);padding:14px 0;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <strong><?= e($r['product_name']) ?></strong> · ⭐ <?= $r['rating'] ?>/5<br>
+          <span style="font-size:0.78rem;color:var(--adm-text-muted);"><?= e($r['full_name']) ?> · <?= date('d M Y', strtotime($r['created_at'])) ?></span>
+          <?php if ($r['comment']): ?><div style="font-size:0.86rem;margin-top:4px;color:var(--adm-text-main);"><?= e($r['comment']) ?></div><?php endif; ?>
+        </div>
+        <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this review?')">
+          <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="review_id" value="<?= $r['id'] ?>">
+          <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+        </form>
       </div>
-      <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this review?')">
-        <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="review_id" value="<?= $r['id'] ?>">
-        <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--dc-danger);">🗑</button>
-      </form>
+      <?php endforeach; ?>
     </div>
-    <?php endforeach; ?>
     <?php endif; ?>
   </div>
 </div>

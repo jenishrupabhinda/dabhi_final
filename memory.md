@@ -194,8 +194,7 @@ CREATE TABLE `menu_items` (
   - **Identical 1-to-1 Sync with Desktop**: Driven by the exact same `$navTree` structure from `Menu::getTree('primary', true)`. Any menu or submenu added, edited, deleted, or hidden in admin immediately updates both desktop and mobile in lockstep.
   - **Horizontal Multi-Level Sliding Panels**:
     - `#mobile-panel-main`: Root level view showing all primary items with emoji icons and bold uppercase titles (`HOME`, `OUR CHIKKI`, `OUR CRAFT`, `REELS`, `REVIEWS`, `TRACK ORDER`). Items with submenus have a rust-red chevron `>`.
-    - `#submenu-panel-{id}`: Level 1 sliding panel with `< {PARENT_TITLE}` back button and `View All →` link.
-    - Card items inside submenus display icon badge, bold title, subtitle description, badge pill (`BESTSELLER`, `SIGNATURE`, etc.), and circular arrow button `→`.
+    - Items inside submenus render with the exact same `.mobile-menu-row` list styling as the main menu (full-width edge-to-edge rows, `18px 20px` padding, `1px solid #ede8e0` dividers, large Recoleta title, icon, and readable badge pills).
     - Smooth horizontal cubic-bezier slide transitions (`transform: translateX(0)` vs `translateX(-35%)` / `translateX(100%)`).
   - **Drawer Header & Footer**:
     - Header: Deep roasted jaggery burgundy `#541f21` with brand logo and white `✕` close button.

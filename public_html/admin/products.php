@@ -27,61 +27,53 @@ $products   = $result['rows'];
 $total      = $result['total'];
 $lastPage   = $result['last_page'];
 $categories = Category::getAll();
+
+$pageTitle   = 'Products';
+$pageHeading = 'Products';
+$activePage  = 'products';
+require_once __DIR__ . '/partials/page-start.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Products | <?= e(APP_NAME) ?> Admin</title>
-  <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
-  <link rel="icon" href="<?= asset('images/logo.png') ?>">
-</head>
-<body>
-<div class="admin-layout">
-  <?php require_once __DIR__ . '/partials/sidebar.php'; ?>
-  <div class="admin-main">
-    <?php require_once __DIR__ . '/partials/topbar.php'; ?>
-    <div class="admin-content">
 
-      <?php flashRender(); ?>
+<div class="admin-content">
 
-      <!-- ── Filters bar ── -->
-      <div class="card" style="margin-bottom:16px;">
-        <form method="GET" action="<?= url('admin/products.php') ?>" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
-          <div class="form-group" style="flex:1;min-width:180px;margin:0;">
-            <label class="form-label">Search</label>
-            <input type="text" name="search" class="form-control form-control-sm"
-              placeholder="Product name or slug…" value="<?= e($search) ?>">
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label class="form-label">Category</label>
-            <select name="category" class="form-control form-control-sm form-select">
-              <option value="">All Categories</option>
-              <?php foreach ($categories as $cat): ?>
-                <option value="<?= $cat['id'] ?>" <?= $catFilter == $cat['id'] ? 'selected' : '' ?>>
-                  <?= e($cat['name']) ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label class="form-label">Status</label>
-            <select name="status" class="form-control form-control-sm form-select">
-              <option value="">All</option>
-              <option value="active"   <?= $status === 'active'   ? 'selected' : '' ?>>Active</option>
-              <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Hidden</option>
-            </select>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-            <a href="<?= url('admin/products.php') ?>" class="btn btn-ghost btn-sm">Clear</a>
-            <a href="<?= url('admin/product-edit.php') ?>" class="btn btn-secondary btn-sm">+ Add Product</a>
-          </div>
-        </form>
-      </div>
+  <?php flashRender(); ?>
+
+  <!-- ── Filters bar ── -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-body" style="padding:16px 20px;">
+      <form method="GET" action="<?= url('admin/products.php') ?>" class="adm-filter-bar">
+        <div class="form-group" style="flex:2;min-width:180px;margin:0;">
+          <label class="form-label">Search</label>
+          <input type="text" name="search" class="form-control"
+            placeholder="Product name or slug…" value="<?= e($search) ?>">
+        </div>
+        <div class="form-group" style="flex:1;min-width:150px;margin:0;">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-control form-select">
+            <option value="">All Categories</option>
+            <?php foreach ($categories as $cat): ?>
+              <option value="<?= $cat['id'] ?>" <?= $catFilter == $cat['id'] ? 'selected' : '' ?>>
+                <?= e($cat['name']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1;min-width:130px;margin:0;">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-control form-select">
+            <option value="">All</option>
+            <option value="active"   <?= $status === 'active'   ? 'selected' : '' ?>>Active</option>
+            <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Hidden</option>
+          </select>
+        </div>
+        <div class="adm-filter-actions">
+          <button type="submit" class="btn btn-primary">Filter</button>
+          <a href="<?= url('admin/products.php') ?>" class="btn btn-ghost">Clear</a>
+          <a href="<?= url('admin/product-edit.php') ?>" class="btn btn-secondary">+ Add Product</a>
+        </div>
+      </form>
+    </div>
+  </div>
 
       <!-- ── Product table ── -->
       <div class="card">
@@ -91,7 +83,8 @@ $categories = Category::getAll();
             <?= $search ? ' matching "'.e($search).'"' : '' ?>
           </h3>
         </div>
-        <div class="table-wrap">
+        <!-- Desktop Table (>= 768px) -->
+        <div class="table-wrap product-desktop-table">
           <table class="dc-table">
             <thead>
               <tr>
@@ -168,6 +161,72 @@ $categories = Category::getAll();
           </table>
         </div>
 
+        <!-- Mobile Products Cards View (< 768px) with Direct Action Buttons -->
+        <div class="product-mobile-cards">
+          <?php if (empty($products)): ?>
+            <div class="text-muted text-center" style="padding:28px;">No products found.</div>
+          <?php else: ?>
+            <?php foreach ($products as $p):
+              $variants = Product::getVariants((int)$p['id']);
+              $stock = (int)$p['total_stock'];
+              $minPrice = !empty($variants) ? min(array_column($variants, 'selling_price')) : null;
+            ?>
+            <div class="category-mobile-card">
+              <div class="category-card-top">
+                <div class="category-card-thumb">
+                  <?php if ($p['primary_image']): ?>
+                    <img src="<?= e(imageUrl($p['primary_image'])) ?>" alt="<?= e($p['name']) ?>">
+                  <?php else: ?>
+                    <span class="cat-icon-fallback">🛍</span>
+                  <?php endif; ?>
+                </div>
+                <div class="category-card-main">
+                  <div class="category-card-name">
+                    <a href="<?= url('admin/product-edit.php?id=' . (int)$p['id']) ?>" style="color:inherit;text-decoration:none;">
+                      <?= e($p['name']) ?>
+                    </a>
+                    <?php if ($p['is_featured']): ?>
+                      <span class="badge badge-yellow" style="font-size:0.65rem;margin-left:4px;">★ Featured</span>
+                    <?php endif; ?>
+                  </div>
+                  <div class="category-card-parent"><?= e($p['category_name']) ?> &bull; <?= count($variants) ?> variants</div>
+                </div>
+                <div class="category-card-status">
+                  <span class="badge badge-<?= $p['is_active'] ? 'success' : 'neutral' ?>">
+                    <?= $p['is_active'] ? 'Active' : 'Hidden' ?>
+                  </span>
+                </div>
+              </div>
+
+              <div class="category-card-meta">
+                <div class="cat-meta-pill">
+                  <span class="cat-meta-label">Stock:</span>
+                  <span class="cat-meta-val" <?= $stock <= 10 ? 'style="color:var(--dc-warning);"' : '' ?>><?= number_format($stock) ?>g</span>
+                </div>
+                <div class="cat-meta-pill">
+                  <span class="cat-meta-label">Price:</span>
+                  <span class="cat-meta-val"><?= $minPrice !== null ? formatINR((float)$minPrice) : '—' ?></span>
+                </div>
+              </div>
+
+              <div class="category-card-actions">
+                <a href="<?= url('admin/product-edit.php?id=' . (int)$p['id']) ?>" class="btn btn-outline btn-sm">
+                  ✏️ Edit
+                </a>
+                <a href="<?= url('admin/products.php?action=toggle&id=' . (int)$p['id'] . '&_token=' . urlencode(csrfToken())) ?>"
+                   class="btn btn-secondary btn-sm"
+                   onclick="return confirm('Toggle \'<?= e(addslashes($p['name'])) ?>\'?')">
+                  <?= $p['is_active'] ? '👁️ Hide' : '👁️ Show' ?>
+                </a>
+                <a href="<?= url('product.php?slug=' . urlencode($p['slug'])) ?>" target="_blank" class="btn btn-ghost btn-sm" title="View on store">
+                  🌐 Store
+                </a>
+              </div>
+            </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+
         <!-- Pagination -->
         <?php if ($lastPage > 1): ?>
         <div style="display:flex;justify-content:center;gap:6px;padding:16px;">
@@ -179,9 +238,5 @@ $categories = Category::getAll();
         <?php endif; ?>
       </div>
 
-    </div>
-  </div>
-</div>
-<script src="<?= asset('js/main.js') ?>" defer></script>
-</body>
-</html>
+    </div><!-- /admin-content -->
+<?php require_once __DIR__ . '/partials/page-end.php'; ?>
